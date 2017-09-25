@@ -1,0 +1,8 @@
+wheel
+jinja2
+flask
+flask-wtf
+requests
+pymongo
+six
+raven[flask]
