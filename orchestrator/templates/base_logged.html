@@ -50,7 +50,7 @@
 
         <li>
             <a href="javascript:;" data-toggle="collapse" data-target="#jobs-ul" class="" aria-expanded="true"><i class="fa fa-file-o fa-fw"></i> Jobs <i class="fa fa-fw fa-caret-down"></i></a>
-            <ul class="nav nav-second-level"id="jobs-ul">
+            <ul class="nav nav-second-level" id="jobs-ul">
               <li><a href="{{ url_for('templates') }}"><i class="fa fa-magic fa-fw fa-lg"></i> Playbooks</a></li>
               <li><a href="{{ url_for('jobs') }}"><i class="fa fa-history fa-fw fa-lg"></i> Jobs history</a></li>
               <li><a href="{{ url_for('wip') }}"><i class="fa fa-retweet fa-fw fa-lg"></i> Scheduled Jobs</a></li>
@@ -60,7 +60,7 @@
 
         <li>
             <a href="javascript:;" data-toggle="collapse" data-target="#execute-ul" class="" aria-expanded="true"><i class="fa fa-rub fa-fw"></i> Execute <i class="fa fa-fw fa-caret-down"></i></a>
-            <ul class="nav nav-second-level"id="execute-ul">
+            <ul class="nav nav-second-level" id="execute-ul">
               <li><a href="{{ url_for('run') }}"><i class="fa fa-terminal fa-fw fa-lg"></i> Run module</a></li>
               <li><a href="{{ url_for('wip') }}"><i class="fa fa-list-alt fa-fw fa-lg"></i> Inventory / Reporting</a></li>
             </ul>
@@ -68,9 +68,29 @@
 
         <li>
             <a href="javascript:;" data-toggle="collapse" data-target="#debug-ul" class="" aria-expanded="true"><i class="fa fa-wrench fa-fw"></i> Debug <i class="fa fa-fw fa-caret-down"></i></a>
-            <ul class="nav nav-second-level"id="debug-ul">
-              <li><a href="{{ url_for('debug') }}"><i class="fa fa-bar-chart-o fa-fw"></i> Debug Nodes</a></li>
+            <ul class="nav nav-second-level" id="debug-ul">
+              <li>
+                <a href="{{ url_for('debug') }}">
+                  <i class="fa fa-bar-chart-o fa-fw"></i> Debug Nodes
+                </a>
+              </li>
             </ul>
+        </li>
+
+        <li>
+          <a href="javascript:;" data-toggle="collapse" data-target="#topo-ul" class="" aria-expanded="true"><i class="fa fa-sitemap fa-fw"></i> Topo <i class="fa fa-fw fa-caret-down"></i></a>
+          <ul class="nav nav-second-level" id="topo-ul">
+            <li>
+              <a href="{{ url_for('traffic_path') }}">
+                <i class="fa fa-check-square fa-fw fa-lg"></i> Traffic path
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('control_path') }}">
+                <i class="fa fa-rocket fa-fw fa-lg"></i> Control path
+              </a>
+            </li>
+          </ul>
         </li>
       </ul>
 

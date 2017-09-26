@@ -447,3 +447,59 @@ def format_argument(arguments, sort_key):
 @app.template_filter("is_string")
 def format_argument(instance):
     return isinstance(instance, string_types)
+
+@app.route('/topo/traffic_path')
+@login_required
+def traffic_path():
+  return render_template('traffic_path.html', isTopo=True)
+
+
+
+from apscheduler.schedulers.background import BackgroundScheduler
+from bs4 import BeautifulSoup, SoupStrainer
+
+import datetime, subprocess, logging
+
+log = logging.getLogger('apscheduler.executors.default')
+log.setLevel(logging.INFO)  # DEBUG
+
+fmt = logging.Formatter('%(levelname)s:%(name)s:%(message)s')
+h = logging.StreamHandler()
+h.setFormatter(fmt)
+log.addHandler(h)
+
+ike_data_list = []
+ike_remote_address = []
+def run_script():
+  content = subprocess.check_output("python getVPNinfo.py", shell=True)
+  # content = open('mock.txt', 'r')
+  data = BeautifulSoup(content, "html.parser")
+
+  ike_data = data.find_all('rpc-reply')[0]
+  ipsec_data = data.find_all('rpc-reply')[1]
+
+  node_data = ike_data.find_all('ike-security-associations')
+  
+  global ike_data_list
+  global ike_remote_address
+  for node in node_data:
+    single_ike_data = {
+      'remote_address': node.find('ike-sa-remote-address').string,
+      'index': node.find('ike-sa-index').string,
+      'state': node.find('ike-sa-state').string,
+      'initiator_cookie': node.find('ike-sa-initiator-cookie').string,
+      'responder_cookie': node.find('ike-sa-responder-cookie').string,
+      'exchange_type': node.find('ike-sa-exchange-type').string,
+    }
+    if single_ike_data['remote_address'] not in ike_remote_address:
+      ike_remote_address.append(single_ike_data['remote_address'])
+      ike_data_list.append(single_ike_data)
+
+@app.route('/vpn_info')
+def getVpnInfo():
+  return jsonify(data=ike_data_list, err_msg="success")
+
+def timer_mission():
+  scheduler = BackgroundScheduler()
+  scheduler.add_job(run_script, 'interval', start_date=datetime.datetime.now() + datetime.timedelta(seconds=1), minutes=15)
+  scheduler.start()

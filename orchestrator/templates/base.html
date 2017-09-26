@@ -20,7 +20,9 @@
 
 
     <!-- Page Specific CSS -->
-
+    {% if isTopo %}
+    <link rel="stylesheet" href="{{url_for('static', filename='css/topo.css') }}">
+    {% endif %}
   </head>
 
   <body>
