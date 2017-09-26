@@ -1,2 +1,4 @@
 -r _requirements.txt
 werkzeug
+flask_admin
+flask_sqlalchemy
