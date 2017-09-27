@@ -50,7 +50,7 @@ class Probe(db.Model):
         self.test_interval = test_interval
     
     # def __repr__(self):
-    #     return '<owner %r , test_name %r, target %r, test_interval %r>' % self.owner, % self.test_name, % self.target, % self.test_interval
+        # return '<owner %r , test_name %r, target %r, test_interval %r>' % self.owner, % self.test_name, % self.target, % self.test_interval
 
 class Templates(db.Model):
     __tablename__ = 'templates'
@@ -66,4 +66,26 @@ class Templates(db.Model):
         self.name = name
     
     # def __repr__(self):
-    #     return '<name %r, description %r, target %r, function %r, expr_form %r, args %r' % self.name, % self.description, % self.target, % self.expr_form, % self.function, % self.args
+    #     return '<name %r, description %r, target %r, function %r, expr_form %r, args %r>' % self.name, % self.description, % self.target, % self.expr_form, % self.function, % self.args
+
+class VPN(db.Model):
+    __tablename__ = 'VPN'
+
+    name = db.Column(db.String(255), primary_key = True)
+    network_segment = db.Column(db.String(255), nullable = False)
+    dh_group = db.Column(db.String(255) , nullable = False)
+    authentication_algorithm = db.Column(db.String(30), nullable = False)
+    encryption_algorithm = db.Column(db.String(30), nullable = False)
+    pre_shared_key = db.Column(db.String(30), nullable = False)
+    ipsec_protocol = db.Column(db.String(30), nullable = False)
+
+    def __init__(self,name,network_segment,dh_group,authentication_algorithm,pre_shared_key,ipsec_protocol):
+        self.name = name
+        self.network_segment = network_segment
+        self.dh_group = dh_group
+        self.authentication_algorithm = authentication_algorithm
+        self.pre_shared_key = pre_shared_key
+        self.ipsec_protocol = ipsec_protocol
+    
+    def __repr__(self):
+        return '<name %r>' % self.name
