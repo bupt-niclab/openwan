@@ -227,7 +227,7 @@ def add_template():
     if form.validate_on_submit():
         master_config = client.run('config.values', client="wheel")['data']['return']
 
-        BLACKLIST_ARGS = ('csrf_token', 'tgt', 'fun', 'expr_form', 'name', 'description')
+        BLACKLIST_ARGS = ('csrf_token', 'tgt', 'fun', 'expr_form', 'name', 'description','owner')
         args = get_filtered_post_arguments(BLACKLIST_ARGS)
 
         templates = master_config.get('templates', {})
@@ -503,3 +503,32 @@ def timer_mission():
   scheduler = BackgroundScheduler()
   scheduler.add_job(run_script, 'interval', start_date=datetime.datetime.now() + datetime.timedelta(seconds=1), minutes=15)
   scheduler.start()
+
+
+@app.route("/templates/probe/new", methods = ['GET' , 'POST'])
+@login_required
+def add_probe_template():
+    form = NewTemplateForm()
+    if form.validate_on_submit():
+       master_config = client.run('config.values' , client = "wheel")['data']['return']
+
+       BLACKLIST_ARGS = ('owner','test-name','probe-type','data-size','data-fill','port',
+       'dscp-code-point','hardware-timestamp','history-size','moving-average-size','probe-count',
+       'probe-interval','source-address','target','test-interval')
+       args = get_filtered_post_arguments(BLACKLIST_ARGS)
+
+       templates = master_config.get('templates', {})
+    #    print templates
+       templates[form.owner.data.strip()] = {
+           'test-name':form.test-name.data.strip(),
+           'target':form.target.data.strip(),
+           'test-interval':form.test-interval.data.strip()
+       }
+       client.run('config.apply', client="wheel",key="templates",value=templates)
+
+       master_config = client.run('config.values', client = "wheel")
+
+       flash('Template {0} has been successfully saved'.format(form.owner.data.strip()))
+
+       return redirect(url_for('templates'))
+    return render_template("add_probe_template.html",form = form)
