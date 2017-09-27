@@ -14,7 +14,7 @@ if host == '0.0.0.0':
     print ("""Please be adviced that controller is running in debug mode and """
            """listening to 0.0.0.0 which is very dangerous. If you're not """
            """100% hundred sure of what to do, exit now.""")
-timer_mission()
+# timer_mission()
 app.run(debug=True, host='0.0.0.0')
 
 

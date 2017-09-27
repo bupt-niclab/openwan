@@ -17,3 +17,8 @@
 #contextmenu li a:hover {
   background: #fff;
 }
+
+.container-fluid {
+  position: relative;
+  overflow-x: scroll; 
+}

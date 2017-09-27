@@ -22,6 +22,11 @@ $(document).ready(function(){
   menuItem = menuList.find('a');
   
   menuItem.click(function() {
+    if($(this)[0].id === 'config-template') {
+      alert('配置成功');
+    } else {
+      alert('查看成功');
+    }
     menuList.hide();
   });
 
@@ -31,23 +36,27 @@ $(document).ready(function(){
     }
   });
 
-  getNodes(function(nodeList) {
-    nodeList.forEach(function(node){
-      node.x = Math.random() * 1000,
-      node.y = Math.random() * 500,
-      node.w = 40,
-      node.h = 40,
-      node.text = node.remote_address,
-      node.img = 'vpn.png',
-      node.dragable = true
-    })
-    var addedNodeList = createNodes(nodeList, scene);
-    for (var i = 0, j = addedNodeList.length;i < j;i++) {
-      createLink(addedNodeList[i], local, '', scene);
-    }
-  });
-
-})
+  // getNodes(function(nodeList) {
+  //   nodeList.forEach(function(node){
+  //     node.x = Math.random() * 1000,
+  //     node.y = Math.random() * 500,
+  //     node.w = 40,
+  //     node.h = 40,
+  //     node.text = node.remote_address,
+  //     node.img = 'vpn.png',
+  //     node.dragable = true
+  //   })
+  //   var addedNodeList = createNodes(nodeList, scene);
+  //   for (var i = 0, j = addedNodeList.length;i < j;i++) {
+  //     createLink(addedNodeList[i], local, '', scene);
+  //   }
+  // });
+  var nodeList = simulateNodes();
+  var addedNodeList = createNodes(nodeList, scene);
+  for (var i = 0, j = addedNodeList.length;i < j;i++) {
+    createLink(addedNodeList[i], local, '', scene);
+  }
+});
 
 // 模拟生成节点
 function simulateNodes () {
@@ -55,10 +64,12 @@ function simulateNodes () {
 
   for (var i = 0;i < 5; i++) {
     var singleNode = {
-      x: Math.random() * 1000,
+      x: Math.random() * 800,
       y: Math.random() * 500,
       w: 40,
       h: 40,
+      img: 'vpn.png',
+      dragable: true,
       text: 'Node ' + i
     }
     nodeList.push(singleNode);
@@ -167,9 +178,10 @@ function makeNodeEditable (scene) {
 // 右键弹出菜单
 function handler (event) {
   if (event.button === 2) {
+    console.log(event);
     $('#contextmenu').css({
-      top: event.pageY,
-      left: event.pageX
+      top: event.layerY,
+      left: event.layerX + 40
     }).show();
   }
 }
