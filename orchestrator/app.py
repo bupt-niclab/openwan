@@ -272,7 +272,49 @@ matchers = [
     ('range', 'Range'),
     ('compound', 'Compound')
 ]
+probe_type = [
+    ('0','0'),
+    ('1','1'),
+    ('2','2'),
+    ('3','3'),
+    ('4','4'),
+    ('5','5'),
+    ('6','6')
+]
 
+hardware_time = [
+    ('True', 'True'),
+    ('False', 'False')
+]
+
+dh_group = [
+    ('group1', 'group1'),
+    ('group2', 'group2')，
+    ('group5', 'group5')
+]
+
+authentication_algorithm = [
+    ('md5', 'md5'),
+    ('sha-256','sha-256'),
+    ('sha1','sha1')
+]
+
+encryption_algorithm = [
+    ('3des-cbc','3des-cbc'),
+    ('aes-128-cbc','aes-128-cbc'),
+    ('aes-192-cbc', 'aes-192-cbc'),
+    ('aes-256-cbc','aes-256-cbc'),
+    ('des-cbc','des-cbc')
+]
+
+pre_shared_key = [
+    ('ascii-text $ABC123','ascii-text $ABC123')
+]
+
+ipsec_protocol = [
+    ('ah','ah'),
+    ('esp','esp')
+]
 class RunForm(Form):
     expr_form = SelectField('matcher', choices=matchers)
     tgt = StringField('target', validators=[DataRequired()])
@@ -282,12 +324,12 @@ class RunForm(Form):
 class ProbeForm(Form):
     owner = StringField('owner', validators=[DataRequired()])#32字符
     test_name = StringField('test-name', validators = [DataRequired])#32字符
-    probe_type = SelectField('probe-type', choices=matchers)#0-6
+    probe_type = SelectField('probe-type', choices=probe_type)#0-6
     data_size = StringField('data-size', validators=[DataRequired])#0-65507
     data_fill = StringField('datafill', validators=[DataRequired])#1-800h 16进制 和data-size要都有或都没有
     destination_port = StringField('destination-port', validators=[DataRequired])#7 或 49160-65535
     dscp_code_point = StringField('dscp-code-point', validators=[DataRequired])#6bits
-    hardware_time = SelectField('hardware-timestamp', choices=matchers)#yes or no
+    hardware_time = SelectField('hardware-timestamp', choices=hardware_time)#yes or no
     history_size = StringField('history-size',validators=[DataRequired])#0-255
     moving_average_size = StringField('moving-average-size', validators=[DataRequired])#0-255
     probe_count = StringField('probe-count', validators=[DataRequired])#1-15
@@ -299,11 +341,11 @@ class ProbeForm(Form):
 class VPNForm(Form):
     name = StringField('name', validators=[DataRequired])#必填
     network_segment = StringField('network-segment', validators=[DataRequired])#必填
-    dh_group = SelectField('dh-group',choices=matchers)
-    authentication_algorithm = SelectField('authentication-algorithm',choices=matchers)
+    dh_group = SelectField('dh-group',choices=dh_group)
+    authentication_algorithm = SelectField('authentication-algorithm',choices=authentication_algorithm)
     encryption_algorithm = SelectField('encryption-algorithm',choices=matchers)
-    pre_shared_key = SelectField('pre-shared-key',validators=matchers)
-    ipsec_protocol = SelectField('ipsec-protocol',choices=matchers)
+    pre_shared_key = SelectField('pre-shared-key',choices=pre_shared_key)
+    ipsec_protocol = SelectField('ipsec-protocol',choices=ipsec_protocol)
 
 class NewTemplateForm(RunForm):
     name = StringField('name', validators=[DataRequired()])
