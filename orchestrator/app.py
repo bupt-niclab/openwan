@@ -289,7 +289,7 @@ hardware_time = [
 
 dh_group = [
     ('group1', 'group1'),
-    ('group2', 'group2')，
+    ('group2', 'group2'),
     ('group5', 'group5')
 ]
 
