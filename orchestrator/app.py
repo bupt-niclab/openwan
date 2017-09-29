@@ -14,6 +14,10 @@ from .utils import format_arguments, Call, validate_permissions, REQUIRED_PERMIS
 from .utils import get_filtered_post_arguments
 from flask_admin import Admin
 from . import settings
+from flask_sqlalchemy import sqlalchemy
+from models import Templates
+from models import db
+from flask.ext.sqlalchemy import sqlalchemy
 
 
 
@@ -244,7 +248,7 @@ def add_template():
         client.run('config.apply', client="wheel", key="templates", value=templates)
 
         master_config = client.run('config.values', client="wheel")
-
+        
         flash('Template {0} has been successfully saved'.format(form.name.data.strip()))
 
         return redirect(url_for('templates'))
@@ -576,296 +580,15 @@ def timer_mission():
   scheduler.start()
 
 
-@app.route("/templates/probe/new_http_get", methods = ['GET' , 'POST'])
+@app.route('/aaa', methods = ['GET'])
 @login_required
-def add_http_get_template():
-    form = ProbeForm()
-    if form.validate_on_submit():
-       master_config = client.run('config.values' , client = "wheel")['data']['return']
+def add_probe_template():
+    # new_tmp = Templates('test_tem')
+    tem = db.session.query(Templates).first()
+    tem.name = 'abf'
+    db.session.add(new_tmp)
+    db.session.commit()
 
-       BLACKLIST_ARGS = ('owner','test-name','probe-type',
-       'dscp-code-point','history-size','moving-average-size','probe-count',
-       'probe-interval','source-address','target','test-interval')
-       args = get_filtered_post_arguments(BLACKLIST_ARGS)
+    tmp_query = Templates.query.all()
 
-       templates = master_config.get('templates', {})
-    #    print templates
-       templates[form.owner.data.strip()] = {
-           'owner':form.owner.data.strip(),
-           'test-name':form.test_name.data.strip(),
-           'probe-type':form.probe_type.data.strip(),
-           'dscp-code-point':form.dscp_code_point.data.strip(),
-           'history-size':form.history_size.data.strip(),
-           'moving-average-size':form.moving_average_size.data.strip(),
-           'probe-count':form.probe_count.data.strip(),
-           'probe-interval':form.probe_interval.data.strip(),
-           'source-address':form.source_address.data.strip(),
-           'target':form.target.data.strip(),
-           'test-interval':form.test_interval.data.strip()
-       }
-       client.run('config.apply', client="wheel",key="templates",value=templates)
-
-       master_config = client.run('config.values', client = "wheel")
-
-       flash('Template {0} has been successfully saved'.format(form.owner.data.strip()))
-
-       return redirect(url_for('templates'))
-    return render_template("add_probe_template.html",form = form)
-
-@app.route("/templates/probe/new_http_metadata_get", methods = ['GET' , 'POST'])
-@login_required
-def add_http_metadat_get_template():
-    form = ProbeForm()
-    if form.validate_on_submit():
-       master_config = client.run('config.values' , client = "wheel")['data']['return']
-
-       BLACKLIST_ARGS = ('owner','test-name','probe-type',
-       'dscp-code-point','history-size','moving-average-size','probe-count',
-       'probe-interval','source-address','target','test-interval')
-       args = get_filtered_post_arguments(BLACKLIST_ARGS)
-
-       templates = master_config.get('templates', {})
-    #    print templates
-       templates[form.owner.data.strip()] = {
-           'owner':form.owner.data.strip(),
-           'test-name':form.test_name.data.strip(),
-           'probe-type':form.probe_type.data.strip(),
-           'dscp-code-point':form.dscp_code_point.data.strip(),
-           'history-size':form.history_size.data.strip(),
-           'moving-average-size':form.moving_average_size.data.strip(),
-           'probe-count':form.probe_count.data.strip(),
-           'probe-interval':form.probe_interval.data.strip(),
-           'source-address':form.source_address.data.strip(),
-           'target':form.target.data.strip(),
-           'test-interval':form.test_interval.data.strip()
-       }
-       client.run('config.apply', client="wheel",key="templates",value=templates)
-
-       master_config = client.run('config.values', client = "wheel")
-
-       flash('Template {0} has been successfully saved'.format(form.owner.data.strip()))
-
-       return redirect(url_for('templates'))
-    return render_template("add_probe_template.html",form = form)
-
-@app.route("/templates/probe/new_icmp_ping", methods = ['GET' , 'POST'])
-@login_required
-def add_icmp_ping_template():
-    form = ProbeForm()
-    if form.validate_on_submit():
-       master_config = client.run('config.values' , client = "wheel")['data']['return']
-
-       BLACKLIST_ARGS = ('owner','test-name','probe-type','data-fill','data-size',
-       'dscp-code-point','hardware-timestamp','history-size','moving-average-size','probe-count',
-       'probe-interval','source-address','target','test-interval')
-       args = get_filtered_post_arguments(BLACKLIST_ARGS)
-
-       templates = master_config.get('templates', {})
-    #    print templates
-       templates[form.owner.data.strip()] = {
-           'owner':form.owner.data.strip(),
-           'test-name':form.test_name.data.strip(),
-           'probe-type':form.probe_type.data.strip(),
-           'data-fill':form.data_fill.data.strip(),
-           'data-size':form.data_size.data.strip(),
-           'dscp-code-point':form.dscp_code_point.data.strip(),
-           'hardware-timestamp':form.hardware_time.data.strip(),
-           'history-size':form.history_size.data.strip(),
-           'moving-average-size':form.moving_average_size.data.strip(),
-           'probe-count':form.probe_count.data.strip(),
-           'probe-interval':form.probe_interval.data.strip(),
-           'source-address':form.source_address.data.strip(),
-           'target':form.target.data.strip(),
-           'test-interval':form.test_interval.data.strip()
-       }
-       client.run('config.apply', client="wheel",key="templates",value=templates)
-
-       master_config = client.run('config.values', client = "wheel")
-
-       flash('Template {0} has been successfully saved'.format(form.owner.data.strip()))
-
-       return redirect(url_for('templates'))
-    return render_template("add_probe_template.html",form = form)
-
-@app.route("/templates/probe/new_icmp_ping_timestamp", methods = ['GET' , 'POST'])
-@login_required
-def add_icmp_ping_timestamp_template():
-    form = ProbeForm()
-    if form.validate_on_submit():
-       master_config = client.run('config.values' , client = "wheel")['data']['return']
-
-       BLACKLIST_ARGS = ('owner','test-name','probe-type','data-fill','data-size',
-       'dscp-code-point','hardware-timestamp','history-size','moving-average-size','probe-count',
-       'probe-interval','source-address','target','test-interval')
-       args = get_filtered_post_arguments(BLACKLIST_ARGS)
-
-       templates = master_config.get('templates', {})
-    #    print templates
-       templates[form.owner.data.strip()] = {
-           'owner':form.owner.data.strip(),
-           'test-name':form.test_name.data.strip(),
-           'probe-type':form.probe_type.data.strip(),
-           'data-fill':form.data_fill.data.strip(),
-           'data-size':form.data_size.data.strip(),
-           'dscp-code-point':form.dscp_code_point.data.strip(),
-           'hardware-timestamp':form.hardware_time.data.strip(),
-           'history-size':form.history_size.data.strip(),
-           'moving-average-size':form.moving_average_size.data.strip(),
-           'probe-count':form.probe_count.data.strip(),
-           'probe-interval':form.probe_interval.data.strip(),
-           'source-address':form.source_address.data.strip(),
-           'target':form.target.data.strip(),
-           'test-interval':form.test_interval.data.strip()
-       }
-       client.run('config.apply', client="wheel",key="templates",value=templates)
-
-       master_config = client.run('config.values', client = "wheel")
-
-       flash('Template {0} has been successfully saved'.format(form.owner.data.strip()))
-
-       return redirect(url_for('templates'))
-    return render_template("add_probe_template.html",form = form)
-
-@app.route("/templates/probe/new_tcp_ping", methods = ['GET' , 'POST'])
-@login_required
-def add_tcp_ping_template():
-    form = ProbeForm()
-    if form.validate_on_submit():
-       master_config = client.run('config.values' , client = "wheel")['data']['return']
-
-       BLACKLIST_ARGS = ('owner','test-name','probe-type','destination-port',
-       'dscp-code-point','history-size','moving-average-size','probe-count',
-       'probe-interval','source-address','target','test-interval')
-       args = get_filtered_post_arguments(BLACKLIST_ARGS)
-
-       templates = master_config.get('templates', {})
-    #    print templates
-       templates[form.owner.data.strip()] = {
-           'owner':form.owner.data.strip(),
-           'test-name':form.test_name.data.strip(),
-           'destination-port':form.destination_port.data.strip(),
-           'probe-type':form.probe_type.data.strip(),
-           'dscp-code-point':form.dscp_code_point.data.strip(),
-           'history-size':form.history_size.data.strip(),
-           'moving-average-size':form.moving_average_size.data.strip(),
-           'probe-count':form.probe_count.data.strip(),
-           'probe-interval':form.probe_interval.data.strip(),
-           'source-address':form.source_address.data.strip(),
-           'target':form.target.data.strip(),
-           'test-interval':form.test_interval.data.strip()
-       }
-       client.run('config.apply', client="wheel",key="templates",value=templates)
-
-       master_config = client.run('config.values', client = "wheel")
-
-       flash('Template {0} has been successfully saved'.format(form.owner.data.strip()))
-
-       return redirect(url_for('templates'))
-    return render_template("add_probe_template.html",form = form)
-
-@app.route("/templates/probe/new_udp_ping", methods = ['GET' , 'POST'])
-@login_required
-def add_udp_ping_template():
-    form = ProbeForm()
-    if form.validate_on_submit():
-       master_config = client.run('config.values' , client = "wheel")['data']['return']
-
-       BLACKLIST_ARGS = ('owner','test-name','probe-type','destination-port',
-       'dscp-code-point','history-size','moving-average-size','probe-count',
-       'probe-interval','source-address','target','test-interval')
-       args = get_filtered_post_arguments(BLACKLIST_ARGS)
-
-       templates = master_config.get('templates', {})
-    #    print templates
-       templates[form.owner.data.strip()] = {
-           'owner':form.owner.data.strip(),
-           'test-name':form.test_name.data.strip(),
-           'probe-type':form.probe_type.data.strip(),
-           'destination-port':form.destination_port.data.strip(),
-           'dscp-code-point':form.dscp_code_point.data.strip(),
-           'history-size':form.history_size.data.strip(),
-           'moving-average-size':form.moving_average_size.data.strip(),
-           'probe-count':form.probe_count.data.strip(),
-           'probe-interval':form.probe_interval.data.strip(),
-           'source-address':form.source_address.data.strip(),
-           'target':form.target.data.strip(),
-           'test-interval':form.test_interval.data.strip()
-       }
-       client.run('config.apply', client="wheel",key="templates",value=templates)
-
-       master_config = client.run('config.values', client = "wheel")
-
-       flash('Template {0} has been successfully saved'.format(form.owner.data.strip()))
-
-       return redirect(url_for('templates'))
-    return render_template("add_probe_template.html",form = form)
-
-@app.route("/templates/probe/new_udp_ping_timestamp", methods = ['GET' , 'POST'])
-@login_required
-def add_udp_ping_timestamp_template():
-    form = ProbeForm()
-    if form.validate_on_submit():
-       master_config = client.run('config.values' , client = "wheel")['data']['return']
-
-       BLACKLIST_ARGS = ('owner','test-name','probe-type','destination-port',
-       'dscp-code-point','history-size','moving-average-size','probe-count',
-       'probe-interval','source-address','target','test-interval')
-       args = get_filtered_post_arguments(BLACKLIST_ARGS)
-
-       templates = master_config.get('templates', {})
-    #    print templates
-       templates[form.owner.data.strip()] = {
-           'owner':form.owner.data.strip(),
-           'test-name':form.test_name.data.strip(),
-           'probe-type':form.probe_type.data.strip(),
-           'destination-port':form.destination_port.data.strip(),
-           'dscp-code-point':form.dscp_code_point.data.strip(),
-           'history-size':form.history_size.data.strip(),
-           'moving-average-size':form.moving_average_size.data.strip(),
-           'probe-count':form.probe_count.data.strip(),
-           'probe-interval':form.probe_interval.data.strip(),
-           'source-address':form.source_address.data.strip(),
-           'target':form.target.data.strip(),
-           'test-interval':form.test_interval.data.strip()
-       }
-       client.run('config.apply', client="wheel",key="templates",value=templates)
-
-       master_config = client.run('config.values', client = "wheel")
-
-       flash('Template {0} has been successfully saved'.format(form.owner.data.strip()))
-
-       return redirect(url_for('templates'))
-    return render_template("add_probe_template.html",form = form)
-
-@app.route("/templates/VPn/new_vpn_static", methods = ['GET' , 'POST'])
-@login_required
-def add_Vpn_static_template():
-    form = VPNForm()
-    if form.validate_on_submit():
-       master_config = client.run('config.values' , client = "wheel")['data']['return']
-
-       BLACKLIST_ARGS = ('name','network-segment','dh-group','authentication-algorithm',
-       'encryption-algorithm','pre-shared-key','ipsec-protocol')
-       args = get_filtered_post_arguments(BLACKLIST_ARGS)
-
-       templates = master_config.get('templates', {})
-    #    print templates
-       templates[form.owner.data.strip()] = {
-           'name':form.name.data.strip(),
-           'network-segment':form.network_segment.data.strip(),
-           'dh-groupe':form.dh_group.data.strip(),
-           'authentication-algorithm':form.authentication_algorithm.data.strip(),
-           'encryption-algorithm':form.encryption_algorithm.data.strip(),
-           'pre-shared-key':form.pre_shared_key.data.strip(),
-           'ipsec-protocol':form.ipsec_protocol.data.strip(),
-           
-       }
-       client.run('config.apply', client="wheel",key="templates",value=templates)
-
-       master_config = client.run('config.values', client = "wheel")
-
-       flash('Template {0} has been successfully saved'.format(form.owner.data.strip()))
-
-       return redirect(url_for('templates'))
-    return render_template("add_VPN_template.html",form = form)
-
+    return jsonify(errmsg='success')

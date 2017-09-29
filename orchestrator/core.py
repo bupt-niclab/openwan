@@ -9,6 +9,7 @@ reload(sys)  # Reload is a hack
 sys.setdefaultencoding('UTF8')
 from flask import current_app
 from .utils import get_job_level, get_job_human_status, transform_arguments
+from flask_sqlalchemy import sqlalchemy
 
 
 class ExpiredToken(Exception):
@@ -220,6 +221,7 @@ class HTTPSaltStackClient(object):
 
         headers = {'accept': 'application/json', 'X-Auth-Token': token,
                    'content-type': 'application/json'}
+        # tmp = templates.query.
         r = self.session.post(self.endpoint, data=json.dumps(data),
                               headers=headers, verify=self.verify_ssl)
         print r

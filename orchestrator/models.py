@@ -4,12 +4,17 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, url_for
 from flask_restless import APIManager
 from flask_sqlalchemy import SQLAlchemy
+import sqlite3
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///template.sqlite'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = 'True'
 db = SQLAlchemy(app)
+
+datafile = 'template.sqlite'
+# datadir = ''
+conn = sqlite3.connect(db)
 
 
 
@@ -22,7 +27,7 @@ class Probe(db.Model):
     # content = db.Column(db.String(255), nullable=False)
     owner = db.Column(db.String(32), primary_key = True)
     test_name = db.Column(db.String(32), primary_key = True)
-    probe_type = db.Column(db.Integer, nullable = True)
+    probe_type = db.Column(db.String(3), nullable = True)
     data_fill = db.Column(db.String(3), nullable = True)
     data_size = db.Column(db.String(5), nullable = True)
     destination_port = db.Column(db.String(5), nullable = True)
@@ -43,9 +48,22 @@ class Probe(db.Model):
     # def url(self):
     #     return url_for('add_http_get_template', article_id=self.id)
 
-    def __init__(self,owner,test_name,target,test_interval):
+    def __init__(self,owner,test_name,probe_type,data_fill,data_size,
+    destination_port,dscp_code_point,hardware_time,history_size,moving_average_size,
+    probe_count,probe_interval,source_address,target,test_interval):
         self.owner = owner
         self.test_name = test_name
+        self.probe_type = probe_type
+        self.data_fill = data_fill
+        self.data_size = data_size
+        self.destination_port = destination_port
+        self.dscp_code_point = dscp_code_point
+        self.hardware_time = hardware_time
+        self.history_size = history_size
+        self.moving_average_size = moving_average_size
+        self.probe_count = probe_count
+        self.probe_interval = probe_interval
+        self.source_address = source_address
         self.target = target
         self.test_interval = test_interval
     
@@ -62,8 +80,13 @@ class Templates(db.Model):
     expr_form = db.Column(db.String(255), nullable = True)
     args = db.Column(db.String(255), nullable = True)
 
-    def __init__(self,name):
+    def __init__(self,name,description,target,function,expr_form,args):
         self.name = name
+        self.description = description
+        self.target = target
+        self.function = function
+        self.expr_form = expr_form
+        self.args = args
     
     # def __repr__(self):
     #     return '<name %r, description %r, target %r, function %r, expr_form %r, args %r>' % self.name, % self.description, % self.target, % self.expr_form, % self.function, % self.args
@@ -79,11 +102,12 @@ class VPN(db.Model):
     pre_shared_key = db.Column(db.String(30), nullable = False)
     ipsec_protocol = db.Column(db.String(30), nullable = False)
 
-    def __init__(self,name,network_segment,dh_group,authentication_algorithm,pre_shared_key,ipsec_protocol):
+    def __init__(self,name,network_segment,dh_group,authentication_algorithm,encryption_algorithm,pre_shared_key,ipsec_protocol):
         self.name = name
         self.network_segment = network_segment
         self.dh_group = dh_group
         self.authentication_algorithm = authentication_algorithm
+        self.encryption_algorithm = encryption_algorithm
         self.pre_shared_key = pre_shared_key
         self.ipsec_protocol = ipsec_protocol
     
