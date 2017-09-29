@@ -23,7 +23,8 @@ $(document).ready(function(){
   
   menuItem.click(function() {
     if($(this)[0].id === 'config-template') {
-      alert('配置成功');
+      $('#config-template-modal').modal();
+      // alert('配置成功');
     } else {
       alert('查看成功');
     }
@@ -34,6 +35,24 @@ $(document).ready(function(){
     if (event.button === 0) {
       menuList.hide();
     }
+  });
+
+  var applyBtn = $('.apply-template');
+  var appliedTemplate = 0; // TODO:读取数据并解析该节点是否有应用模板
+  applyBtn.click(function(e){
+    // console.log($(this)[0]);
+    var thisBtn = $($(this)[0]);
+    // console.log(thisBtn);
+    if (appliedTemplate === 1) {      
+      // TODO:找到已被应用的模板，取消其按钮样式
+   
+    } else {
+      appliedTemplate = 1;
+    }
+    thisBtn.text('已应用');
+    thisBtn.attr('disabled', 'disabled'); 
+    // thisBtn.innerText = '已应用';
+    // console.log(thisBtn.dataset.templateType);
   });
 
   // getNodes(function(nodeList) {
@@ -178,7 +197,7 @@ function makeNodeEditable (scene) {
 // 右键弹出菜单
 function handler (event) {
   if (event.button === 2) {
-    console.log(event);
+    // console.log(event);
     $('#contextmenu').css({
       top: event.layerY,
       left: event.layerX + 40

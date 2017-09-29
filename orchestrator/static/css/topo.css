@@ -22,3 +22,7 @@
   position: relative;
   overflow-x: scroll; 
 }
+
+.template-table th, .template-table td{
+  text-align: center;
+}

@@ -26,6 +26,47 @@
     </ul>
   </div>
 </div>
+<div id="config-template-modal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">配置模板</h4>
+      </div>
+      <div class="modal-body">
+        <table class="table table-bordered table-hover template-table">
+          <thead>
+            <tr>
+              <th>序号</th>
+              <th>模板名称</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>VPN</td>
+              <td>
+                <button class="btn btn-primary apply-template" data-template-type="vpn">应用</button>
+              </td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>探针</td>
+              <td>
+                <button class="btn btn-primary apply-template" data-template-type="probe">应用</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" data-dismiss="modal">关闭</button>
+        <button class="btn btn-primary">确定</button>        
+      </div>
+    </div>
+  </div>
+</div>
 
 {% endblock %}
 
