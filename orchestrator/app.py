@@ -14,10 +14,11 @@ from .utils import format_arguments, Call, validate_permissions, REQUIRED_PERMIS
 from .utils import get_filtered_post_arguments
 from flask_admin import Admin
 from . import settings
-from flask_sqlalchemy import sqlalchemy
+# from flask_sqlalchemy import sqlalchemy
+from .database import db_session
 from models import Templates
-from models import db
-from flask.ext.sqlalchemy import sqlalchemy
+# from models import db
+# from flask.ext.sqlalchemy import sqlalchemy
 
 
 
@@ -584,11 +585,15 @@ def timer_mission():
 @login_required
 def add_probe_template():
     # new_tmp = Templates('test_tem')
-    tem = db.session.query(Templates).first()
+    tem = db_session.query(Templates).first()
     tem.name = 'abf'
-    db.session.add(new_tmp)
-    db.session.commit()
+    db_session.add(tem)
+    db_session.commit()
 
     tmp_query = Templates.query.all()
 
     return jsonify(errmsg='success')
+
+@app.teardown_request
+def shutdown_session(exception=None):
+  db_session.remove()

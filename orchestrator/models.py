@@ -1,45 +1,46 @@
-from flask_sqlalchemy import SQLAlchemy
+# from flask_sqlalchemy import SQLAlchemy
 # coding:utf-8
 
-from flask import Flask, url_for
-from flask_restless import APIManager
-from flask_sqlalchemy import SQLAlchemy
-import sqlite3
+# from flask import Flask, url_for
+# from flask_restless import APIManager
+# from flask_sqlalchemy import SQLAlchemy
+# import sqlite3
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///template.sqlite'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = 'True'
-db = SQLAlchemy(app)
+# app = Flask(__name__)
+# app.config['SECRET_KEY'] = 'secret'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///template.sqlite'
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = 'True'
+# db = SQLAlchemy(app)
 
-datafile = 'template.sqlite'
+# datafile = 'template.sqlite'
 # datadir = ''
-conn = sqlite3.connect(db)
+# conn = sqlite3.connect(db)
+
+from sqlalchemy import Column, Integer, String, Boolean
+from .database import Base
 
 
-
-
-class Probe(db.Model):
+class Probe(Base):
     __tablename__ = 'probe'
 
-    # id = db.Column(db.Integer, primary_key=True)
-    # title = db.Column(db.String(100), nullable=False)
-    # content = db.Column(db.String(255), nullable=False)
-    owner = db.Column(db.String(32), primary_key = True)
-    test_name = db.Column(db.String(32), primary_key = True)
-    probe_type = db.Column(db.String(3), nullable = True)
-    data_fill = db.Column(db.String(3), nullable = True)
-    data_size = db.Column(db.String(5), nullable = True)
-    destination_port = db.Column(db.String(5), nullable = True)
-    dscp_code_point = db.Column(db.String(6), nullable = True)
-    hardware_time = db.Column(db.Boolean, nullable = True)
-    history_size = db.Column(db.String(3), nullable = True)
-    moving_average_size = db.Column(db.String(3) , nullable = True)
-    probe_count = db.Column(db.String(2), nullable = True)
-    probe_interval = db.Column(db.String(3), nullable = True)
-    source_address = db.Column(db.String(30), nullable = True)
-    target = db.Column(db.String(255), nullable = False)
-    test_interval = db.Column(db.String(5), nullable = False)
+    # id = Column(Integer, primary_key=True)
+    # title = Column(String(100), nullable=False)
+    # content = Column(String(255), nullable=False)
+    owner = Column(String(32), primary_key = True)
+    test_name = Column(String(32), primary_key = True)
+    probe_type = Column(String(3), nullable = True)
+    data_fill = Column(String(3), nullable = True)
+    data_size = Column(String(5), nullable = True)
+    destination_port = Column(String(5), nullable = True)
+    dscp_code_point = Column(String(6), nullable = True)
+    hardware_time = Column(Boolean, nullable = True)
+    history_size = Column(String(3), nullable = True)
+    moving_average_size = Column(String(3) , nullable = True)
+    probe_count = Column(String(2), nullable = True)
+    probe_interval = Column(String(3), nullable = True)
+    source_address = Column(String(30), nullable = True)
+    target = Column(String(255), nullable = False)
+    test_interval = Column(String(5), nullable = False)
 
 
     def __unicode__(self):
@@ -70,15 +71,15 @@ class Probe(db.Model):
     # def __repr__(self):
         # return '<owner %r , test_name %r, target %r, test_interval %r>' % self.owner, % self.test_name, % self.target, % self.test_interval
 
-class Templates(db.Model):
+class Templates(Base):
     __tablename__ = 'templates'
 
-    name = db.Column(db.String(32), primary_key = True)
-    description = db.Column(db.String(255), nullable = True)
-    target = db.Column(db.String(255), nullable = True)
-    function = db.Column(db.String(255), nullable = True)
-    expr_form = db.Column(db.String(255), nullable = True)
-    args = db.Column(db.String(255), nullable = True)
+    name = Column(String(32), primary_key = True)
+    description = Column(String(255), nullable = True)
+    target = Column(String(255), nullable = True)
+    function = Column(String(255), nullable = True)
+    expr_form = Column(String(255), nullable = True)
+    args = Column(String(255), nullable = True)
 
     def __init__(self,name,description,target,function,expr_form,args):
         self.name = name
@@ -91,16 +92,16 @@ class Templates(db.Model):
     # def __repr__(self):
     #     return '<name %r, description %r, target %r, function %r, expr_form %r, args %r>' % self.name, % self.description, % self.target, % self.expr_form, % self.function, % self.args
 
-class VPN(db.Model):
+class VPN(Base):
     __tablename__ = 'VPN'
 
-    name = db.Column(db.String(255), primary_key = True)
-    network_segment = db.Column(db.String(255), nullable = False)
-    dh_group = db.Column(db.String(255) , nullable = False)
-    authentication_algorithm = db.Column(db.String(30), nullable = False)
-    encryption_algorithm = db.Column(db.String(30), nullable = False)
-    pre_shared_key = db.Column(db.String(30), nullable = False)
-    ipsec_protocol = db.Column(db.String(30), nullable = False)
+    name = Column(String(255), primary_key = True)
+    network_segment = Column(String(255), nullable = False)
+    dh_group = Column(String(255) , nullable = False)
+    authentication_algorithm = Column(String(30), nullable = False)
+    encryption_algorithm = Column(String(30), nullable = False)
+    pre_shared_key = Column(String(30), nullable = False)
+    ipsec_protocol = Column(String(30), nullable = False)
 
     def __init__(self,name,network_segment,dh_group,authentication_algorithm,encryption_algorithm,pre_shared_key,ipsec_protocol):
         self.name = name
