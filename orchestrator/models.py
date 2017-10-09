@@ -96,7 +96,7 @@ class VPN(Base):
     __tablename__ = 'VPN'
 
     name = Column(String(255), primary_key = True)
-    network_segment = Column(String(255), nullable = False)
+    network_segment = Column(String(255), primary_key = True)
     dh_group = Column(String(255) , nullable = False)
     authentication_algorithm = Column(String(30), nullable = False)
     encryption_algorithm = Column(String(30), nullable = False)
