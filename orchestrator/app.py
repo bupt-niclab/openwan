@@ -1,6 +1,7 @@
 #coding=utf-8
 
 import sys
+import json
 
 from functools import wraps
 from six import string_types
@@ -607,6 +608,10 @@ def add_VPN_template():
     ipsec_protocol = request.json['ipsec_protocol']
 
     tmp = VPN(VPN_name,network_segment,dh_group,authentication_algorithm,encryption_algorithm,pre_shared_key,ipsec_protocol)
+    print (tmp)
+    test = db_session.query(VPN).filter_by(name = VPN_name).first()
+    if test.name != None:
+        return jsonify(errmsg="primary key conflict", data="1")
 
     db_session.add(tmp)
     db_session.commit()
@@ -620,6 +625,8 @@ def del_VPN_template():
     VPN_name = request.json['name']
     
     tmp = db_session.query(VPN).filter_by(name = VPN_name).first()
+    if tmp.name == None:
+        return jsonify(errmsg="No such template",data='2')
 
     db_session.delete(tmp)
     db_session.commit()
