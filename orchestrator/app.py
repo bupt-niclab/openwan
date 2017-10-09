@@ -208,10 +208,15 @@ def job_result(jid):
 @app.route("/templates")
 @login_required
 def templates():
-    master_config = client.run('config.values', client="wheel")['data']['return']
-    if not master_config.get('templates'):
-        master_config['templates'] = {}
-    return render_template("templates.html", templates=master_config['templates'])
+    # master_config = client.run('config.values', client="wheel")['data']['return']
+    # if not master_config.get('templates'):
+    #     master_config['templates'] = {}
+    tmp = db_session.query(VPN).all()
+
+    # return jsonify(errmsg = "success", data = json.dumps(tmp ,default = VPN2dict))
+
+
+    return render_template("templates.html", templates=tmp)
 
 @app.route("/templates/run/<template>")
 @login_required
@@ -231,30 +236,50 @@ def run_template(template):
 @app.route("/templates/new", methods=['GET', 'POST'])
 @login_required
 def add_template():
-    form = NewTemplateForm()
-    if form.validate_on_submit():
-        master_config = client.run('config.values', client="wheel")['data']['return']
+    # form = NewTemplateForm()
+    vpn_form = VPNForm()
+    probe_form = ProbeForm()
+    if vpn_form.validate_on_submit():
+      print(vpn_form.name.data)
+      print(vpn_form.network_segment.data)
+      print(vpn_form.dh_group.data)    
+      print(vpn_form.authentication_algorithm.data)    
+      print(vpn_form.encryption_algorithm.data)              
+      tmp = VPN(vpn_form.name.data, vpn_form.network_segment.data,vpn_form.dh_group.data, vpn_form.authentication_algorithm.data,vpn_form.encryption_algorithm.data, vpn_form.pre_shared_key.data,vpn_form.ipsec_protocol.data)
+      print (tmp)
+      # test = db_session.query(VPN).filter_by(name = vpn_form.name.data).first()
+      # if test.name != None:
+      #   return jsonify(errmsg="primary key conflict", data="1")
 
-        BLACKLIST_ARGS = ('csrf_token', 'tgt', 'fun', 'expr_form', 'name', 'description','owner')
-        args = get_filtered_post_arguments(BLACKLIST_ARGS)
+      db_session.add(tmp)
+      db_session.commit()
 
-        templates = master_config.get('templates', {})
-        #print templates
-        templates[form.name.data.strip()] = {
-            'description': form.description.data.strip(),
-            'fun': form.fun.data.strip(),
-            'tgt': form.tgt.data.strip(),
-            'expr_form': form.expr_form.data.strip(),
-            'args': args}
+      return jsonify(errmsg="success", data='0')
 
-        client.run('config.apply', client="wheel", key="templates", value=templates)
+    if probe_form.validate_on_submit():
+      return jsonify(errmsg="success")      
+    #     master_config = client.run('config.values', client="wheel")['data']['return']
 
-        master_config = client.run('config.values', client="wheel")
+    #     BLACKLIST_ARGS = ('csrf_token', 'tgt', 'fun', 'expr_form', 'name', 'description','owner')
+    #     args = get_filtered_post_arguments(BLACKLIST_ARGS)
+
+    #     templates = master_config.get('templates', {})
+    #     #print templates
+    #     templates[form.name.data.strip()] = {
+    #         'description': form.description.data.strip(),
+    #         'fun': form.fun.data.strip(),
+    #         'tgt': form.tgt.data.strip(),
+    #         'expr_form': form.expr_form.data.strip(),
+    #         'args': args}
+
+    #     client.run('config.apply', client="wheel", key="templates", value=templates)
+
+    #     master_config = client.run('config.values', client="wheel")
         
-        flash('Template {0} has been successfully saved'.format(form.name.data.strip()))
+    #     flash('Template {0} has been successfully saved'.format(form.name.data.strip()))
 
-        return redirect(url_for('templates'))
-    return render_template("add_template.html", form=form)
+    #     return redirect(url_for('templates'))
+    return render_template("add_template.html", vpn_form=vpn_form)
 
 
 @app.route("/deployments")
@@ -345,11 +370,11 @@ class ProbeForm(Form):
     test_interval = StringField('test-interval', validators=[DataRequired])#0-86400
 
 class VPNForm(Form):
-    name = StringField('name', validators=[DataRequired])#必填
-    network_segment = StringField('network-segment', validators=[DataRequired])#必填
+    name = StringField('name', validators=[DataRequired()])#必填
+    network_segment = StringField('network-segment', validators=[DataRequired()])#必填
     dh_group = SelectField('dh-group',choices=dh_group)
     authentication_algorithm = SelectField('authentication-algorithm',choices=authentication_algorithm)
-    encryption_algorithm = SelectField('encryption-algorithm',choices=matchers)
+    encryption_algorithm = SelectField('encryption-algorithm',choices=encryption_algorithm)
     pre_shared_key = SelectField('pre-shared-key',choices=pre_shared_key)
     ipsec_protocol = SelectField('ipsec-protocol',choices=ipsec_protocol)
 
@@ -581,20 +606,6 @@ def timer_mission():
   scheduler.add_job(run_script, 'interval', start_date=datetime.datetime.now() + datetime.timedelta(seconds=1), minutes=15)
   scheduler.start()
 
-
-@app.route('/aaa', methods = ['GET'])
-@login_required
-def add_probe_template():
-    # new_tmp = Templates('test_tem')
-    tem = db_session.query(Templates).first()
-    tem.name = 'abf'
-    db_session.add(tem)
-    db_session.commit()
-
-    tmp_query = Templates.query.all()
-
-    return jsonify(errmsg='success')
-
 @app.route("/templates/VPN/new", methods = ['POST'])
 @login_required 
 def add_VPN_template():
@@ -618,13 +629,15 @@ def add_VPN_template():
 
     return jsonify(errmsg="success", data='0')
 
-@app.route('/templates/VPN/delete', methods = ['DELETE'])
+@app.route('/templates/VPN/delete', methods = ['POST'])
 @login_required
 def del_VPN_template():
-    
+    # print(request.json)
     VPN_name = request.json['name']
+    network_segment = request.json['network_segment']
     
-    tmp = db_session.query(VPN).filter_by(name = VPN_name).first()
+    
+    tmp = db_session.query(VPN).filter_by(name = VPN_name, network_segment = network_segment).first()
     if tmp.name == None:
         return jsonify(errmsg="No such template",data='2')
 
@@ -668,6 +681,18 @@ def query_VPN_template():
     # print tmp
 
     return jsonify(errmsg = "success", data = json.dumps(tmp ,default = VPN2dict))
+
+@app.route('/templates/VPN/all', methods = ['GET'])
+@login_required
+def query_all_VPN_template():
+    
+    # VPN_name = request.json['name']
+
+    tmp = db_session.query(VPN).all()
+
+
+    return jsonify(errmsg = "success", data = json.dumps(tmp ,default = VPN2dict))
+
 
 def VPN2dict(vpn):
     return {

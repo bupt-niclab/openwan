@@ -27,24 +27,33 @@
             <table class="table table-bordered table-hover tablesorter" id="minions">
                 <thead>
                 <tr>
-                    <th>Template name</i></th>
-                    <th>Description</i></th>
-                    <th>Target</th>
-                    <th>Function</th>
-                    <th>Latest runs</th>
-                    <th>Launch template job</i></th>
+                    <th>name</th>
+                    <th>network_segment</th>
+                    <th>dh_group</th>
+                    <th>authentication_algorithm</th>
+                    <th>encryption_algorithm</th>
+                    <th>pre_shared_key</th>
+                    <th>ipsec_protocol</th>
+                    <th>操作</th>
                 </tr>
                 </thead>
                 <tbody>
-                {% for template_name, template in templates.items() %}
-                <td>{{ template_name }}</td>
-                <td>{{ template.description }}</td>
-                <td>{{ template.tgt }}</td>
-                <td>{{ template.fun }}</td>
-                <td></td>
-                <td><a href="{{ url_for('run_template', template=template_name) }}">Launch now</a></td>
-                </tr>
-                {% endfor %}
+                  <tr>
+                    {% for template in templates %}
+                    <td>{{ template.name }}</td>
+                    <td>{{ template.network_segment }}</td>
+                    <td>{{ template.dh_group }}</td>
+                    <td>{{ template.authentication_algorithm }}</td>
+                    <td>{{ template.encryption_algorithm }}</td>
+                    <td>{{ template.pre_shared_key }}</td>
+                    <td>{{ template.ipsec_protocol }}</td>
+                    <td>
+                      <a href="#">修改</a>
+                      <a href="#" onclick="delTemplate('{{template.name}}', '{{template.network_segment}}')">删除</a>                      
+                    </td>
+                    <!-- <td><a href="{{ url_for('run_template', template=template_name) }}">Launch now</a></td> -->
+                  </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
@@ -55,14 +64,32 @@
 
 {% block scripts %}
 <script type="text/javascript">
+    function delTemplate(name, network_segment) {
+      console.log(name, network_segment);
+      $.ajax({
+        url: '/templates/VPN/delete',
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json'
+        },
+        data: JSON.stringify({
+          name: name,
+          network_segment: network_segment
+        })
+      }).done(function(msg) {
+        console.log(msg);
+      }).fail(function(err){
+        console.log(err);
+      })
+    }
     $(function () {
-        $("#minions").dataTable({
-            "order": [[0, "desc"]],
-            "lengthMenu": [[20, 50, 100, -1], [20, 50, 100, "All"]],
-            "columnDefs": [
-                {"orderable": false, "targets": -1}
-            ]
-        });
+        // $("#minions").dataTable({
+        //     "order": [[0, "desc"]],
+        //     "lengthMenu": [[20, 50, 100, -1], [20, 50, 100, "All"]],
+        //     "columnDefs": [
+        //         {"orderable": false, "targets": -1}
+        //     ]
+        // });
     });
 </script>
 {% endblock %}
