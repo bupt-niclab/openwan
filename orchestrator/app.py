@@ -16,7 +16,7 @@ from flask_admin import Admin
 from . import settings
 # from flask_sqlalchemy import sqlalchemy
 from .database import db_session
-from models import Templates
+from models import Templates,VPN,Probe
 # from models import db
 # from flask.ext.sqlalchemy import sqlalchemy
 
@@ -593,6 +593,86 @@ def add_probe_template():
     tmp_query = Templates.query.all()
 
     return jsonify(errmsg='success')
+
+@app.route("/templates/VPN/new", methods = ['POST'])
+@login_required 
+def add_VPN_template():
+    
+    VPN_name = request.json['name']
+    network_segment = request.json['network_segment']
+    dh_group = request.json['dh_group']
+    authentication_algorithm = request.json['authentication_algorithm']
+    encryption_algorithm = request.json['encryption_algorithm']
+    pre_shared_key = request.json['pre_shared_key']
+    ipsec_protocol = request.json['ipsec_protocol']
+
+    tmp = VPN(VPN_name,network_segment,dh_group,authentication_algorithm,encryption_algorithm,pre_shared_key,ipsec_protocol)
+
+    db_session.add(tmp)
+    db_session.commit()
+
+    return jsonify(errmsg="success", data='0')
+
+@app.route('/templates/VPN/delete', methods = ['DELETE'])
+@login_required
+def del_VPN_template():
+    
+    VPN_name = request.json['name']
+    
+    tmp = db_session.query(VPN).filter_by(name = VPN_name).first()
+
+    db_session.delete(tmp)
+    db_session.commit()
+
+    return jsonify(errmsg = "success", data = '0')
+
+@app.route('/templates/VPN/modify', methods = ['POST'])
+@login_required
+def modify_VPN_template():
+    
+    VPN_name = request.json['name']
+    network_segment = request.json['network_segment']
+    dh_group = request.json['dh_group']
+    authentication_algorithm = request.json['authentication_algorithm']
+    encryption_algorithm = request.json['encryption_algorithm']
+    pre_shared_key = request.json['pre_shared_key']
+    ipsec_protocol = request.json['ipsec_protocol']
+
+    tmp = db_session.query(VPN).filter_by(name = VPN_name).first()
+
+    db_session.delete(tmp)
+    db_session.commit()
+
+    tmp = VPN(VPN_name,network_segment,dh_group,authentication_algorithm,encryption_algorithm,pre_shared_key,ipsec_protocol)
+
+    db_session.add(tmp)
+    db_session.commit()
+
+    return jsonify(errmsg="success", data='0')
+
+@app.route('/templates/VPN/query', methods = ['POST'])
+@login_required
+def query_VPN_template():
+    
+    VPN_name = request.json['name']
+
+    tmp = db_session.query(VPN).filter_by(name = VPN_name).first()
+
+    # print tmp
+
+    return jsonify(errmsg = "success", data = json.dumps(tmp ,default = VPN2dict))
+
+def VPN2dict(vpn):
+    return {
+        "name":vpn.name,
+        "network_segment":vpn.network_segment,
+        "dh_group":vpn.dh_group,
+        "authentication_algorithm":vpn.authentication_algorithm,
+        "encryption_algorithm":vpn.encryption_algorithm,
+        "pre_shared_key":vpn.pre_shared_key,
+        "ipsec_protocol":vpn.ipsec_protocol
+
+}
 
 @app.teardown_request
 def shutdown_session(exception=None):
