@@ -2,6 +2,8 @@
 
 import sys
 import json
+import os
+import socket
 
 from functools import wraps
 from six import string_types
@@ -678,7 +680,7 @@ def query_VPN_template():
 
     tmp = db_session.query(VPN).filter_by(name = VPN_name).first()
 
-    # print tmp
+    # print (tmp)
 
     return jsonify(errmsg = "success", data = json.dumps(tmp ,default = VPN2dict))
 
@@ -705,6 +707,23 @@ def VPN2dict(vpn):
         "ipsec_protocol":vpn.ipsec_protocol
 
 }
+@app.route('/applyVPNtemplate',methods = ['POST'])
+@login_required
+def applyVPNtemplate():
+    VPN_name = request.json['name']
+    network_segment = request.json['network_segment']
+
+    tmp = db_session.query(VPN).filter_by(name = VPN_name,network_segment=network_segment).first()
+
+    # print(tmp)
+
+    #解析域名
+    # url = "www.baidu.com"
+    # ip = socket.gethostbyname(url) 
+
+    str  = tmp.name
+    
+    return jsonify(errmsg = "success", data = '0')
 
 @app.teardown_request
 def shutdown_session(exception=None):

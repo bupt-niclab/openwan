@@ -95,15 +95,17 @@ class Templates(Base):
 class VPN(Base):
     __tablename__ = 'VPN'
 
-    name = Column(String(255), primary_key = True)
-    network_segment = Column(String(255), primary_key = True)
-    dh_group = Column(String(255) , nullable = False)
-    authentication_algorithm = Column(String(30), nullable = False)
-    encryption_algorithm = Column(String(30), nullable = False)
-    pre_shared_key = Column(String(30), nullable = False)
-    ipsec_protocol = Column(String(30), nullable = False)
+    tid = db.Column(db.Integer, nullable = False, autoincrement = True)
+    name = db.Column(db.String(255), primary_key = True)
+    network_segment = db.Column(db.String(255), nullable = False)
+    dh_group = db.Column(db.String(255) , nullable = False)
+    authentication_algorithm = db.Column(db.String(30), nullable = False)
+    encryption_algorithm =db.Column(db.String(30), nullable = False)
+    pre_shared_key = db.Column(db.String(30), nullable = False)
+    ipsec_protocol = db.Column(db.String(30), nullable = False)
 
     def __init__(self,name,network_segment,dh_group,authentication_algorithm,encryption_algorithm,pre_shared_key,ipsec_protocol):
+        # self.tid = tid
         self.name = name
         self.network_segment = network_segment
         self.dh_group = dh_group
