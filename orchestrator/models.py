@@ -95,8 +95,8 @@ class Templates(Base):
 class VPN(Base):
     __tablename__ = 'VPN'
 
-    tid = Column(Integer, nullable = False, autoincrement = True)
-    name = Column(String(255), primary_key = True)
+    tid = Column(Integer, primary_key = True, autoincrement = True)
+    name = Column(String(255), unique = True)
     network_segment = Column(String(255), nullable = False)
     dh_group = Column(String(255) , nullable = False)
     authentication_algorithm = Column(String(30), nullable = False)
