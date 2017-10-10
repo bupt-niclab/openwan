@@ -1,0 +1,105 @@
+{% from "macros.jinja" import hiding_control %}
+{% extends "base_logged.html" %}
+
+{% macro render_field(field, label_visible=true) -%}
+     <div class="form-group {% if field.errors %}has-error{% endif %} {{ kwargs.pop('class_', '') }}" id="form-group-{{ field.name }}">
+        {% if field.type != 'HiddenField' and label_visible %}
+            {{ field.label(class_='col-sm-2 control-label') }}
+        {% endif %}
+        <div class="col-sm-10 input-group">
+          {{ field(class_='form-control', **kwargs) }}
+          {% if field.errors %}
+              {% for e in field.errors %}
+                  <span class="help-block">{{ e }}</span>
+              {% endfor %}
+          {% endif %}
+        </div>
+    </div>
+{%- endmacro %}
+
+
+{% block page %}
+<div id="page-wrapper-3">
+  <div class="row">
+    <div class="col-lg-12">
+      <h1>Edit template</h1>
+      <ol class="breadcrumb">
+        <li><a href="{{ url_for('index') }}"><i class="fa fa-dashboard"></i> Controller</a></li>
+        <li class="active"><a href="{{ url_for('templates') }}"><i class="fa fa-fa-magic"></i> Templates</a></li>
+        <li class="active"><i class="fa fa-fa-magic"></i> Edit template</li>
+      </ol>
+    </div>
+  </div><!-- /.row -->
+
+  <div class="row">
+    <div class="tab-content">
+      <div class="tab-pane active" id="vpn">
+        <div class="alert alert-warning" role="alert">
+          Jobs templates are saved in salt-master configuration and adding a new template will change the salt-master configuration formatting and will strip comments. See 
+          <a href="http://docs.saltstack.com/en/latest/ref/wheel/all/salt.wheel.config.html#salt.wheel.config.apply">the documentation for more details.
+          </a>
+        </div>
+        <div class="row">
+          <div class="col-lg-12">
+            <form method="POST" class="form-horizontal" role="form" action="{{ url_for('edit_template') }}" id="vpn_template_form">
+              {{ vpn_form.csrf_token }}
+              {{ render_field(vpn_form.name) }}
+              {{ render_field(vpn_form.network_segment) }}
+              {{ render_field(vpn_form.dh_group) }}
+              {{ render_field(vpn_form.authentication_algorithm) }}
+              {{ render_field(vpn_form.encryption_algorithm) }}
+              {{ render_field(vpn_form.pre_shared_key) }}
+              {{ render_field(vpn_form.ipsec_protocol)}}
+      
+              <div class="panel panel-default" id="vpn_optional_panel" style="display: none">
+                <div class="panel-heading">
+                  <h3 class="panel-title">{{hiding_control('hide_control', True)|safe }} Optional arguments</h3>
+                </div>
+                <div class="panel-body" id="vpn_optional_arguments" style="display: none">
+                </div>
+              </div>
+      
+              <div class="form-group" id="vpn_submit">
+                <div class="col-sm-offset-2 col-sm-10">
+                  <button type="submit" class="btn btn-default">Save template</button>
+                </div>
+              </div>
+            </form>
+          </div>
+          <!-- <div class="col-lg-12">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">Functions docs</h3>
+              </div>
+              <div class="panel-body">
+                <pre id="doc-placeholder"></pre>
+              </div>
+            </div>
+          </div> -->
+        </div>
+      </div>
+      <div class="tab-pane" id="probe">
+        <div class="alert alert-warning" role="alert">
+          Jobs templates are saved in salt-master configuration and adding a new template will change the salt-master configuration formatting and will strip comments. See 
+          <a href="http://docs.saltstack.com/en/latest/ref/wheel/all/salt.wheel.config.html#salt.wheel.config.apply">the documentation for more details.
+          </a>
+        </div>
+        <div class="row">
+          <div class="col-lg-12">
+          </div>
+          <!-- <div class="col-lg-12">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">Functions docs</h3>
+              </div>
+              <div class="panel-body">
+                <pre id="doc-placeholder"></pre>
+              </div>
+            </div>
+          </div> -->
+        </div>
+      </div>
+      <div class="tab-pane" id="other">其他</div>
+    </div> 
+  </div>
+{% endblock %}

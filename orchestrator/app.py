@@ -241,22 +241,13 @@ def add_template():
     # form = NewTemplateForm()
     vpn_form = VPNForm()
     probe_form = ProbeForm()
-    if vpn_form.validate_on_submit():
-      print(vpn_form.name.data)
-      print(vpn_form.network_segment.data)
-      print(vpn_form.dh_group.data)    
-      print(vpn_form.authentication_algorithm.data)    
-      print(vpn_form.encryption_algorithm.data)              
+    if vpn_form.validate_on_submit():            
       tmp = VPN(vpn_form.name.data, vpn_form.network_segment.data,vpn_form.dh_group.data, vpn_form.authentication_algorithm.data,vpn_form.encryption_algorithm.data, vpn_form.pre_shared_key.data,vpn_form.ipsec_protocol.data)
-      print (tmp)
-      # test = db_session.query(VPN).filter_by(name = vpn_form.name.data).first()
-      # if test.name != None:
-      #   return jsonify(errmsg="primary key conflict", data="1")
 
       db_session.add(tmp)
       db_session.commit()
-
-      return jsonify(errmsg="success", data='0')
+      flash('template saved successfully')
+      return redirect(url_for('templates'))
 
     if probe_form.validate_on_submit():
       return jsonify(errmsg="success")      
@@ -283,6 +274,35 @@ def add_template():
     #     return redirect(url_for('templates'))
     return render_template("add_template.html", vpn_form=vpn_form)
 
+@app.route("/template/edit/<tid>", methods=['GET', 'POST'])
+@login_required
+def edit_template(tid):
+  tmp = db_session.query(VPN).filter_by(tid=tid).first()  
+  vpn_form = VPNForm()
+  vpn_form.name.data = tmp.name
+  vpn_form.network_segment.data = tmp.network_segment
+  vpn_form.dh_group.data = tmp.dh_group
+  vpn_form.authentication_algorithm.data = tmp.authentication_algorithm
+  vpn_form.encryption_algorithm.data = tmp.encryption_algorithm
+  vpn_form.pre_shared_key.data = tmp.pre_shared_key
+  vpn_form.ipsec_protocol.data = tmp.ipsec_protocol
+  
+  probe_form = ProbeForm()
+  if vpn_form.validate_on_submit():            
+    db_session.delete(tmp)
+    db_session.commit()
+
+    tmp2 = VPN(vpn_form.name.data, vpn_form.network_segment.data,vpn_form.dh_group.data, vpn_form.authentication_algorithm.data,vpn_form.encryption_algorithm.data, vpn_form.pre_shared_key.data,vpn_form.ipsec_protocol.data)
+
+    db_session.add(tmp2)
+    db_session.commit()
+
+    flash('template saved successfully')    
+    return redirect(url_for('templates'))
+
+  if probe_form.validate_on_submit():
+    return jsonify(errmsg="success")      
+  return render_template("edit_template.html", vpn_form=vpn_form)
 
 @app.route("/deployments")
 @login_required

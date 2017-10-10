@@ -48,7 +48,7 @@
                     <td>{{ template.pre_shared_key }}</td>
                     <td>{{ template.ipsec_protocol }}</td>
                     <td>
-                      <a href="#">修改</a>
+                      <a href="{{url_for('edit_template', tid=template.tid)}}">修改</a>
                       <a href="#" onclick="delTemplate('{{template.name}}', '{{template.network_segment}}')">删除</a>                      
                     </td>
                     <!-- <td><a href="{{ url_for('run_template', template=template_name) }}">Launch now</a></td> -->
