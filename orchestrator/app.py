@@ -220,6 +220,13 @@ def templates():
 
     return render_template("templates.html", templates=tmp)
 
+@app.route("/api_templates")
+# @login_required
+def api_templates():
+  tmp = db_session.query(VPN).all()
+  return jsonify(errmsg = "success", data = json.dumps(tmp ,default = VPN2dict))
+
+
 @app.route("/templates/run/<template>")
 @login_required
 def run_template(template):
@@ -277,22 +284,24 @@ def add_template():
 @app.route("/template/edit/<tid>", methods=['GET', 'POST'])
 @login_required
 def edit_template(tid):
-  tmp = db_session.query(VPN).filter_by(tid=tid).first()  
-  vpn_form = VPNForm()
-  vpn_form.name.data = tmp.name
-  vpn_form.network_segment.data = tmp.network_segment
-  vpn_form.dh_group.data = tmp.dh_group
-  vpn_form.authentication_algorithm.data = tmp.authentication_algorithm
-  vpn_form.encryption_algorithm.data = tmp.encryption_algorithm
-  vpn_form.pre_shared_key.data = tmp.pre_shared_key
-  vpn_form.ipsec_protocol.data = tmp.ipsec_protocol
+  tmp = db_session.query(VPN).filter_by(tid=tid).first()
+  vpn_form = VPNForm()    
+  if request.method == 'GET':
+    vpn_form.name.data = tmp.name
+    vpn_form.network_segment.data = tmp.network_segment
+    vpn_form.dh_group.data = tmp.dh_group
+    vpn_form.authentication_algorithm.data = tmp.authentication_algorithm
+    vpn_form.encryption_algorithm.data = tmp.encryption_algorithm
+    vpn_form.pre_shared_key.data = tmp.pre_shared_key
+    vpn_form.ipsec_protocol.data = tmp.ipsec_protocol
+    probe_form = ProbeForm()
   
-  probe_form = ProbeForm()
   if vpn_form.validate_on_submit():            
     db_session.delete(tmp)
     db_session.commit()
-
+    print(vpn_form.name.data)
     tmp2 = VPN(vpn_form.name.data, vpn_form.network_segment.data,vpn_form.dh_group.data, vpn_form.authentication_algorithm.data,vpn_form.encryption_algorithm.data, vpn_form.pre_shared_key.data,vpn_form.ipsec_protocol.data)
+    print(tmp2)
 
     db_session.add(tmp2)
     db_session.commit()
@@ -302,7 +311,8 @@ def edit_template(tid):
 
   if probe_form.validate_on_submit():
     return jsonify(errmsg="success")      
-  return render_template("edit_template.html", vpn_form=vpn_form)
+  return render_template("edit_template.html", vpn_form=vpn_form, tid=tid)
+
 
 @app.route("/deployments")
 @login_required
@@ -577,7 +587,10 @@ def format_argument(instance):
 def traffic_path():
   return render_template('traffic_path.html', isTopo=True)
 
-
+@app.route('/topo/control_path')
+@login_required
+def control_path():
+  return render_template('control_path.html', isTopo=True)
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from bs4 import BeautifulSoup, SoupStrainer
@@ -744,6 +757,37 @@ def applyVPNtemplate():
     str  = tmp.name
     
     return jsonify(errmsg = "success", data = '0')
+
+@app.route('/control_path_nodes',methods = ['GET'])
+@login_required
+def getControlPathinfo():
+    nodesinfo = []
+    #按行将获取到的配置信息写入xml文件中 
+    output = open('interface.txt','w')
+    # infoget = os.popen("salt 'cpe*' junos.rpc 'get-interface-information' '/home/user/interface.xml' interface_name='ge-0/0/0.0' terse=True")
+    # for line in os.popen("salt 'cpe*' junos.rpc 'get-interface-information' interface_name='ge-0/0/0.0' terse=True"):
+    for line in os.popen("salt '*' test.ping"):
+        output.writable(line)
+    output.close()
+    #按行读取保存好了的xml文件 
+    flag = 0;
+    d = dict()
+    node_name = None
+    node_state = None
+    read_file = open('interface.txt','r')
+    for line in read_file:
+        print(line)
+        if flag % 2 == 0:
+            d['node_name'] = line
+        if flag % 2 == 1:
+            if line == "True":
+                d['node_state'] = "up"
+            else:
+                d['node_state'] = "down"
+            nodesinfo.append(d)
+        flag = flag + 1
+
+    return jsonify(errmsg = "success", data = json.dumps(nodesinfo))
 
 @app.teardown_request
 def shutdown_session(exception=None):

@@ -65,8 +65,8 @@
 {% block scripts %}
 <script type="text/javascript">
     function delTemplate(name, network_segment) {
-      console.log(name, network_segment);
-      $.ajax({
+      if(confirm('确认删除？')) {
+        $.ajax({
         url: '/templates/VPN/delete',
         method: 'POST',
         headers: {
@@ -77,10 +77,13 @@
           network_segment: network_segment
         })
       }).done(function(msg) {
-        console.log(msg);
+        alert('删除成功');        
+        window.location.reload();
       }).fail(function(err){
-        console.log(err);
+        alert(err);
       })
+      }
+
     }
     $(function () {
         // $("#minions").dataTable({

@@ -37,68 +37,27 @@ $(document).ready(function(){
     }
   });
 
-  var applyBtn = $('.apply-template');
-  var appliedTemplate = 0; // TODO:读取数据并解析该节点是否有应用模板
-  applyBtn.click(function(e){
-    // console.log($(this)[0]);
-    var thisBtn = $($(this)[0]);
-    // console.log(thisBtn);
-    if (appliedTemplate === 1) {      
-      // TODO:找到已被应用的模板，取消其按钮样式
-   
-    } else {
-      appliedTemplate = 1;
-    }
-    thisBtn.text('已应用');
-    thisBtn.attr('disabled', 'disabled'); 
-    // thisBtn.innerText = '已应用';
-    // console.log(thisBtn.dataset.templateType);
-  });
-
   getNodes(function(nodeList) {
-    var cpeList = nodeList.map(function(cpe){
-      return {
-        x = Math.random() * 600,
-        y = Math.random() * 500,
-        w = 40,
-        h = 40,
-        text = cpe.switch.name,
-        img = 'switch.png',
-        dragable = true
-      };
-    });
+    console.log(nodeList);
     nodeList.forEach(function(node){
       node.x = Math.random() * 600,
       node.y = Math.random() * 500,
       node.w = 40,
       node.h = 40,
-      node.text = node.switch.name,
-      node.img = 'switch.png',
+      node.text = node.name,
+      node.img = 'vpn.png',
       node.dragable = true
     })
-    var addedNodeList = createNodes(cpeList, scene);
+    var addedNodeList = createNodes(nodeList, scene);
     for (var i = 0, j = addedNodeList.length;i < j;i++) {
       createLink(addedNodeList[i], local, '', scene);
-      nodeList[i].devices.forEach(function(device){
-        device.x = Math.random() * 600,
-        device.y = Math.random() * 500,
-        device.w = 40,
-        device.h = 40,
-        device.text = device.ip,
-        device.img = 'switch.png',
-        device.dragable = true 
-      });
-      var addedDeviceList = createNodes(nodeList[i].devices, scene);
-      for (var x = 0, y = addedDeviceList.length;x < y;x++) {
-        createLink(addedDeviceList[x], addedNodeList[i], '', scene);
-      }
     }
   });
-  var nodeList = simulateNodes();
-  var addedNodeList = createNodes(nodeList, scene);
-  for (var i = 0, j = addedNodeList.length;i < j;i++) {
-    createLink(addedNodeList[i], local, '', scene);
-  }
+  // var nodeList = simulateNodes();
+  // var addedNodeList = createNodes(nodeList, scene);
+  // for (var i = 0, j = addedNodeList.length;i < j;i++) {
+  //   createLink(addedNodeList[i], local, '', scene);
+  // }
 });
 
 // 模拟生成节点
@@ -148,9 +107,6 @@ function createSingleNode (nodeInfo, scene) {
     node.alarm = 'down';
   }
   scene.add(node);
-  node.addEventListener('mouseup', function(event) {
-    handler(event);
-  })
   return node;
 }
 
@@ -194,9 +150,6 @@ function makeNodeEditable (scene) {
         var endNode = e.target;
         var l = new JTopo.Link(beginNode, endNode);
         scene.add(l);
-        l.addEventListener('mouseup', function(event) {
-          handler(event);
-        });
         beginNode = null;
         scene.remove(link);
       } else {
@@ -218,39 +171,17 @@ function makeNodeEditable (scene) {
   });
 }
 
-// 右键弹出菜单
-function handler (event) {
-  if (event.button === 2) {
-    // console.log(event);
-    $('#contextmenu').css({
-      top: event.layerY,
-      left: event.layerX + 40
-    }).show();
-  }
-}
 
 // 获取节点信息
 function getNodes(callback) {
   $.ajax({
     type: "get",
-    url: "/traffic_path_nodes",
+    url: "/control_path_nodes",
     success: function (response) {
-      if (response.err_msg === 'success') {
-        callback(response.data);
+      if (response.errmsg === 'success') {
+        callback(JSON.parse(response.data));
       }
     }
   });
 }
 
-// 获取模板列表
-function getTemplates(callback) {
-  $.ajax({
-    type: 'get',
-    url: '/api_templates',
-    success: function(response) {
-      if (response.err_msg === 'success') {
-        callback(response.data);
-      }
-    }
-  })
-}
