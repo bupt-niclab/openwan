@@ -741,22 +741,205 @@ def VPN2dict(vpn):
 
 }
 @app.route('/applyVPNtemplate',methods = ['POST'])
-@login_required
+# @login_required
 def applyVPNtemplate():
     VPN_name = request.json['name']
     network_segment = request.json['network_segment']
+    nodesinfo = []
+    output = open('/etc/ansible/roles/Juniper.junos/config.set','w')
 
     tmp = db_session.query(VPN).filter_by(name = VPN_name,network_segment=network_segment).first()
 
+
     # print(tmp)
+
 
     #解析域名
     # url = "www.baidu.com"
     # ip = socket.gethostbyname(url) 
 
     str  = tmp.name
+    #按行写入到指定的config文件中 
+    inputline = "set security zones security-zone" + tmp.name +"address-book address" + tmp.name + "-2"
+    print(inputline)
+    # output.write(inputline)
     
-    return jsonify(errmsg = "success", data = '0')
+
+    output.close()
+    return jsonify(errmsg = "success", data = json.dumps(nodesinfo))
+
+@app.route('/control_path_nodes',methods = ['GET'])
+@login_required
+def getControlPathinfo():
+    nodesinfo = []
+    #按行将获取到的配置信息写入xml文件中 
+    output = open('interface.txt','w')
+    # infoget = os.popen("salt 'cpe*' junos.rpc 'get-interface-information' '/home/user/interface.xml' interface_name='ge-0/0/0.0' terse=True")
+    # for line in os.popen("salt 'cpe*' junos.rpc 'get-interface-information' interface_name='ge-0/0/0.0' terse=True"):
+    for line in os.popen("salt '*' test.ping"):
+        output.write(line)
+    output.close()
+    #按行读取保存好了的xml文件 
+    flag = 0;
+    d = dict()
+    node_name = None
+    node_state = None
+    read_file = open('interface.txt','r')
+    for line in read_file:
+        print(line)
+        if flag % 2 == 0:
+            d['node_name'] = line
+        if flag % 2 == 1:
+            if line == "True":
+                d['node_state'] = "up"
+            else:
+                d['node_state'] = "down"
+            nodesinfo.append(d)
+        flag = flag + 1
+
+    return jsonify(errmsg = "success", data = json.dumps(nodesinfo))
+
+@app.route('/traffic_path_nodes',methods = ['GET'])
+@login_required
+def getTrafficPathinfo():
+    nodesinfo_basic = []
+    nodesinfo_full = []
+    nodesinfo_result = []
+    d1 = dict()
+    d2 = dict()
+    d3 = dict()
+    #按行将获取到的配置信息写入xml文件中 
+    # infoget = os.popen("salt 'cpe*' junos.rpc 'get-interface-information' '/home/user/interface.xml' interface_name='ge-0/0/0.0' terse=True")
+    # for line in os.popen("salt 'cpe*' junos.rpc 'get-interface-information' interface_name='ge-0/0/0.0' terse=True"):
+    vmx_json = os.popen("salt 'vmx' junos.rpc 'get-ike-active-peers-information' --output=json")
+    vmx_dict = json.loads(vmx_json)
+    for i in range(len(vmx_dict.vmx.rpc_reply.ike-active-peers-information.ike-active-peers)):
+        d1['ip'] = vmx_dict.vmx.rpc_reply.ike-active-peers-information.ike-active-peers[i].ike-sa-remote-address
+        d1['name'] = vmx_dict.vmx.rpc_reply.ike-active-peers-information.ike-active-peers[i].ike-ike-id
+        nodesinfo_basic.append(d1)
+        d1.clear()
+    for j in range(len(nodesinfo_basic)):
+        str = "salt "+ nodesinfo_basic[j].name+" junos.rpc 'get-ike-active-peers-information' --output=json"
+        child_nodes_json = os.popen(str)
+        chiled_nodes_dict = json.loads(child_nodes_json)
+        d3['switch'] = nodesinfo_basic[j]
+        for k in range(len(nodesinfo_basic[j].name.vmx.rpc_reply.ike-active-peers-information.ike-active-peers)):
+            d2['ip'] = nodesinfo_basic[j].name.vmx.rpc_reply.ike-active-peers-information.ike-active-peers[k].ike-sa-remote-address
+            d2['name'] = nodesinfo_basic[j].name.vmx.rpc_reply.ike-active-peers-information.ike-active-peers[k].ike-ike-id
+            nodesinfo_full[k].append(d2)
+            d2.clear()
+        d3['devices'] = nodesinfo_full[k]
+        nodesinfo_result.append(d3)
+        d3.clear()
+        nodesinfo_full.clear()
+    
+
+    return jsonify(errmsg = "success", data = json.dumps(nodesinfo_result))
+
+@app.route('/apply_vpn_template', methods=['POST'])
+# @login_required
+def applyVPNtemplate_1():
+    tid = request.json['tid']
+    device_name = request.json['name']
+    #拿到对应的模板 
+    device_vpn_num = os.popen("salt 'cpe1' junos.rpc 'get-arp-table-information' --output=json")
+    devices_info = json.loads(device_vpn_num)
+    print("type is ",type(devices_info))
+    vpn_num = devices_info.count("ip-address")
+
+    # vpn_num = 0
+    vpn_ip = "10.66."+str(vpn_num)+".254/24"
+
+    tmp = db_session.query(VPN).filter_by(tid = tid).first()
+    # print(tmp.network_segment)
+
+    url_segment = []
+
+    url_segment = str(tmp.network_segment).split('-')
+    print("hello:",str(tmp.network_segment).split('-'))
+    url1 = url_segment[0]
+    url2 = url_segment[1]
+    #拼 config.set文件 
+    output = open('config.set','w')
+    input_str = "set interfaces st0 unit " + vpn_num + " family inet address " + vpn_ip
+    output.write(input_str)
+    input_str = "set routing-options static route 0.0.0.0/0 next-hop 192.168.0.11"
+    output.write(input_str)
+    input_str = "set routing-options static route "+url1+" next-hop st0." + str(vpn_num)
+    output.write(input_str)
+    input_str = "set security zones security-zone untrust interfaces ge-0/0/0.0"
+    output.write(input_str)
+    input_str = "set security zones security-zone untrust host-inbound-traffic system-services ike"
+    output.write(input_str)
+    input_str = "set security zones security-zone trust interfaces ge-0/0/1.0"
+    output.write(input_str)
+    input_str = "set security zones security-zone trust host-inbound-traffic system-services all"
+    output.write(input_str)
+    input_str = "set security zones security-zone "+str(tmp.name) + " interfaces st0." + str(vpn_num)
+    output.write(input_str)
+    input_str = "set security ike proposal ike-phase1-proposal"+str(vpn_num) +" authentication-method pre-shared-keys"
+    output.write(input_str)
+    input_str = "set security ike proposal ike-phase1-proposal"+str(vpn_num) +" dh-group "+str(tmp.dh_group)
+    output.write(input_str)
+    input_str = "set security ike proposal ike-phase1-proposal"+str(vpn_num) +" authentication-algorithm "+str(tmp.authentication_algorithm)
+    output.write(input_str)
+    input_str = "set security ike proposal ike-phase1-proposal"+str(vpn_num) +" encryption-algorithm "+str(tmp.encryption_algorithm)
+    output.write(input_str)
+    input_str = "set security ike policy ike-phase1-policy"+str(vpn_num) +" mode aggressive"
+    output.write(input_str)
+    input_str = "set security ike policy ike-phase1-policy"+str(vpn_num) +" proposals ike-phase1-proposal"+str(vpn_num)
+    output.write(input_str)
+    input_str = "set security ike policy ike-phase1-policy"+str(vpn_num) +" pre-shared-key "+str(tmp.pre_shared_key)
+    output.write(input_str)
+    input_str = "set security ike gateway gw-"+str(tmp.name)+" external-interface ge-0/0/0.0"
+    output.write(input_str)
+    input_str = "set security ike gateway gw-"+str(tmp.name)+" ike-policy ike-phase1-policy"+str(vpn_num)
+    output.write(input_str)
+    # input_str = "set security ike gateway gw-"+str(tmp.name)+" dynamic hostname gw1.company.com"
+    output.write(input_str)
+    input_str = "set security ipsec proposal ipsec-phase2-proposal"+str(vpn_num) +" protocol "+str(tmp.ipsec_protocol)
+    output.write(input_str)
+    # input_str = "set security ipsec proposal ipsec-phase2-proposal"+str(vpn_num) +" authentication-algorithm "+str(tmp.)
+    output.write(input_str)
+    input_str = "set security ipsec proposal ipsec-phase2-proposal"+str(vpn_num) +" encryption-algorithm "+str(tmp.encryption_algorithm)
+    output.write(input_str)
+    # input_str = "set security ipsec policy ipsec-phase2-policy"+str(vpn_num) +" proposals ipsec-phase2-proposal"
+    output.write(input_str)
+    input_str = "set security ipsec policy ipsec-phase2-policy"+str(vpn_num) +" perfect-forward-secrecy keys "+str(tmp.dh_group)
+    output.write(input_str)
+    input_str = "set security ipsec vpn ike-"+str(tmp.name)+" ike gateway gw-"+str(tmp.name)
+    output.write(input_str)
+    input_str = "set security ipsec vpn ike-"+str(tmp.name)+" ike ipsec-policy ipsec-phase2-policy"+str(vpn_num)
+    output.write(input_str)
+    input_str = "set security ipsec vpn ike-"+str(tmp.name)+" bind-interface st0."+str(vpn_num)
+    output.write(input_str)
+    input_str = "set security ipsec vpn ike-"+str(tmp.name)+" establish-tunnels immediately"
+    output.write(input_str)
+    # input_str = "set security policies from-zone trust to-zone "+str(tmp.name)+" policy tr-"+str(tmp.name)+" match source-address vpn-test-1"
+    output.write(input_str)
+    input_str = "set security policies from-zone trust to-zone "+str(tmp.name)+" policy tr-"+str(tmp.name)+" match destination-address any"
+    output.write(input_str)
+    input_str = "set security policies from-zone trust to-zone "+str(tmp.name)+" policy tr-"+str(tmp.name)+" match application any"
+    output.write(input_str)
+    input_str = "set security policies from-zone trust to-zone "+str(tmp.name)+" policy tr-"+str(tmp.name)+" then permit"
+    output.write(input_str)
+    input_str = "set security policies from-zone "+str(tmp.name)+" to-zone trust policy "+str(tmp.name)+"-tr match source-address any"
+    output.write(input_str)
+    # input_str = "set security policies from-zone "+str(tmp.name)+" to-zone trust policy "+str(tmp.name)+"-tr match destination-address vpn-test-1"
+    output.write(input_str)
+    input_str = "set security policies from-zone "+str(tmp.name)+" to-zone trust policy "+str(tmp.name)+"-tr match application any"
+    output.write(input_str)
+    input_str = "set security policies from-zone "+str(tmp.name)+" to-zone trust policy "+str(tmp.name)+"-tr then permit"
+    output.write(input_str)
+    input_str = "set security flow tcp-mss ipsec-vpn mss 1350"
+    output.write(input_str)
+    
+
+    output.close()
+
+    #调用命令行下发配置
+    f = os.popen("salt ") 
+    return jsonify(errmsg = "success")
 
 @app.route('/control_path_nodes',methods = ['GET'])
 @login_required
