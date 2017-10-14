@@ -875,7 +875,7 @@ def applyVPNtemplate_1():
     global LASTAPPLY_TID
     tid = request.json['tid']
     lastapply_tid = tid
-    device_name = request.json['name']
+    device_name = request.json['device_name']
     #拿到对应的模板 
     device_vpn_num = os.popen("salt 'cpe1' junos.rpc 'get-arp-table-information' --output=json")
     devices_info = json.loads(device_vpn_num)
@@ -973,9 +973,9 @@ def applyVPNtemplate_1():
     output.close()
 
     #调用命令行下发配置
-    strpush = "salt "+str(tmp.name)+" cp.get_file salt://srv/salt/base/config.set /srv/salt/base/config.set"
+    strpush = "salt "+str(device_name)+" cp.get_file salt://srv/salt/base/config.set /srv/salt/base/config.set"
     f = os.popen(strpush) 
-    strrun = "salt "+str(tmp.name)+" cmd.run cmd = ' ansible-playbook roles/JUniper.junos/"+str(tmp.name)+"config.yml' cwd = '/etc/ansible'"
+    strrun = "salt "+str(device_name)+" cmd.run cmd = ' ansible-playbook roles/JUniper.junos/"+str(tmp.name)+"config.yml' cwd = '/etc/ansible'"
     g = os.popen(strrun)
     print("return type is ： ",type(g.readlines()))
     for line in g.readlines():
