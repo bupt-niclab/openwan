@@ -44,7 +44,7 @@ $(document).ready(function(){
       node.y = Math.random() * 500,
       node.w = 40,
       node.h = 40,
-      node.text = node.name,
+      node.text = node.node_name,
       node.img = 'vpn.png',
       node.dragable = true
     })
@@ -100,10 +100,10 @@ function createSingleNode (nodeInfo, scene) {
     node.setImage('/static/images/' + nodeInfo.img, true);
   }
   node.dragable = nodeInfo.dragable;
-  if(nodeInfo.state === 'UP') {
+  if(nodeInfo.node_state === 'up') {
     node.alarm = 'up';
     node.alarmColor = '0, 255, 0';
-  } else if (nodeInfo.state === 'DOWN') {
+  } else if (nodeInfo.node_state === 'down') {
     node.alarm = 'down';
   }
   scene.add(node);
