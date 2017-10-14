@@ -884,14 +884,15 @@ def applyVPNtemplate_1():
     tid = request.json['tid']
     LASTAPPLY_TID = tid
     # device_name = request.json['device_name']
-    device_name = "cpe1"
+    device_name1 = "Agent-2"
+    device_name2 = "cpe1"
     tmp = db_session.query(VPN).filter_by(tid = tid).first()
     #拿到对应的模板 
-    str_arp = "salt '"+device_name+"' junos.rpc 'get-arp-table-information' --output=json"
+    str_arp = "salt '"+device_name2+"' junos.rpc 'get-arp-table-information' --output=json"
     device_vpn_num = subprocess.check_output(str_arp, shell=True)
     devices_info = json.loads(device_vpn_num)
     print(devices_info)
-    vpn_num = len(devices_info[device_name]['rpc_reply']['arp-table-information']['arp-table-entry'])
+    vpn_num = len(devices_info[device_name2]['rpc_reply']['arp-table-information']['arp-table-entry'])
 
     # vpn_num = 0
     vpn_ip = "10.66."+str(vpn_num)+".254/24"
@@ -983,9 +984,9 @@ def applyVPNtemplate_1():
     output.close()
 
     #调用命令行下发配置
-    strpush = "salt "+str(device_name)+" cp.get_file salt://config.set /etc/ansible/roles/Juniper.junos/config.set"
+    strpush = "salt "+str(device_name1)+" cp.get_file salt://config.set /etc/ansible/roles/Juniper.junos/config.set"
     f = subprocess.check_output(strpush, shell=True) 
-    strrun = "salt "+str(device_name)+" cmd.run cmd='ansible-playbook roles/Juniper.junos/"+str(device_name)+".yml' cwd='/etc/ansible'"
+    strrun = "salt "+str(device_name1)+" cmd.run cmd='ansible-playbook roles/Juniper.junos/"+str(device_name2)+".yml' cwd='/etc/ansible'"
     print strpush    
     print strrun
     g = subprocess.check_output(strrun, shell=True)
