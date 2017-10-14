@@ -4,6 +4,8 @@ $(document).ready(function(){
 
   var scene = new JTopo.Scene(stage); // 创建一个场景对象
   scene.background = '/static/images/bg.jpg';
+
+  var currentNode = null;
   
   // 创建公网节点
   var local = createSingleNode({
@@ -21,10 +23,41 @@ $(document).ready(function(){
   var menuList = $('#contextmenu'),
   menuItem = menuList.find('a');
   
+  var templateTable;
   menuItem.click(function() {
     if($(this)[0].id === 'config-template') {
       $('#config-template-modal').modal();
-      // alert('配置成功');
+        // TODO: 渲染表格
+      if(!templateTable) {
+        tamplateTable = $('#templates').DataTable({
+          ajax: {
+            url: '/api_templates'
+          },
+          pageLength: 5,
+          columns: [{
+            data: "tid"
+          }, {
+            data: "name"
+          }],
+          columnDefs: [
+          {
+            render: function(data, type, row, meta) {
+              // return '<a href="' + data + '" target="_blank">' + row.title + '</a>';
+              return '<button class="btn btn-primary" onclick="applyTemplate">操作</button>';              
+            },
+            //指定是第三列
+            targets: 2
+          }]
+        });
+        // templateTable.on('order.dt search.dt', function() {
+        //     t.column(0, {
+        //       "search": 'applied',
+        //       "order": 'applied'
+        //     }).nodes().each(function(cell, i) {
+        //       cell.innerHTML = i + 1;
+        //   });
+        // }).draw();
+      }
     } else {
       alert('查看成功');
     }
@@ -37,45 +70,37 @@ $(document).ready(function(){
     }
   });
 
-  var applyBtn = $('.apply-template');
-  var appliedTemplate = 0; // TODO:读取数据并解析该节点是否有应用模板
-  applyBtn.click(function(e){
-    // console.log($(this)[0]);
-    var thisBtn = $($(this)[0]);
-    // console.log(thisBtn);
-    if (appliedTemplate === 1) {      
-      // TODO:找到已被应用的模板，取消其按钮样式
+  // var applyBtn = $('.apply-template');
+  // var appliedTemplate = 0; // TODO:读取数据并解析该节点是否有应用模板
+  // applyBtn.click(function(e){
+  //   // console.log($(this)[0]);
+  //   var thisBtn = $($(this)[0]);
+  //   // console.log(thisBtn);
+  //   if (appliedTemplate === 1) {      
+  //     // TODO:找到已被应用的模板，取消其按钮样式
    
-    } else {
-      appliedTemplate = 1;
-    }
-    thisBtn.text('已应用');
-    thisBtn.attr('disabled', 'disabled'); 
-    // thisBtn.innerText = '已应用';
-    // console.log(thisBtn.dataset.templateType);
-  });
+  //   } else {
+  //     appliedTemplate = 1;
+  //   }
+  //   thisBtn.text('已应用');
+  //   thisBtn.attr('disabled', 'disabled'); 
+  //   // thisBtn.innerText = '已应用';
+  //   // console.log(thisBtn.dataset.templateType);
+  // });
 
   getNodes(function(nodeList) {
     var cpeList = nodeList.map(function(cpe){
       return {
-        x = Math.random() * 600,
-        y = Math.random() * 500,
-        w = 40,
-        h = 40,
-        text = cpe.switch.name,
-        img = 'switch.png',
-        dragable = true
+        x: Math.random() * 600,
+        y: Math.random() * 500,
+        w: 30,
+        h: 30,
+        text: cpe.switch.name,
+        img: 'switch.png',
+        dragable: true,
+        nodeType: 'switch'
       };
     });
-    nodeList.forEach(function(node){
-      node.x = Math.random() * 600,
-      node.y = Math.random() * 500,
-      node.w = 40,
-      node.h = 40,
-      node.text = node.switch.name,
-      node.img = 'switch.png',
-      node.dragable = true
-    })
     var addedNodeList = createNodes(cpeList, scene);
     for (var i = 0, j = addedNodeList.length;i < j;i++) {
       createLink(addedNodeList[i], local, '', scene);
@@ -85,8 +110,9 @@ $(document).ready(function(){
         device.w = 40,
         device.h = 40,
         device.text = device.ip,
-        device.img = 'switch.png',
-        device.dragable = true 
+        device.img = 'vpn.png',
+        device.dragable = true,
+        device.nodeType = 'terminal'
       });
       var addedDeviceList = createNodes(nodeList[i].devices, scene);
       for (var x = 0, y = addedDeviceList.length;x < y;x++) {
@@ -94,11 +120,12 @@ $(document).ready(function(){
       }
     }
   });
-  var nodeList = simulateNodes();
-  var addedNodeList = createNodes(nodeList, scene);
-  for (var i = 0, j = addedNodeList.length;i < j;i++) {
-    createLink(addedNodeList[i], local, '', scene);
-  }
+  // var nodeList = simulateNodes();
+  // var addedNodeList = createNodes(nodeList, scene);
+  // for (var i = 0, j = addedNodeList.length;i < j;i++) {
+  //   createLink(addedNodeList[i], local, '', scene);
+  // }
+
 });
 
 // 模拟生成节点
@@ -148,9 +175,12 @@ function createSingleNode (nodeInfo, scene) {
     node.alarm = 'down';
   }
   scene.add(node);
-  node.addEventListener('mouseup', function(event) {
-    handler(event);
-  })
+  // TODO: 判断是否是 CPE 节点
+  if (nodeInfo.nodeType === 'switch') {
+    node.addEventListener('mouseup', function(event) {
+      handler(event, node);
+    })
+  }
   return node;
 }
 
@@ -219,7 +249,8 @@ function makeNodeEditable (scene) {
 }
 
 // 右键弹出菜单
-function handler (event) {
+function handler (event, node) {
+  currentNode = node;
   if (event.button === 2) {
     // console.log(event);
     $('#contextmenu').css({
@@ -231,15 +262,29 @@ function handler (event) {
 
 // 获取节点信息
 function getNodes(callback) {
-  $.ajax({
-    type: "get",
-    url: "/traffic_path_nodes",
-    success: function (response) {
-      if (response.err_msg === 'success') {
-        callback(response.data);
-      }
-    }
-  });
+  var mockData = [{
+    switch: {
+      name: 'CPE1',
+      id: 1
+    },
+    devices: [{ip: '10.0.0.0'}, {ip: '10.0.0.1'}, {ip: '10.0.0.2'}]
+  }, {
+    switch: {
+      name: 'CPE2',
+      id: 2
+    },
+    devices: [{ip: '192.0.0.0'}, {ip: '192.0.0.1'}, {ip: '192.0.0.2'}]
+  }];
+  callback(mockData);
+  // $.ajax({
+  //   type: "get",
+  //   url: "/traffic_path_nodes",
+  //   success: function (response) {
+  //     if (response.err_msg === 'success') {
+  //       callback(response.data);
+  //     }
+  //   }
+  // });
 }
 
 // 获取模板列表
@@ -253,4 +298,9 @@ function getTemplates(callback) {
       }
     }
   })
+}
+
+
+function applyTemplate() {
+  
 }

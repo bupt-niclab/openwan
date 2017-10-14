@@ -220,11 +220,15 @@ def templates():
 
     return render_template("templates.html", templates=tmp)
 
-@app.route("/api_templates")
+@app.route("/api_templates/<switchname>")
 # @login_required
-def api_templates():
+def api_templates(switchname):
   tmp = db_session.query(VPN).all()
-  return jsonify(errmsg = "success", data = json.dumps(tmp ,default = VPN2dict))
+  # TODO:
+  # tid = 3
+  # applied = True False
+  # return jsonify(errmsg = "success", data = json.dumps(tmp, default = VPN2dict))
+  return jsonify(errmsg = "success", data = VPN2dict(tmp))
 
 
 @app.route("/templates/run/<template>")
@@ -247,8 +251,9 @@ def run_template(template):
 def add_template():
     # form = NewTemplateForm()
     vpn_form = VPNForm()
-    probe_form = ProbeForm()
-    if vpn_form.validate_on_submit():            
+    # probe_form = ProbeForm()
+    if vpn_form.validate_on_submit():   
+      # ((?:(?:25[0-5]|2[0-4]\d|(?:1\d{2}|[1-9]?\d))\.){3}(?:25[0-5]|2[0-4]\d|(?:1\d{2}|[1-9]?\d)))/24         
       tmp = VPN(vpn_form.name.data, vpn_form.network_segment.data,vpn_form.dh_group.data, vpn_form.authentication_algorithm.data,vpn_form.encryption_algorithm.data, vpn_form.pre_shared_key.data,vpn_form.ipsec_protocol.data)
 
       db_session.add(tmp)
@@ -256,8 +261,8 @@ def add_template():
       flash('template saved successfully')
       return redirect(url_for('templates'))
 
-    if probe_form.validate_on_submit():
-      return jsonify(errmsg="success")      
+    # if probe_form.validate_on_submit():
+    #   return jsonify(errmsg="success")      
     #     master_config = client.run('config.values', client="wheel")['data']['return']
 
     #     BLACKLIST_ARGS = ('csrf_token', 'tgt', 'fun', 'expr_form', 'name', 'description','owner')
@@ -294,7 +299,7 @@ def edit_template(tid):
     vpn_form.encryption_algorithm.data = tmp.encryption_algorithm
     vpn_form.pre_shared_key.data = tmp.pre_shared_key
     vpn_form.ipsec_protocol.data = tmp.ipsec_protocol
-    probe_form = ProbeForm()
+    # probe_form = ProbeForm()
   
   if vpn_form.validate_on_submit():            
     db_session.delete(tmp)
@@ -309,8 +314,8 @@ def edit_template(tid):
     flash('template saved successfully')    
     return redirect(url_for('templates'))
 
-  if probe_form.validate_on_submit():
-    return jsonify(errmsg="success")      
+  # if probe_form.validate_on_submit():
+  #   return jsonify(errmsg="success")      
   return render_template("edit_template.html", vpn_form=vpn_form, tid=tid)
 
 
@@ -409,6 +414,20 @@ class VPNForm(Form):
     encryption_algorithm = SelectField('encryption-algorithm',choices=encryption_algorithm)
     pre_shared_key = SelectField('pre-shared-key',choices=pre_shared_key)
     ipsec_protocol = SelectField('ipsec-protocol',choices=ipsec_protocol)
+
+def validate_network_segment(form, field):
+  try: 
+    startIpSegment = field.data.strip().split('-')[0] # 192.168.1.1/24
+    startIp = startIpSegment.split('/')[0]  # 192.168.1.1
+    startSubnetMask = startIpSegment.split('/')[1]  # 24
+
+    endIpSegment = field.data.strip().split('-')[1] # 192.168.1.10/24
+    endIp = endIpSegment.split('/')[0]   # 192.168.1.10
+    endSubnetMask = endIpSegment.split('/')[1]  # 24
+  except:
+    raise ValidationError("please input correct format like '10.0.0.1/24-10.1.0.0/24'")
+
+  # if form.validators.IPAddress(ipv4=True):
 
 class NewTemplateForm(RunForm):
     name = StringField('name', validators=[DataRequired()])
@@ -729,17 +748,22 @@ def query_all_VPN_template():
     return jsonify(errmsg = "success", data = json.dumps(tmp ,default = VPN2dict))
 
 
-def VPN2dict(vpn):
-    return {
-        "name":vpn.name,
-        "network_segment":vpn.network_segment,
-        "dh_group":vpn.dh_group,
-        "authentication_algorithm":vpn.authentication_algorithm,
-        "encryption_algorithm":vpn.encryption_algorithm,
-        "pre_shared_key":vpn.pre_shared_key,
-        "ipsec_protocol":vpn.ipsec_protocol
+def VPN2dict(vpns):
+  result = []
+  for vpn in vpns:
+    single = {
+      "tid": vpn.tid,
+      "name":vpn.name,
+      "network_segment":vpn.network_segment,
+      "dh_group":vpn.dh_group,
+      "authentication_algorithm":vpn.authentication_algorithm,
+      "encryption_algorithm":vpn.encryption_algorithm,
+      "pre_shared_key":vpn.pre_shared_key,
+      "ipsec_protocol":vpn.ipsec_protocol
+    }
+    result.append(single)
+  return result
 
-}
 @app.route('/applyVPNtemplate',methods = ['POST'])
 # @login_required
 def applyVPNtemplate():
