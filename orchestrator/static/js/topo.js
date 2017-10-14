@@ -92,36 +92,54 @@ $(document).ready(function(){
   //   // console.log(thisBtn.dataset.templateType);
   // });
 
+  // getNodes(function(nodeList) {
+  //   var cpeList = nodeList.map(function(cpe){
+  //     return {
+  //       x: Math.random() * 600,
+  //       y: Math.random() * 500,
+  //       w: 30,
+  //       h: 30,
+  //       text: cpe.switch.name,
+  //       img: 'switch.png',
+  //       dragable: true,
+  //       nodeType: 'switch'
+  //     };
+  //   });
+  //   var addedNodeList = createNodes(cpeList, scene);
+  //   for (var i = 0, j = addedNodeList.length;i < j;i++) {
+  //     createLink(addedNodeList[i], local, '', scene);
+  //     nodeList[i].devices.forEach(function(device){
+  //       device.x = Math.random() * 600,
+  //       device.y = Math.random() * 500,
+  //       device.w = 40,
+  //       device.h = 40,
+  //       device.text = device.ip,
+  //       device.img = 'vpn.png',
+  //       device.dragable = true,
+  //       device.nodeType = 'terminal'
+  //     });
+  //     var addedDeviceList = createNodes(nodeList[i].devices, scene);
+  //     for (var x = 0, y = addedDeviceList.length;x < y;x++) {
+  //       createLink(addedDeviceList[x], addedNodeList[i], '', scene);
+  //     }
+  //   }
+  // });
+
   getNodes(function(nodeList) {
-    var cpeList = nodeList.map(function(cpe){
-      return {
-        x: Math.random() * 600,
-        y: Math.random() * 500,
-        w: 30,
-        h: 30,
-        text: cpe.switch.name,
-        img: 'switch.png',
-        dragable: true,
-        nodeType: 'switch'
-      };
-    });
-    var addedNodeList = createNodes(cpeList, scene);
+    console.log(nodeList);
+    nodeList.forEach(function(node){
+      node.x = Math.random() * 600;
+      node.y = Math.random() * 500;
+      node.w = 40;
+      node.h = 40;
+      node.text = node.name;
+      node.img = 'switch.png';
+      node.dragable = true;
+      node.nodeType = 'switch'
+    })
+    var addedNodeList = createNodes(nodeList, scene);
     for (var i = 0, j = addedNodeList.length;i < j;i++) {
       createLink(addedNodeList[i], local, '', scene);
-      nodeList[i].devices.forEach(function(device){
-        device.x = Math.random() * 600,
-        device.y = Math.random() * 500,
-        device.w = 40,
-        device.h = 40,
-        device.text = device.ip,
-        device.img = 'vpn.png',
-        device.dragable = true,
-        device.nodeType = 'terminal'
-      });
-      var addedDeviceList = createNodes(nodeList[i].devices, scene);
-      for (var x = 0, y = addedDeviceList.length;x < y;x++) {
-        createLink(addedDeviceList[x], addedNodeList[i], '', scene);
-      }
     }
   });
   // var nodeList = simulateNodes();
@@ -284,8 +302,8 @@ function getNodes(callback) {
     type: "get",
     url: "/traffic_path_nodes",
     success: function (response) {
-      if (response.err_msg === 'success') {
-        callback(response.data);
+      if (response.errmsg === 'success') {
+        callback(JSON.parse(response.data));
       }
     }
   });
@@ -305,6 +323,9 @@ function getTemplates(callback) {
 }
 
 function applyTemplate(tid) {
+  if(currentNode.text === '192.168.0.13') {
+    currentNode.text = 'cpe2';
+  }
   $.ajax({
     type: 'post',
     url: '/apply_vpn_template',
