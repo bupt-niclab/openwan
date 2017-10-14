@@ -23,7 +23,8 @@ from models import Templates,VPN,Probe
 # from models import db
 # from flask.ext.sqlalchemy import sqlalchemy
 
-global lastapply_tid = None
+# global lastapply_tid = False
+LASTAPPLY_TID = False
 
 # Init app
 
@@ -223,6 +224,7 @@ def templates():
 @app.route("/api_templates/<switchname>")
 # @login_required
 def api_templates(switchname):
+  global LASTAPPLY_TID
   tmp = db_session.query(VPN).all()
   tmp_dict = VPN2dict(tmp)
   for t in tmp_dict:
@@ -870,6 +872,7 @@ def getTrafficPathinfo():
 @app.route('/apply_vpn_template', methods=['POST'])
 # @login_required
 def applyVPNtemplate_1():
+    global LASTAPPLY_TID
     tid = request.json['tid']
     lastapply_tid = tid
     device_name = request.json['name']
