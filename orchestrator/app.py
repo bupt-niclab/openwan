@@ -884,8 +884,8 @@ def applyVPNtemplate_1():
     url1 = url_segment[0]
     url2 = url_segment[1]
     #拼 config.set文件 
-    output = open('config.set','w')
-    input_str = "set interfaces st0 unit " + vpn_num + " family inet address " + vpn_ip
+    output = open('/srv/salt/base/config.set','w')
+    input_str = "set interfaces st0 unit " + str(vpn_num) + " family inet address " + vpn_ip
     output.write(input_str)
     input_str = "set routing-options static route 0.0.0.0/0 next-hop 192.168.0.11"
     output.write(input_str)
@@ -927,7 +927,7 @@ def applyVPNtemplate_1():
     output.write(input_str)
     input_str = "set security ipsec proposal ipsec-phase2-proposal"+str(vpn_num) +" encryption-algorithm "+str(tmp.encryption_algorithm)
     output.write(input_str)
-    # input_str = "set security ipsec policy ipsec-phase2-policy"+str(vpn_num) +" proposals ipsec-phase2-proposal"
+    input_str = "set security ipsec policy ipsec-phase2-policy"+str(vpn_num) +" proposals ipsec-phase2-proposal"+str(vpn_num)
     output.write(input_str)
     input_str = "set security ipsec policy ipsec-phase2-policy"+str(vpn_num) +" perfect-forward-secrecy keys "+str(tmp.dh_group)
     output.write(input_str)
@@ -962,7 +962,10 @@ def applyVPNtemplate_1():
     output.close()
 
     #调用命令行下发配置
-    f = os.popen("salt ") 
+    strpush = "salt "+str(tmp.name)+" cp.get_file salt://srv/salt/base/config.set /srv/salt/base/config.set"
+    f = os.popen(strpush) 
+    strrun = "salt "+str(tmp.name)+" cmd.run cmd = ' ansible-playbook roles/JUniper.junos/"+str(tmp.name)+"config.yml' cwd = '/etc/ansible'"
+    g = os.popen(strrun)
     return jsonify(errmsg = "success")
 
 @app.route('/control_path_nodes',methods = ['GET'])
