@@ -874,9 +874,10 @@ def applyVPNtemplate_1():
     tid = request.json['tid']
     lastapply_tid = tid
     device_name = request.json['device_name']
+    tmp = db_session.query(VPN).filter_by(tid = tid).first()
     #拿到对应的模板 
-    device_vpn_num = os.popen("salt 'cpe1' junos.rpc 'get-arp-table-information' --output=json")
-    # print device_vpn_num
+    str_arp = "salt '"+device_name+"' junos.rpc 'get-arp-table-information' --output=json"
+    device_vpn_num = os.popen(str_arp)
     devices_info = device_vpn_num.message
     print("type is ",type(devices_info))
     vpn_num = devices_info.count("ip-address")
@@ -884,7 +885,6 @@ def applyVPNtemplate_1():
     # vpn_num = 0
     vpn_ip = "10.66."+str(vpn_num)+".254/24"
 
-    tmp = db_session.query(VPN).filter_by(tid = tid).first()
     # print(tmp.network_segment)
 
     url_segment = []
