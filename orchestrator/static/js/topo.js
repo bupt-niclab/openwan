@@ -1,11 +1,12 @@
+var currentNode = null;
+var templateTable;
+
 $(document).ready(function(){
   var canvas = document.getElementById('canvas'); 
   var stage = new JTopo.Stage(canvas); // 创建一个舞台对象
 
   var scene = new JTopo.Scene(stage); // 创建一个场景对象
   scene.background = '/static/images/bg.jpg';
-
-  var currentNode = null;
   
   // 创建公网节点
   var local = createSingleNode({
@@ -18,32 +19,34 @@ $(document).ready(function(){
     dragable: false
   }, scene);
 
-  // makeNodeEditable(scene);
-
   var menuList = $('#contextmenu'),
   menuItem = menuList.find('a');
   
-  var templateTable;
   menuItem.click(function() {
     if($(this)[0].id === 'config-template') {
       $('#config-template-modal').modal();
-        // TODO: 渲染表格
       if(!templateTable) {
-        tamplateTable = $('#templates').DataTable({
+        templateTable = $('#templates').DataTable({
           ajax: {
-            url: '/api_templates'
+            url: '/api_templates/' + currentNode.text
           },
           pageLength: 5,
           columns: [{
             data: "tid"
           }, {
             data: "name"
+          }, {
+            data: "applied"
           }],
           columnDefs: [
           {
             render: function(data, type, row, meta) {
               // return '<a href="' + data + '" target="_blank">' + row.title + '</a>';
-              return '<button class="btn btn-primary" onclick="applyTemplate">操作</button>';              
+              if (data) {
+                return '<button class="btn btn-primary" disabled>已应用</button>';
+              } else {
+                return '<button class="btn btn-primary" onclick="applyTemplate(' + row.tid + ')">应用</button>';                
+              }           
             },
             //指定是第三列
             targets: 2
@@ -63,6 +66,7 @@ $(document).ready(function(){
     }
     menuList.hide();
   });
+
 
   stage.click(function(event) {
     if (event.button === 0) {
@@ -125,7 +129,6 @@ $(document).ready(function(){
   // for (var i = 0, j = addedNodeList.length;i < j;i++) {
   //   createLink(addedNodeList[i], local, '', scene);
   // }
-
 });
 
 // 模拟生成节点
@@ -250,6 +253,7 @@ function makeNodeEditable (scene) {
 
 // 右键弹出菜单
 function handler (event, node) {
+  // console.log(node);
   currentNode = node;
   if (event.button === 2) {
     // console.log(event);
@@ -258,33 +262,33 @@ function handler (event, node) {
       left: event.layerX + 40
     }).show();
   }
-}
+}  
 
 // 获取节点信息
 function getNodes(callback) {
-  var mockData = [{
-    switch: {
-      name: 'CPE1',
-      id: 1
-    },
-    devices: [{ip: '10.0.0.0'}, {ip: '10.0.0.1'}, {ip: '10.0.0.2'}]
-  }, {
-    switch: {
-      name: 'CPE2',
-      id: 2
-    },
-    devices: [{ip: '192.0.0.0'}, {ip: '192.0.0.1'}, {ip: '192.0.0.2'}]
-  }];
-  callback(mockData);
-  // $.ajax({
-  //   type: "get",
-  //   url: "/traffic_path_nodes",
-  //   success: function (response) {
-  //     if (response.err_msg === 'success') {
-  //       callback(response.data);
-  //     }
-  //   }
-  // });
+  // var mockData = [{
+  //   switch: {
+  //     name: 'CPE1',
+  //     id: 1
+  //   },
+  //   devices: [{ip: '10.0.0.0'}, {ip: '10.0.0.1'}, {ip: '10.0.0.2'}]
+  // }, {
+  //   switch: {
+  //     name: 'CPE2',
+  //     id: 2
+  //   },
+  //   devices: [{ip: '192.0.0.0'}, {ip: '192.0.0.1'}, {ip: '192.0.0.2'}]
+  // }];
+  // callback(mockData);
+  $.ajax({
+    type: "get",
+    url: "/traffic_path_nodes",
+    success: function (response) {
+      if (response.err_msg === 'success') {
+        callback(response.data);
+      }
+    }
+  });
 }
 
 // 获取模板列表
@@ -300,7 +304,22 @@ function getTemplates(callback) {
   })
 }
 
-
-function applyTemplate() {
-  
+function applyTemplate(tid) {
+  $.ajax({
+    type: 'post',
+    url: '/apply_vpn_template',
+    contentType: "application/json",
+    data: JSON.stringify({
+      tid: tid,
+      device_name: currentNode.text
+    })
+  }).done(function(response){
+    if (response.status === 0) {
+      alert('应用成功');
+      templateTable.ajax.reload();  
+    } else {
+      alert(response.errmsg)
+    }
+  })
 }
+

@@ -232,11 +232,9 @@ def api_templates(switchname):
           t['applied'] = True
       else:
           t['applied'] = False
-  # TODO:
-  # tid = 3
-  # applied = True False
-  # return jsonify(errmsg = "success", data = json.dumps(tmp, default = VPN2dict))
-  return jsonify(errmsg = "success", data = VPN2dict(tmp))
+  # data = VPN2dict(tmp)
+  # data[0]['applied'] = True
+  return jsonify(errmsg = "success", data = data)
 
 
 @app.route("/templates/run/<template>")
@@ -768,7 +766,7 @@ def VPN2dict(vpns):
       "encryption_algorithm":vpn.encryption_algorithm,
       "pre_shared_key":vpn.pre_shared_key,
       "ipsec_protocol":vpn.ipsec_protocol
-      "applied":vpn.applied
+      # "applied":vpn.applied
     }
     result.append(single)
   return result
@@ -878,7 +876,8 @@ def applyVPNtemplate_1():
     device_name = request.json['device_name']
     #拿到对应的模板 
     device_vpn_num = os.popen("salt 'cpe1' junos.rpc 'get-arp-table-information' --output=json")
-    devices_info = json.loads(device_vpn_num)
+    # print device_vpn_num
+    devices_info = device_vpn_num.message
     print("type is ",type(devices_info))
     vpn_num = devices_info.count("ip-address")
 
@@ -981,45 +980,15 @@ def applyVPNtemplate_1():
     for line in g.readlines():
         strerrmsg = strerrmsg + line
     if "failed=0" in strerrmsg:
-        return jsonify(errmsg = "success", status = "0")
+        return jsonify(errmsg = "success", status = 0)
     elif "failed=1" in strerrmsg:
-        return jsonify(errmsg = strerrmsg , status = "-1")
+        return jsonify(errmsg = strerrmsg , status = -1)
     else:
-        return jsonify(errmsg = strerrmsg , status = "1")
+        return jsonify(errmsg = strerrmsg , status = 1)
         
 
     # return jsonify(errmsg = "success") 
 
-@app.route('/control_path_nodes',methods = ['GET'])
-@login_required
-def getControlPathinfo():
-    nodesinfo = []
-    #按行将获取到的配置信息写入xml文件中 
-    output = open('interface.txt','w')
-    # infoget = os.popen("salt 'cpe*' junos.rpc 'get-interface-information' '/home/user/interface.xml' interface_name='ge-0/0/0.0' terse=True")
-    # for line in os.popen("salt 'cpe*' junos.rpc 'get-interface-information' interface_name='ge-0/0/0.0' terse=True"):
-    for line in os.popen("salt '*' test.ping"):
-        output.writable(line)
-    output.close()
-    #按行读取保存好了的xml文件 
-    flag = 0;
-    d = dict()
-    node_name = None
-    node_state = None
-    read_file = open('interface.txt','r')
-    for line in read_file:
-        print(line)
-        if flag % 2 == 0:
-            d['node_name'] = line
-        if flag % 2 == 1:
-            if line == "True":
-                d['node_state'] = "up"
-            else:
-                d['node_state'] = "down"
-            nodesinfo.append(d)
-        flag = flag + 1
-
-    return jsonify(errmsg = "success", data = json.dumps(nodesinfo))
 
 @app.teardown_request
 def shutdown_session(exception=None):
