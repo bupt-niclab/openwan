@@ -23,7 +23,7 @@ from models import Templates,VPN,Probe
 # from models import db
 # from flask.ext.sqlalchemy import sqlalchemy
 
-
+global lastapply_tid = None
 
 # Init app
 
@@ -224,6 +224,12 @@ def templates():
 # @login_required
 def api_templates(switchname):
   tmp = db_session.query(VPN).all()
+  tmp_dict = VPN2dict(tmp)
+  for t in tmp_dict:
+      if t['tid'] == lastapply_tid:
+          t['applied'] = True
+      else:
+          t['applied'] = False
   # TODO:
   # tid = 3
   # applied = True False
@@ -760,6 +766,7 @@ def VPN2dict(vpns):
       "encryption_algorithm":vpn.encryption_algorithm,
       "pre_shared_key":vpn.pre_shared_key,
       "ipsec_protocol":vpn.ipsec_protocol
+      "applied":vpn.applied
     }
     result.append(single)
   return result
@@ -864,6 +871,7 @@ def getTrafficPathinfo():
 # @login_required
 def applyVPNtemplate_1():
     tid = request.json['tid']
+    lastapply_tid = tid
     device_name = request.json['name']
     #拿到对应的模板 
     device_vpn_num = os.popen("salt 'cpe1' junos.rpc 'get-arp-table-information' --output=json")
@@ -966,7 +974,18 @@ def applyVPNtemplate_1():
     f = os.popen(strpush) 
     strrun = "salt "+str(tmp.name)+" cmd.run cmd = ' ansible-playbook roles/JUniper.junos/"+str(tmp.name)+"config.yml' cwd = '/etc/ansible'"
     g = os.popen(strrun)
-    return jsonify(errmsg = "success")
+    print("return type is ： ",type(g.readlines()))
+    for line in g.readlines():
+        strerrmsg = strerrmsg + line
+    if "failed=0" in strerrmsg:
+        return jsonify(errmsg = "success", status = "0")
+    elif "failed=1" in strerrmsg:
+        return jsonify(errmsg = strerrmsg , status = "-1")
+    else:
+        return jsonify(errmsg = strerrmsg , status = "1")
+        
+
+    # return jsonify(errmsg = "success") 
 
 @app.route('/control_path_nodes',methods = ['GET'])
 @login_required
