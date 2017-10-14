@@ -766,7 +766,6 @@ def VPN2dict(vpns):
       "encryption_algorithm":vpn.encryption_algorithm,
       "pre_shared_key":vpn.pre_shared_key,
       "ipsec_protocol":vpn.ipsec_protocol
-      # "applied":vpn.applied
     }
     result.append(single)
   return result
@@ -800,24 +799,26 @@ def applyVPNtemplate():
     return jsonify(errmsg = "success", data = json.dumps(nodesinfo))
 
 @app.route('/control_path_nodes',methods = ['GET'])
-@login_required
+# @login_required
 def getControlPathinfo():
     nodesinfo = []
     #按行将获取到的配置信息写入xml文件中 
     output = open('interface.txt','w')
+    ff = subprocess.check_output("salt '*' test.ping",shell = True)
+    # print(ff)
     # infoget = os.popen("salt 'cpe*' junos.rpc 'get-interface-information' '/home/user/interface.xml' interface_name='ge-0/0/0.0' terse=True")
     # for line in os.popen("salt 'cpe*' junos.rpc 'get-interface-information' interface_name='ge-0/0/0.0' terse=True"):
-    for line in os.popen("salt '*' test.ping"):
+    for line in ff:
         output.write(line)
     output.close()
     #按行读取保存好了的xml文件 
     flag = 0;
-    d = dict()
     node_name = None
     node_state = None
     read_file = open('interface.txt','r')
-    for line in read_file:
-        print(line)
+    d = dict()
+    for line in read_file.readlines():
+        d1 = dict()
         if flag % 2 == 0:
             d['node_name'] = line
         if flag % 2 == 1:
@@ -825,9 +826,11 @@ def getControlPathinfo():
                 d['node_state'] = "up"
             else:
                 d['node_state'] = "down"
-            nodesinfo.append(d)
+            d1 = d.copy()
+            nodesinfo.append(d1)
+            print(nodesinfo)
         flag = flag + 1
-
+        # print(nodesinfo)
     return jsonify(errmsg = "success", data = json.dumps(nodesinfo))
 
 @app.route('/traffic_path_nodes',methods = ['GET'])
