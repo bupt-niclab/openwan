@@ -895,11 +895,11 @@ def applyVPNtemplate_1():
     output.write(input_str)
     input_str = "set security ike gateway gw-"+str(tmp.name)+" ike-policy ike-phase1-policy"+str(vpn_num)
     output.write(input_str)
-    # input_str = "set security ike gateway gw-"+str(tmp.name)+" dynamic hostname gw1.company.com"
+    input_str = "set security ike gateway gw-"+str(tmp.name)+" address 192.168.0.11"
     output.write(input_str)
     input_str = "set security ipsec proposal ipsec-phase2-proposal"+str(vpn_num) +" protocol "+str(tmp.ipsec_protocol)
     output.write(input_str)
-    # input_str = "set security ipsec proposal ipsec-phase2-proposal"+str(vpn_num) +" authentication-algorithm "+str(tmp.)
+    input_str = "set security ipsec proposal ipsec-phase2-proposal"+str(vpn_num) +" authentication-algorithm hmac-sha1-96"
     output.write(input_str)
     input_str = "set security ipsec proposal ipsec-phase2-proposal"+str(vpn_num) +" encryption-algorithm "+str(tmp.encryption_algorithm)
     output.write(input_str)
@@ -915,7 +915,7 @@ def applyVPNtemplate_1():
     output.write(input_str)
     input_str = "set security ipsec vpn ike-"+str(tmp.name)+" establish-tunnels immediately"
     output.write(input_str)
-    # input_str = "set security policies from-zone trust to-zone "+str(tmp.name)+" policy tr-"+str(tmp.name)+" match source-address vpn-test-1"
+    input_str = "set security policies from-zone trust to-zone "+str(tmp.name)+" policy tr-"+str(tmp.name)+" match source-address "+str(tmp.name)+"-1"
     output.write(input_str)
     input_str = "set security policies from-zone trust to-zone "+str(tmp.name)+" policy tr-"+str(tmp.name)+" match destination-address any"
     output.write(input_str)
@@ -925,7 +925,7 @@ def applyVPNtemplate_1():
     output.write(input_str)
     input_str = "set security policies from-zone "+str(tmp.name)+" to-zone trust policy "+str(tmp.name)+"-tr match source-address any"
     output.write(input_str)
-    # input_str = "set security policies from-zone "+str(tmp.name)+" to-zone trust policy "+str(tmp.name)+"-tr match destination-address vpn-test-1"
+    input_str = "set security policies from-zone "+str(tmp.name)+" to-zone trust policy "+str(tmp.name)+"-tr match destination-address "+str(tmp.name)+"-1"
     output.write(input_str)
     input_str = "set security policies from-zone "+str(tmp.name)+" to-zone trust policy "+str(tmp.name)+"-tr match application any"
     output.write(input_str)
