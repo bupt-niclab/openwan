@@ -888,13 +888,13 @@ def applyVPNtemplate_1():
     device_name2 = "cpe1"
     tmp = db_session.query(VPN).filter_by(tid = tid).first()
     #拿到对应的模板 
-    str_arp = "salt '"+device_name2+"' junos.rpc 'get-arp-table-information' --output=json"
-    device_vpn_num = subprocess.check_output(str_arp, shell=True)
-    devices_info = json.loads(device_vpn_num)
-    print(devices_info)
-    vpn_num = len(devices_info[device_name2]['rpc_reply']['arp-table-information']['arp-table-entry'])
+    # str_arp = "salt '"+device_name2+"' junos.rpc 'get-arp-table-information' --output=json"
+    # device_vpn_num = subprocess.check_output(str_arp, shell=True)
+    # devices_info = json.loads(device_vpn_num)
+    # print(devices_info)
+    # vpn_num = len(devices_info[device_name2]['rpc_reply']['arp-table-information']['arp-table-entry'])
 
-    # vpn_num = 0
+    vpn_num = 30
     vpn_ip = "10.66."+str(vpn_num)+".254/24"
 
     # print(tmp.network_segment)
@@ -989,12 +989,99 @@ def applyVPNtemplate_1():
     strrun = "salt "+str(device_name1)+" cmd.run cmd='ansible-playbook roles/Juniper.junos/"+str(device_name2)+".yml' cwd='/etc/ansible'"
     print strpush    
     print strrun
-    g = subprocess.check_output(strrun, shell=False,stderr = subprocess.STDOUT)
+    g = subprocess.check_output(strrun, shell=True,stderr = subprocess.STDOUT)
     print(g)
     strerrmsg = g
-    # for line in g.readlines():
-    #     strerrmsg = strerrmsg + line
-    # print strerrmsg
+
+    # # 这里开始配置给CPECloud的模板
+    # str_arp_cpeCloud = "salt 'cpeCloud' junos.rpc 'get-arp-table-information' --output=json"
+    # device_vpn_num_cpeCloud = subprocess.check_output(str_arp_cpeCloud, shell = True)
+    # devices_info_cepCloud = json.loads(device_vpn_num_cpeCloud)
+    # print(devices_info_cepCloud)
+    # vpn_num_cpeCloud = len(devices_info_cepCloud['cpeCloud']['rpc_reply']['arp-table-information']['arp-table-entry'])
+
+    # vpn_ip_cpeCloud = "10.66.20.254/24"
+
+    # output = open('/srv/salt/base/config.set','w')
+    # input_str = "set interfaces st0 unit 20 family inet address 10.66.20.254/24\n"
+    # output.write(input_str)
+    # input_str = "set routing-options static route 192.168.1.0/24 next-hop st0.20\n"
+    # output.write(input_str)
+    # input_str = "set security zones security-zone untrust interfaces ge-0/0/0.0\n"
+    # output.write(input_str)
+    # input_str = "set security zones security-zone untrust host-inbound-traffic system-services ike\n"
+    # output.write(input_str)
+    # input_str = "set security zones security-zone trust interfaces ge-0/0/1.0\n"
+    # output.write(input_str)
+    # input_str = "set security zones security-zone trust host-inbound-traffic system-services all\n"
+    # output.write(input_str)
+    # input_str = "set security zones security-zone normal3 interfaces st0.20\n"
+    # output.write(input_str)
+    # input_str = "set security ike proposal ike-phase1-proposal20 authentication-method pre-shared-keys\n"
+    # output.write(input_str)
+    # input_str = "set security ike proposal ike-phase1-proposal20 dh-group group1\n"
+    # output.write(input_str)
+    # input_str = "set security ike proposal ike-phase1-proposal20 authentication-algorithm md5\n"
+    # output.write(input_str)
+    # input_str = "set security ike proposal ike-phase1-proposal20 encryption-algorithm 3des-cbc\n"
+    # output.write(input_str)
+    # input_str = "set security ike policy ike-phase1-policy20 mode aggressive\n"
+    # output.write(input_str)
+    # input_str = "set security ike policy ike-phase1-policy20 proposals ike-phase1-proposal20\n"
+    # output.write(input_str)
+    # input_str = "set security ike policy ike-phase1-policy20 pre-shared-key ascii-text $ABC123\n"
+    # output.write(input_str)
+    # input_str = "set security ike gateway gw-normal3 external-interface ge-0/0/0.0\n"
+    # output.write(input_str)
+    # input_str = "set security ike gateway gw-normal3 ike-policy ike-phase1-policy20\n"
+    # output.write(input_str)
+    # input_str = "set security ike gateway gw-normal3 address 192.168.0.14\n"
+    # output.write(input_str)
+    # input_str = "set security ipsec proposal ipsec-phase2-proposal20 authentication-algorithm hmac-sha1-96\n"
+    # output.write(input_str)
+    # input_str = "set security ipsec proposal ipsec-phase2-proposal20 encryption-algorithm 3des-cbc\n"
+    # output.write(input_str)
+    # input_str = "set security ipsec policy ipsec-phase2-policy20 proposals ipsec-phase2-proposal20\n"
+    # output.write(input_str)
+    # input_str = "set security ipsec policy ipsec-phase2-policy20 perfect-forward-secrecy keys group1\n"
+    # output.write(input_str)
+    # input_str = "set security ipsec vpn ike-normal3 ike gateway gw-normal3\n"
+    # output.write(input_str)
+    # input_str = "set security ipsec vpn ike-normal3 ike ipsec-policy ipsec-phase2-policy20\n"
+    # output.write(input_str)
+    # input_str = "set security ipsec vpn ike-normal3 bind-interface st0.20\n"
+    # output.write(input_str)
+    # input_str = "set security ipsec vpn ike-normal3 establish-tunnels immediately\n"
+    # output.write(input_str)
+    # input_str = "set security policies from-zone trust to-zone normal3 policy tr-normal3 match source-address any\n"
+    # output.write(input_str)
+    # input_str = "set security policies from-zone trust to-zone normal3 policy tr-normal3 match destination-address any\n"
+    # output.write(input_str)
+    # input_str = "set security policies from-zone trust to-zone normal3 policy tr-normal3 match application any\n"
+    # output.write(input_str)
+    # input_str = "set security policies from-zone trust to-zone normal3 policy tr-normal3 then permit\n"
+    # output.write(input_str)
+    # input_str = "set security policies from-zone normal3 to-zone trust policy normal3-tr match source-address any\n"
+    # output.write(input_str)
+    # input_str = "set security policies from-zone normal3 to-zone trust policy normal3-tr match destination-address any\n"
+    # output.write(input_str)
+    # input_str = "set security policies from-zone normal3 to-zone trust policy normal3-tr match application any\n"
+    # output.write(input_str)
+    # input_str = "set security policies from-zone normal3 to-zone trust policy normal3-tr then permit\n"
+    # output.write(input_str)
+    # input_str = "set security flow tcp-mss ipsec-vpn mss 1350\n"
+    # output.write(input_str)
+
+    # output.close()
+    # # 向cpeCloud下发配置
+    # str_cpeCloud_push = "salt cpeCloud cp.get_file salt://config.set /etc/ansible/roles/Juniper.junos/config.set"
+    # f_cpeCloud = subprocess.check_output(str_cpeCloud_push,shell = True)
+    # str_cpeCloud_run = "salt cpeCloud cmd.run cmd='ansible-playbook roles/Juniper.junos/cpeCloud.yml' cwd='/etc/ansible'"
+    # print str_cpeCloud_push
+    # print str_cpeCloud_run
+    # g_cpeCloud = subprocess.check_output(str_cpeCloud_run, shell=False,stderr = subprocess.STDOUT)
+    # print(g_cpeCloud)
+    # strerrmsg_cpeCloud = g_cpeCloud
     if "failed=0" in strerrmsg:
         return jsonify(errmsg = "success", status = 0)
     elif "failed=1" in strerrmsg:
