@@ -989,7 +989,7 @@ def applyVPNtemplate_1():
     strrun = "salt "+str(device_name1)+" cmd.run cmd='ansible-playbook roles/Juniper.junos/"+str(device_name2)+".yml' cwd='/etc/ansible'"
     print strpush    
     print strrun
-    g = subprocess.check_output(strrun, shell=True)
+    g = subprocess.check_output(strrun, shell=False,stderr = subprocess.STDOUT)
     print(g)
     strerrmsg = g
     # for line in g.readlines():
