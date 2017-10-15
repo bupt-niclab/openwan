@@ -909,15 +909,15 @@ def applyVPNtemplate_1():
     output = open('/srv/salt/base/config.set','w')
     input_str = "set interfaces st0 unit " + str(vpn_num) + " family inet address " + vpn_ip + "\n"
     output.write(input_str)
-    input_str = "set routing-options static route 0.0.0.0/0 next-hop 192.168.0.11" + "\n"
-    output.write(input_str)
+    # input_str = "set routing-options static route 0.0.0.0/0 next-hop 192.168.0.11" + "\n"
+    # output.write(input_str)
     input_str = "set routing-options static route "+url1+" next-hop st0." + str(vpn_num)+ "\n"
     output.write(input_str)
-    input_str = "set security zones security-zone untrust interfaces ge-0/0/0.0"+ "\n"
+    input_str = "set security zones security-zone untrust interfaces ge-0/0/1.0"+ "\n"
     output.write(input_str)
     input_str = "set security zones security-zone untrust host-inbound-traffic system-services ike"+ "\n"
     output.write(input_str)
-    input_str = "set security zones security-zone trust interfaces ge-0/0/1.0"+ "\n"
+    input_str = "set security zones security-zone trust interfaces ge-0/0/2.0"+ "\n"
     output.write(input_str)
     input_str = "set security zones security-zone trust host-inbound-traffic system-services all"+ "\n"
     output.write(input_str)
