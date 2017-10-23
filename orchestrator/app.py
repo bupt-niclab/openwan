@@ -821,6 +821,16 @@ def getControlPathinfo():
         d1 = dict()
         if flag % 2 == 0:
             d['node_name'] = line.strip().strip(':')
+            str = "salt '"+d['node_name']+"' grains.item os --output=json"
+            node_name = d['node_name']
+            fff = subprocess.check_output(str,shell = True)
+            node_info = json.loads(fff)
+            node_type = node_info[node_name]['os']
+            print("node type is ",node_type)
+            if node_type != "proxy":
+                d['node_type'] = "master"
+            else:
+                d['node_type'] = "agent"
         if flag % 2 == 1:
             if line.strip() == "True":
                 d['node_state'] = "up"
