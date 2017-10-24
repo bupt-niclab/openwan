@@ -874,7 +874,7 @@ def getControlPathinfo():
             node_type = node_info[node_name]['os']
             print("node type is ",node_type)
             if node_type != "proxy":
-                d['node_type'] = "master"
+                d['node_type'] = "non-agent"
             else:
                 d['node_type'] = "agent"
         if flag % 2 == 1:
