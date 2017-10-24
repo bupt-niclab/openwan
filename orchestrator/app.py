@@ -260,7 +260,10 @@ def add_template():
     # probe_form = ProbeForm()
     if vpn_form.validate_on_submit():   
       # ((?:(?:25[0-5]|2[0-4]\d|(?:1\d{2}|[1-9]?\d))\.){3}(?:25[0-5]|2[0-4]\d|(?:1\d{2}|[1-9]?\d)))/24         
-      tmp = VPN(vpn_form.name.data, vpn_form.network_segment.data,vpn_form.dh_group.data, vpn_form.authentication_algorithm.data,vpn_form.encryption_algorithm.data, vpn_form.pre_shared_key.data,vpn_form.ipsec_protocol.data)
+      tmp = VPN(vpn_form.name.data,vpn_form.LTE_cloudGW.data,vpn_form.LTE_external_interface.data,vpn_form.LTE_internal_interface.data,
+    vpn_form.LTE_local_identity.data,vpn_form.LTE_local_identity.data,vpn_form.LTE_remote_identity.data,vpn_form.cloud_external_interface.data,
+    vpn_form.cloud_internal_interface.data,vpn_form.cloud_local_address.data,
+    vpn_form.dh_group.data, vpn_form.authentication_algorithm.data,vpn_form.encryption_algorithm.data, vpn_form.pre_shared_key.data,vpn_form.ipsec_protocol.data)
 
       db_session.add(tmp)
       db_session.commit()
@@ -299,19 +302,30 @@ def edit_template(tid):
   vpn_form = VPNForm()    
   if request.method == 'GET':
     vpn_form.name.data = tmp.name
-    vpn_form.network_segment.data = tmp.network_segment
+    vpn_form.LTE_cloudGW.data = tmp.LTE_cloudGW
+    vpn_form.LTE_external_interface.data = tmp.LTE_external_interface
+    vpn_form.LTE_internal_interface.data = tmp.LTE_internal_interface
+    vpn_form.LTE_local_identity.data = tmp.LTE_local_identity
+    vpn_form.LTE_remote_identity.data = tmp.LTE_remote_identity
+    vpn_form.cloud_external_interface.data = tmp.cloud_external_interface
+    vpn_form.cloud_internal_interface.data = tmp.cloud_internal_interface
+    vpn_form.cloud_local_address.data = tmp.cloud_local_address
+    # vpn_form.network_segment.data = tmp.network_segment
     vpn_form.dh_group.data = tmp.dh_group
     vpn_form.authentication_algorithm.data = tmp.authentication_algorithm
     vpn_form.encryption_algorithm.data = tmp.encryption_algorithm
     vpn_form.pre_shared_key.data = tmp.pre_shared_key
-    vpn_form.ipsec_protocol.data = tmp.ipsec_protocol
+    # vpn_form.ipsec_protocol.data = tmp.ipsec_protocol
     # probe_form = ProbeForm()
   
   if vpn_form.validate_on_submit():            
     db_session.delete(tmp)
     db_session.commit()
     print(vpn_form.name.data)
-    tmp2 = VPN(vpn_form.name.data, vpn_form.network_segment.data,vpn_form.dh_group.data, vpn_form.authentication_algorithm.data,vpn_form.encryption_algorithm.data, vpn_form.pre_shared_key.data,vpn_form.ipsec_protocol.data)
+    tmp2 = VPN(vpn_form.name.data,vpn_form.LTE_cloudGW.data,vpn_form.LTE_external_interface.data,vpn_form.LTE_internal_interface.data,
+    vpn_form.LTE_local_identity.data,vpn_form.LTE_local_identity.data,vpn_form.LTE_remote_identity.data,vpn_form.cloud_external_interface.data,
+    vpn_form.cloud_internal_interface.data,vpn_form.cloud_local_address.data,
+    vpn_form.dh_group.data, vpn_form.authentication_algorithm.data,vpn_form.encryption_algorithm.data, vpn_form.pre_shared_key.data,vpn_form.ipsec_protocol.data)
     print(tmp2)
 
     db_session.add(tmp2)
@@ -360,7 +374,23 @@ hardware_time = [
     ('True', 'True'),
     ('False', 'False')
 ]
-
+LTE_cloudGW = [
+    ('112.35.30.65','112.35.30.65'),
+    ('112.35.30.67','112.35.30.67'),
+    ('112.35.30.69','112.35.30.69')
+]
+LTE_external_interface = [
+    ('ge-0/0/0','ge-0/0/0'),
+    ('ge-0/0/1','ge-0/0/1')
+]
+LTE_internal_interface = [
+    ('ge-0/0/2','ge-0/0/2'),
+    ('ge-0/0/1','ge-0/0/1')
+]
+cloud_internal_interface = [
+    ('ge-0/0/1','ge-0/0/1'),
+    ('ge-0/0/2','ge-0/0/2')
+]
 dh_group = [
     ('group1', 'group1'),
     ('group2', 'group2'),
@@ -414,12 +444,20 @@ class ProbeForm(Form):
 
 class VPNForm(Form):
     name = StringField('name', validators=[DataRequired()])#必填
+    LTE_cloudGW = SelectField('LTE-cloudGW', choices=LTE_cloudGW)
+    LTE_external_interface = SelectField('LTE-external-interface',choices=LTE_external_interface)
+    LTE_internal_interface = SelectField('LTE-internal-interface',choices=LTE_internal_interface)
+    LTE_local_identity = StringField('LTE-local-identity',validators=[DataRequired()])
+    LTE_remote_identity = StringField('LTE-remote-identity', validators=[DataRequired()])
+    cloud_external_interface = StringField('cloud-external-interface',validators=[DataRequired()])
+    cloud_internal_interface = SelectField('cloud-internal-interface', choices=cloud_internal_interface)
+    cloud_local_address = StringField('cloud-local-address',validators=[DataRequired()])
     network_segment = StringField('network-segment', validators=[DataRequired()])#必填
     dh_group = SelectField('dh-group',choices=dh_group)
     authentication_algorithm = SelectField('authentication-algorithm',choices=authentication_algorithm)
     encryption_algorithm = SelectField('encryption-algorithm',choices=encryption_algorithm)
     pre_shared_key = SelectField('pre-shared-key',choices=pre_shared_key)
-    ipsec_protocol = SelectField('ipsec-protocol',choices=ipsec_protocol)
+    # ipsec_protocol = SelectField('ipsec-protocol',choices=ipsec_protocol)
 
 def validate_network_segment(form, field):
   try: 
@@ -694,10 +732,10 @@ def add_VPN_template():
 def del_VPN_template():
     # print(request.json)
     VPN_name = request.json['name']
-    network_segment = request.json['network_segment']
+    # network_segment = request.json['network_segment']
     
     
-    tmp = db_session.query(VPN).filter_by(name = VPN_name, network_segment = network_segment).first()
+    tmp = db_session.query(VPN).filter_by(name = VPN_name).first()
     if tmp.name == None:
         return jsonify(errmsg="No such template",data='2')
 
@@ -711,12 +749,20 @@ def del_VPN_template():
 def modify_VPN_template():
     
     VPN_name = request.json['name']
-    network_segment = request.json['network_segment']
+    LTE_cloudGW = request.json['LTE_cloudGW']
+    LTE_external_interface = request.json['LTE_external_interface']
+    LTE_internal_interface = request.json['LTE_internal_interface']
+    LTE_local_identity = request.json['LTE_local_identity']
+    LTE_remote_identity = request.json['LTE_remote_identity']
+    cloud_external_interface = request.json['cloud_external_interface']
+    cloud_internal_interface = request.json['cloud_internal_interface']
+    cloud_local_address = request.json['cloud_local_address']
+    # network_segment = request.json['network_segment']
     dh_group = request.json['dh_group']
     authentication_algorithm = request.json['authentication_algorithm']
     encryption_algorithm = request.json['encryption_algorithm']
     pre_shared_key = request.json['pre_shared_key']
-    ipsec_protocol = request.json['ipsec_protocol']
+    # ipsec_protocol = request.json['ipsec_protocol']
 
     tmp = db_session.query(VPN).filter_by(name = VPN_name).first()
 

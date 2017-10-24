@@ -97,17 +97,34 @@ class VPN(Base):
 
     tid = Column(Integer, primary_key = True, autoincrement = True)
     name = Column(String(255), unique = True)
-    network_segment = Column(String(255), nullable = False)
+    LTE_cloudGW = Column(String(30), nullable = False)
+    LTE_external_interface = Column(String(30), nullable = False)
+    LTE_internal_interface = Column(String(30),nullable = False)
+    LTE_local_identity = Column(String(30),nullable = False)
+    LTE_remote_identity = Column(String(30),nullable = False)
+    cloud_external_interface = Column(String(30),nullable = False)
+    cloud_internal_interface = Column(String(30),nullable = False)
+    cloud_local_address = Column(String(30),nullable = False)
+    # network_segment = Column(String(255), nullable = False)
     dh_group = Column(String(255) , nullable = False)
     authentication_algorithm = Column(String(30), nullable = False)
     encryption_algorithm =Column(String(30), nullable = False)
     pre_shared_key = Column(String(30), nullable = False)
-    ipsec_protocol = Column(String(30), nullable = False)
+    # ipsec_protocol = Column(String(30), nullable = False)
 
-    def __init__(self,name,network_segment,dh_group,authentication_algorithm,encryption_algorithm,pre_shared_key,ipsec_protocol):
+    def __init__(self,name,LTE_cloudGW,LTE_external_interface,LTE_internal_interface,
+    LTE_local_identity,LTE_remote_identity,cloud_external_interface,cloud_internal_interface,
+    cloud_local_address,dh_group,authentication_algorithm,encryption_algorithm,pre_shared_key):
         # self.tid = tid
         self.name = name
-        self.network_segment = network_segment
+        self.LTE_cloudGW = LTE_cloudGW
+        self.LTE_external_interface = LTE_external_interface
+        self.LTE_internal_interface = LTE_internal_interface
+        self.LTE_local_identity = LTE_local_identity
+        self.cloud_external_interface = cloud_external_interface
+        self.cloud_internal_interface = cloud_internal_interface
+        self.cloud_local_address = cloud_local_address
+        # self.network_segment = network_segment
         self.dh_group = dh_group
         self.authentication_algorithm = authentication_algorithm
         self.encryption_algorithm = encryption_algorithm
