@@ -2,20 +2,69 @@ var currentNode = null;
 var templateTable;
 
 $(document).ready(function(){
+
+  console.log(new JTopo.Link);
+  console.log(new JTopo.Node);  
   var canvas = document.getElementById('canvas'); 
   var stage = new JTopo.Stage(canvas); // 创建一个舞台对象
 
   var scene = new JTopo.Scene(stage); // 创建一个场景对象
   scene.background = '/static/images/bg.jpg';
   
-  // 创建公网节点
+  // 创建云端节点
   var local = createSingleNode({
-    x: 500,
-    y: 250,
+    x: 270,
+    y: 200,
     w: 40,
     h: 40,
     text: 'Cloud-GW',
-    img: 'cloud.png',
+    // fontColor: '170,170,170',
+    img: 'frame.png',
+    dragable: false
+  }, scene);
+
+  // 创建 cpe 节点
+  var cpe1 = createSingleNode({
+    x: 290,
+    y: 225,
+    w: 40,
+    h: 40,
+    text: 'CPE1',
+    // fontColor: '170,170,170',    
+    img: 'cpe.png',
+    dragable: false
+  }, scene);
+
+  var cpe2 = createSingleNode({
+    x: 290,
+    y: 305,
+    w: 40,
+    h: 40,
+    text: 'CPE2',
+    // fontColor: '170,170,170',    
+    img: 'cpe.png',
+    dragable: false
+  }, scene);
+
+  var cpe3 = createSingleNode({
+    x: 390,
+    y: 305,
+    w: 40,
+    h: 40,
+    text: 'CPE3',
+    // fontColor: '170,170,170',        
+    img: 'cpe.png',
+    dragable: false
+  }, scene);
+
+  var cpe4 = createSingleNode({
+    x: 390,
+    y: 225,
+    w: 40,
+    h: 40,
+    text: 'CPE4',
+    // fontColor: '170,170,170',        
+    img: 'cpe.png',
     dragable: false
   }, scene);
 
@@ -155,18 +204,40 @@ function simulateNodes () {
 
   for (var i = 0;i < 5; i++) {
     var singleNode = {
-      x: Math.random() * 800,
-      y: Math.random() * 500,
+      x: randomNodePosition('x'),
+      y: randomNodePosition('y'),
       w: 40,
       h: 40,
-      img: 'vpn.png',
+      img: 'switch.png',
       dragable: true,
-      text: 'Node ' + i
+      text: 'Node ' + i,
+      // fontColor: '170,170,170'    
     }
     nodeList.push(singleNode);
   }
 
   return nodeList;
+}
+
+function randomNodePosition(type) {
+  var result;
+  if (type === 'x') {
+    result = Math.random() * 800;
+    if(result >= 230 && result <= 480) {
+      return randomNodePosition('x');
+    }
+    else {
+      return result;
+    }
+  } else {
+    result = Math.random() * 500;
+    if(result >= 200 && result <= 400) {
+      return randomNodePosition('y');
+    }
+    else {
+      return result;
+    }
+  }
 }
 
 // 添加节点数组至拓扑
@@ -195,6 +266,7 @@ function createSingleNode (nodeInfo, scene) {
   } else if (nodeInfo.state === 'DOWN') {
     node.alarm = 'down';
   }
+  node.fontColor = nodeInfo.fontColor || '0,0,0';
   scene.add(node);
   // TODO: 判断是否是 CPE 节点
   if (nodeInfo.nodeType === 'switch') {
@@ -208,12 +280,25 @@ function createSingleNode (nodeInfo, scene) {
 // 创建节点间连线
 function createLink (fromNode, toNode, text, scene) {
   var link = new JTopo.Link(fromNode, toNode, text);
+  // var path = link.getPath();
+  // console.log(path);
+  // var pathLength = Math.floor(Math.sqrt(Math.pow(path[0].x - path[1].x,2) + Math.pow(path[0].y - path[1].y, 2)));
+  // console.log(pathLength);
+  link.arrowsRadius = 10;
   link.lineWidth = 3;
   // link.dashedPattern = dashedPattern;
   link.bundleOffset = 60; // 折线拐角处的长度
   link.bundleGap = 20; // 线条之间的间隔
+  link.arrowsOffset = -50;  
   link.textOffsetY = 3; // 文本偏移量（向下3个像素）
-  link.strokeColor = '255,255,255';
+  link.strokeColor = '81,181,220';    
+
+  setInterval(function(){
+    link.arrowsOffset++;
+    if (link.arrowsOffset === 0) {
+      link.arrowsOffset = -50;
+    }
+  }, 100);
   scene.add(link);
   return link;
 }

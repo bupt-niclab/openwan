@@ -1,4 +1,5 @@
 $(document).ready(function(){
+  console.log(JTopo.Effect);
   var canvas = document.getElementById('canvas'); 
   var stage = new JTopo.Stage(canvas); // 创建一个舞台对象
 
@@ -12,7 +13,7 @@ $(document).ready(function(){
     w: 40,
     h: 40,
     text: 'Cloud-GW',
-    img: 'cloud.png',
+    img: 'control-cloud.png',
     dragable: false
   }, scene);
 
@@ -24,10 +25,7 @@ $(document).ready(function(){
   menuItem.click(function() {
     if($(this)[0].id === 'config-template') {
       $('#config-template-modal').modal();
-      // alert('配置成功');
-    } else {
-      alert('查看成功');
-    }
+    } 
     menuList.hide();
   });
 
@@ -38,15 +36,14 @@ $(document).ready(function(){
   });
 
   getNodes(function(nodeList) {
-    console.log(nodeList);
     nodeList.forEach(function(node){
-      node.x = Math.random() * 600,
-      node.y = Math.random() * 500,
-      node.w = 40,
-      node.h = 40,
-      node.text = node.node_name,
-      node.img = 'vpn.png',
-      node.dragable = true
+      node.x = Math.random() * 600;
+      node.y = Math.random() * 500;
+      node.w = 40;
+      node.h = 40;
+      node.text = node.node_name;
+      node.img = node.node_type === 'agent' ? 'terminal.png' : 'switch.png';
+      node.dragable = true;
     })
     var addedNodeList = createNodes(nodeList, scene);
     for (var i = 0, j = addedNodeList.length;i < j;i++) {
@@ -70,7 +67,7 @@ function simulateNodes () {
       y: Math.random() * 500,
       w: 40,
       h: 40,
-      img: 'vpn.png',
+      img: 'terminal.png',
       dragable: true,
       text: 'Node ' + i
     }
@@ -106,6 +103,7 @@ function createSingleNode (nodeInfo, scene) {
   } else if (nodeInfo.node_state === 'down') {
     node.alarm = 'down';
   }
+  node.fontColor = nodeInfo.fontColor || '0,0,0';  
   scene.add(node);
   return node;
 }
@@ -114,11 +112,11 @@ function createSingleNode (nodeInfo, scene) {
 function createLink (fromNode, toNode, text, scene) {
   var link = new JTopo.Link(fromNode, toNode, text);
   link.lineWidth = 3;
-  // link.dashedPattern = dashedPattern;
+  link.dashedPattern = 5;
   link.bundleOffset = 60; // 折线拐角处的长度
   link.bundleGap = 20; // 线条之间的间隔
   link.textOffsetY = 3; // 文本偏移量（向下3个像素）
-  link.strokeColor = '255,255,255';
+  link.strokeColor = '81,181,220';  
   scene.add(link);
   return link;
 }
