@@ -38,7 +38,7 @@ class VPN(Base):
     tid = db.Column(db.Integer, primary_key = True, autoincrement = True)
     name = db.Column(db.String(255), unique = True)
     LTE_cloudGW = db.Column(db.String(30), nullable = False)
-    LTE_external_interface = db.Column(db.dbString(30), nullable = False)
+    LTE_external_interface = db.Column(db.String(30), nullable = False)
     LTE_internal_interface = db.Column(db.String(30),nullable = False)
     LTE_local_identity = db.Column(db.String(30),nullable = False)
     LTE_remote_identity = db.Column(db.String(30),nullable = False)
