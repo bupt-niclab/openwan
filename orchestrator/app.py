@@ -1206,3 +1206,10 @@ def applyVPNtemplate_1():
 @app.teardown_request
 def shutdown_session(exception=None):
   db_session.remove()
+
+@app.route('/keys/reject/<key>')
+@login_required
+def reject_key(key):
+    content = request.json
+    client.run('key.reject', client="wheel", arg = key)['data']['return']
+    return redirect(url_for('minios_keys'))
