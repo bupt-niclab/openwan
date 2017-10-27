@@ -928,11 +928,30 @@ def getTrafficPathinfo():
             d1['ip'] = vmx_dict['cpeCloud']['rpc_reply']['ike-active-peers-information']['ike-active-peers'][i]['ike-sa-remote-address']
             d1['name'] = vmx_dict['cpeCloud']['rpc_reply']['ike-active-peers-information']['ike-active-peers'][i]['ike-ike-id']
             equ_name = d1['name']
-            str = "salt '"+d1['name']+ "' junos.rpc 'get-pfe-statistics --output=json"
+            str = "salt '"+d1['name']+ "' junos.rpc 'get-pfe-statistics' --output=json"
             equ_in_out = subprocess.check_output(str,shell = True)
             equ_dict = json.loads(equ_in_out)
-            d1['input_pps'] = equ_dict[equ_name]['rpc_reply']['pfe-statistics']['pfe-traffic-statistics']['input-pps']
-            d1['output_pps'] = equ_dict[equ_name]['rpc_reply']['pfe-statistics']['pfe-traffic-statistics']['output-pps']
+            d1['input_pps'] = int(equ_dict[equ_name]['rpc_reply']['pfe-statistics']['pfe-traffic-statistics']['input-pps'])
+            print("input pps is ",type(d1['input_pps']))
+            if d1['input_pps'] <= 10:
+                d1['input_pps'] = 1
+            elif d1['input_pps'] >10 and d1['input_pps'] <= 100 :
+                d1['input_pps'] = 2
+            elif d1['input_pps'] > 100 and d1['input_pps'] <= 1000 :
+                d1['input_pps'] = 3
+            else:
+                d1['input_pps'] = 4   
+                
+            d1['output_pps'] = int(equ_dict[equ_name]['rpc_reply']['pfe-statistics']['pfe-traffic-statistics']['output-pps'])
+            print("output pps is ",type(d1['output_pps']))
+            if d1['output_pps'] <= 10:
+                d1['output_pps'] = 1
+            elif d1['output_pps'] >10 and d1['output_pps'] <= 100 :
+                d1['output_pps'] = 2
+            elif d1['output_pps'] > 100 and d1['output_pps'] <= 1000 :
+                d1['output_pps'] = 3
+            else:
+                d1['output_pps'] = 4 
             nodesinfo_basic.append(d1)
     # cpe_cloud_json_dup = subprocess.check_output("salt 'cpeCloud' junos.rpc 'get-ike-active-peers-information' --output=json", shell=True)
     # cpe_cloud_json_dup = cpe_cloud_json_dup.strip()
