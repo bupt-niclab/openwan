@@ -133,3 +133,16 @@ class VPN(Base):
     
     def __repr__(self):
         return '<name %r>' % self.name
+
+
+class UTM(Base):
+    __tablename__ = 'UTM'
+
+    tid = Column(Integer, primary_key = True, autoincrement = True)
+    name = Column(String(255),nullable = False)
+
+    def __init__(self):
+        self.name = name
+
+    def __repr__(self):
+        return '<name %r>' % self.name
