@@ -304,17 +304,22 @@ def edit_template(tid):
     vpn_form.name.data = tmp.name
     vpn_form.LTE_cloudGW.data = tmp.LTE_cloudGW
     vpn_form.LTE_external_interface.data = tmp.LTE_external_interface
-    vpn_form.LTE_internal_interface.data = tmp.LTE_internal_interface
+    # vpn_form.LTE_internal_interface.data = tmp.LTE_internal_interface
     vpn_form.LTE_local_identity.data = tmp.LTE_local_identity
     vpn_form.LTE_remote_identity.data = tmp.LTE_remote_identity
     vpn_form.cloud_external_interface.data = tmp.cloud_external_interface
-    vpn_form.cloud_internal_interface.data = tmp.cloud_internal_interface
+    # vpn_form.cloud_internal_interface.data = tmp.cloud_internal_interface
     vpn_form.cloud_local_address.data = tmp.cloud_local_address
     # vpn_form.network_segment.data = tmp.network_segment
-    vpn_form.dh_group.data = tmp.dh_group
-    vpn_form.authentication_algorithm.data = tmp.authentication_algorithm
-    vpn_form.encryption_algorithm.data = tmp.encryption_algorithm
-    vpn_form.pre_shared_key.data = tmp.pre_shared_key
+    vpn_form.phase1_dh_group.data = tmp.phase1_dh_group
+    vpn_form.phase1_authentication_algorithm.data = tmp.phase1_authentication_algorithm
+    vpn_form.phase1_encryption_algorithm.data = tmp.phase1_encryption_algorithm
+    vpn_form.phase1_pre_shared_key.data = tmp.phase1_pre_shared_key
+    vpn_form.phase1_dead_peer_detection_nterval = tmp.phase1_dead_peer_detection_nterval
+    vpn_form.phase1_dead_peer_detection_threshold = tmp.phase1_dead_peer_detection_threshold
+    vpn_form.phase2_authentication_algorithm = phase2_authentication_algorithm
+    vpn_form.phase2_encryption_algorithm = phase2_encryption_algorithm
+    vpn_form.phase2_perfect_forward_secrecy_keys = phase2_perfect_forward_secrecy_keys
     # vpn_form.ipsec_protocol.data = tmp.ipsec_protocol
     # probe_form = ProbeForm()
   
@@ -322,10 +327,23 @@ def edit_template(tid):
     db_session.delete(tmp)
     db_session.commit()
     print(vpn_form.name.data)
-    tmp2 = VPN(vpn_form.name.data,vpn_form.LTE_cloudGW.data,vpn_form.LTE_external_interface.data,vpn_form.LTE_internal_interface.data,
-    vpn_form.LTE_local_identity.data,vpn_form.LTE_local_identity.data,vpn_form.LTE_remote_identity.data,vpn_form.cloud_external_interface.data,
-    vpn_form.cloud_internal_interface.data,vpn_form.cloud_local_address.data,
-    vpn_form.dh_group.data, vpn_form.authentication_algorithm.data,vpn_form.encryption_algorithm.data, vpn_form.pre_shared_key.data,vpn_form.ipsec_protocol.data)
+    tmp2 = VPN(vpn_form.name.data,
+    vpn_form.LTE_cloudGW.data,
+    vpn_form.LTE_external_interface.data,
+    vpn_form.LTE_local_identity.data,
+    vpn_form.LTE_local_identity.data,
+    vpn_form.LTE_remote_identity.data,
+    vpn_form.cloud_external_interface.data,
+    vpn_form.cloud_local_address.data,
+    vpn_form.phase1_dh_group.data, 
+    vpn_form.phase1_authentication_algorithm.data,
+    vpn_form.phase1_encryption_algorithm.data, 
+    vpn_form.phase1_pre_shared_key.data,
+    vpn_form.phase1_dead_peer_detection_nterval.data,
+    vpn_form.phase1_dead_peer_detection_threshold.data,
+    vpn_form.phase2_authentication_algorithm.data,
+    vpn_form.phase2_encryption_algorithm.data,
+    vpn_form.phase2_perfect_forward_secrecy_keys)
     print(tmp2)
 
     db_session.add(tmp2)
@@ -397,13 +415,13 @@ dh_group = [
     ('group5', 'group5')
 ]
 
-authentication_algorithm = [
+phase1_authentication_algorithm = [
     ('md5', 'md5'),
     ('sha-256','sha-256'),
     ('sha1','sha1')
 ]
 
-encryption_algorithm = [
+phase1_encryption_algorithm = [
     ('3des-cbc','3des-cbc'),
     ('aes-128-cbc','aes-128-cbc'),
     ('aes-192-cbc', 'aes-192-cbc'),
@@ -411,13 +429,29 @@ encryption_algorithm = [
     ('des-cbc','des-cbc')
 ]
 
-pre_shared_key = [
+phase1_pre_shared_key = [
     ('ascii-text $ABC123','ascii-text $ABC123')
 ]
 
 ipsec_protocol = [
     ('ah','ah'),
     ('esp','esp')
+]
+phase2_authentication_algorithm = [
+    ('hmac-md5-96','hmac-md5-96'),
+    ('hmac-sha1-96','hmac-sha1-96')
+]
+phase2_encryption_algorithm = [
+    ('3des-cbc','3des-cbc'),
+    ('aes-128-cbc','aes-128-cbc'),
+    ('aes-192-cbc', 'aes-192-cbc'),
+    ('aes-256-cbc','aes-256-cbc'),
+    ('des-cbc','des-cbc')
+]
+phase2_perfect_forward_secrecy_keys = [
+    ('group1', 'group1'),
+    ('group2', 'group2'),
+    ('group5', 'group5')
 ]
 class RunForm(Form):
     expr_form = SelectField('matcher', choices=matchers)
@@ -446,19 +480,23 @@ class VPNForm(Form):
     name = StringField('name', validators=[DataRequired()])#必填
     LTE_cloudGW = SelectField('LTE-cloudGW', choices=LTE_cloudGW)
     LTE_external_interface = SelectField('LTE-external-interface',choices=LTE_external_interface)
-    LTE_internal_interface = SelectField('LTE-internal-interface',choices=LTE_internal_interface)
+    # LTE_internal_interface = SelectField('LTE-internal-interface',choices=LTE_internal_interface)
     LTE_local_identity = StringField('LTE-local-identity',validators=[DataRequired()])
     LTE_remote_identity = StringField('LTE-remote-identity', validators=[DataRequired()])
     cloud_external_interface = StringField('cloud-external-interface',validators=[DataRequired()])
-    cloud_internal_interface = SelectField('cloud-internal-interface', choices=cloud_internal_interface)
+    # cloud_internal_interface = SelectField('cloud-internal-interface', choices=cloud_internal_interface)
     cloud_local_address = StringField('cloud-local-address',validators=[DataRequired()])
-    network_segment = StringField('network-segment', validators=[DataRequired()])#必填
-    dh_group = SelectField('dh-group',choices=dh_group)
-    authentication_algorithm = SelectField('authentication-algorithm',choices=authentication_algorithm)
-    encryption_algorithm = SelectField('encryption-algorithm',choices=encryption_algorithm)
-    pre_shared_key = SelectField('pre-shared-key',choices=pre_shared_key)
+    # network_segment = StringField('network-segment', validators=[DataRequired()])#必填
+    phase1_dh_group = SelectField('phase1-dh-group',choices=dh_group)
+    phase1_authentication_algorithm = SelectField('phase1-authentication-algorithm',choices=authentication_algorithm)
+    phase1_encryption_algorithm = SelectField('phase1-encryption-algorithm',choices=encryption_algorithm)
+    phase1_pre_shared_key = SelectField('phase1-pre-shared-key',choices=pre_shared_key)
     # ipsec_protocol = SelectField('ipsec-protocol',choices=ipsec_protocol)
-
+    phase1_dead_peer_detection_nterval = StringField('phase1_dead_peer_detection_nterval',validators=[DataRequired])
+    phase1_dead_peer_detection_threshold = StringField('phase1_dead_peer_detection_threshold',validators=[DataRequired])
+    phase2_authentication_algorithm = SelectField('phase2_authentication_algorithm',choices=phase2_authentication_algorithm)
+    phase2_encryption_algorithm = SelectField('phase2_encryption_algorithm',choices=phase2_encryption_algorithm)
+    phase2_perfect_forward_secrecy_keys = SelectField('phase2_perfect_forward_secrecy_keys',choices=phase2_perfect_forward_secrecy_keys)
 def validate_network_segment(form, field):
   try: 
     startIpSegment = field.data.strip().split('-')[0] # 192.168.1.1/24
@@ -709,14 +747,41 @@ def timer_mission():
 def add_VPN_template():
     
     VPN_name = request.json['name']
-    network_segment = request.json['network_segment']
-    dh_group = request.json['dh_group']
-    authentication_algorithm = request.json['authentication_algorithm']
-    encryption_algorithm = request.json['encryption_algorithm']
-    pre_shared_key = request.json['pre_shared_key']
-    ipsec_protocol = request.json['ipsec_protocol']
+    LTE_cloudGW = request.json['LTE_cloudGW']
+    LTE_external_interface = request.json['LTE_external_interface']
+    LTE_local_identity = request.json['LTE_local_identity']
+    LTE_remote_identity = request.json['LTE_remote_identity']
+    cloud_external_interface = request.json['cloud_external_interface']
+    cloud_local_address = request.json['cloud_local_address']
+    # network_segment = request.json['network_segment']
+    phase1_dh_group = request.json['phase1_dh_group']
+    phase1_authentication_algorithm = request.json['phase1_authentication_algorithm']
+    phase1_encryption_algorithm = request.json['phase1_encryption_algorithm']
+    phase1_pre_shared_key = request.json['phase1_pre_shared_key']
+    phase1_dead_peer_detection_nterval = request.json['phase1_dead_peer_detection_nterval']
+    phase1_dead_peer_detection_threshold = request.json['phase1_dead_peer_detection_threshold']
+    phase2_authentication_algorithm = request.json['phase2_authentication_algorithm']
+    phase2_encryption_algorithm = request.json['phase2_encryption_algorithm']
+    phase2_perfect_forward_secrecy_keys = request.json['phase2_perfect_forward_secrecy_keys']
+    
 
-    tmp = VPN(VPN_name,network_segment,dh_group,authentication_algorithm,encryption_algorithm,pre_shared_key,ipsec_protocol)
+    tmp = VPN(vpn_form.name.data,
+    vpn_form.LTE_cloudGW.data,
+    vpn_form.LTE_external_interface.data,
+    vpn_form.LTE_local_identity.data,
+    vpn_form.LTE_local_identity.data,
+    vpn_form.LTE_remote_identity.data,
+    vpn_form.cloud_external_interface.data,
+    vpn_form.cloud_local_address.data,
+    vpn_form.phase1_dh_group.data, 
+    vpn_form.phase1_authentication_algorithm.data,
+    vpn_form.phase1_encryption_algorithm.data, 
+    vpn_form.phase1_pre_shared_key.data,
+    vpn_form.phase1_dead_peer_detection_nterval.data,
+    vpn_form.phase1_dead_peer_detection_threshold.data,
+    vpn_form.phase2_authentication_algorithm.data,
+    vpn_form.phase2_encryption_algorithm.data,
+    vpn_form.phase2_perfect_forward_secrecy_keys)
     print (tmp)
     test = db_session.query(VPN).filter_by(name = VPN_name).first()
     if test.name != None:
@@ -751,25 +816,43 @@ def modify_VPN_template():
     VPN_name = request.json['name']
     LTE_cloudGW = request.json['LTE_cloudGW']
     LTE_external_interface = request.json['LTE_external_interface']
-    LTE_internal_interface = request.json['LTE_internal_interface']
     LTE_local_identity = request.json['LTE_local_identity']
     LTE_remote_identity = request.json['LTE_remote_identity']
     cloud_external_interface = request.json['cloud_external_interface']
-    cloud_internal_interface = request.json['cloud_internal_interface']
     cloud_local_address = request.json['cloud_local_address']
     # network_segment = request.json['network_segment']
-    dh_group = request.json['dh_group']
-    authentication_algorithm = request.json['authentication_algorithm']
-    encryption_algorithm = request.json['encryption_algorithm']
-    pre_shared_key = request.json['pre_shared_key']
-    # ipsec_protocol = request.json['ipsec_protocol']
+    phase1_dh_group = request.json['phase1_dh_group']
+    phase1_authentication_algorithm = request.json['phase1_authentication_algorithm']
+    phase1_encryption_algorithm = request.json['phase1_encryption_algorithm']
+    phase1_pre_shared_key = request.json['phase1_pre_shared_key']
+    phase1_dead_peer_detection_nterval = request.json['phase1_dead_peer_detection_nterval']
+    phase1_dead_peer_detection_threshold = request.json['phase1_dead_peer_detection_threshold']
+    phase2_authentication_algorithm = request.json['phase2_authentication_algorithm']
+    phase2_encryption_algorithm = request.json['phase2_encryption_algorithm']
+    phase2_perfect_forward_secrecy_keys = request.json['phase2_perfect_forward_secrecy_keys']
 
     tmp = db_session.query(VPN).filter_by(name = VPN_name).first()
 
     db_session.delete(tmp)
     db_session.commit()
 
-    tmp = VPN(VPN_name,network_segment,dh_group,authentication_algorithm,encryption_algorithm,pre_shared_key,ipsec_protocol)
+    tmp = VPN(vpn_form.name.data,
+    vpn_form.LTE_cloudGW.data,
+    vpn_form.LTE_external_interface.data,
+    vpn_form.LTE_local_identity.data,
+    vpn_form.LTE_local_identity.data,
+    vpn_form.LTE_remote_identity.data,
+    vpn_form.cloud_external_interface.data,
+    vpn_form.cloud_local_address.data,
+    vpn_form.phase1_dh_group.data, 
+    vpn_form.phase1_authentication_algorithm.data,
+    vpn_form.phase1_encryption_algorithm.data, 
+    vpn_form.phase1_pre_shared_key.data,
+    vpn_form.phase1_dead_peer_detection_nterval.data,
+    vpn_form.phase1_dead_peer_detection_threshold.data,
+    vpn_form.phase2_authentication_algorithm.data,
+    vpn_form.phase2_encryption_algorithm.data,
+    vpn_form.phase2_perfect_forward_secrecy_keys)
 
     db_session.add(tmp)
     db_session.commit()
