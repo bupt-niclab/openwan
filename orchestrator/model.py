@@ -3,36 +3,37 @@ from flask_sqlalchemy import SQLAlchemy
 
 from flask import Flask, url_for
 # from flask_restless import APIManager
-from flask_sqlalchemy import SQLAlchemy
+from flask.ext.sqlalchemy import SQLAlchemy
+# from flask_sqlalchemy import SQLAlchemy
 import sqlite3
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///template.sqlite'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = 'True'
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = 'True'
 db = SQLAlchemy(app)
 
 # datafile = 'template.sqlite'
 # datadir = ''
 # conn = sqlite3.connect(db)
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session, sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
+# from sqlalchemy import create_engine
+# from sqlalchemy.orm import scoped_session, sessionmaker
+# from sqlalchemy.ext.declarative import declarative_base
 
 
-engine = create_engine('sqlite:///template.sqlite', convert_unicode=True)
-db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False,bind=engine))
-Base = declarative_base()
-Base.query = db_session.query_property()
+# engine = create_engine('sqlite:///template.sqlite', convert_unicode=True)
+# db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False,bind=engine))
+# Base = declarative_base()
+# Base.query = db_session.query_property()
 
-def init_db():
-    from . import models
-    Base.metadata.create_all(bind=engine)
+# def init_db():
+#     from . import models
+#     Base.metadata.create_all(bind=engine)
 
 
 
-class VPN(Base):
+class VPN(db.Model):
     __tablename__ = 'VPN'
 
     tid = db.Column(db.Integer, primary_key = True, autoincrement = True)
