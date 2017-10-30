@@ -20,6 +20,7 @@ from . import settings
 # from flask_sqlalchemy import sqlalchemy
 from .database import db_session
 from models import Templates,VPN,Probe
+from jinja2 import Environment, select_autoescape,Template
 # from models import db
 # from flask.ext.sqlalchemy import sqlalchemy
 
@@ -488,9 +489,9 @@ class VPNForm(Form):
     cloud_local_address = StringField('cloud-local-address',validators=[DataRequired()])
     # network_segment = StringField('network-segment', validators=[DataRequired()])#必填
     phase1_dh_group = SelectField('phase1-dh-group',choices=dh_group)
-    phase1_authentication_algorithm = SelectField('phase1-authentication-algorithm',choices=authentication_algorithm)
-    phase1_encryption_algorithm = SelectField('phase1-encryption-algorithm',choices=encryption_algorithm)
-    phase1_pre_shared_key = SelectField('phase1-pre-shared-key',choices=pre_shared_key)
+    phase1_authentication_algorithm = SelectField('phase1-authentication-algorithm',choices=phase1_authentication_algorithm)
+    phase1_encryption_algorithm = SelectField('phase1-encryption-algorithm',choices=phase1_encryption_algorithm)
+    phase1_pre_shared_key = SelectField('phase1-pre-shared-key',choices=phase1_pre_shared_key)
     # ipsec_protocol = SelectField('ipsec-protocol',choices=ipsec_protocol)
     phase1_dead_peer_detection_nterval = StringField('phase1_dead_peer_detection_nterval',validators=[DataRequired])
     phase1_dead_peer_detection_threshold = StringField('phase1_dead_peer_detection_threshold',validators=[DataRequired])
@@ -903,19 +904,13 @@ def VPN2dict(vpns):
 # @login_required
 def applyVPNtemplate():
     VPN_name = request.json['name']
-    network_segment = request.json['network_segment']
+    dest_ip = request.json['ip']
+    node_name = request.json['node_name']
+    # network_segment = request.json['network_segment']
     nodesinfo = []
-    output = open('/etc/ansible/roles/Juniper.junos/config.set','w')
+    output = open('lte_access.yml','a+')
 
-    tmp = db_session.query(VPN).filter_by(name = VPN_name,network_segment=network_segment).first()
-
-
-    # print(tmp)
-
-
-    #解析域名
-    # url = "www.baidu.com"
-    # ip = socket.gethostbyname(url) 
+    tmp = db_session.query(VPN).filter_by(name = VPN_name).first()
 
     str  = tmp.name
     #按行写入到指定的config文件中 
@@ -925,6 +920,8 @@ def applyVPNtemplate():
     
 
     output.close()
+
+
     return jsonify(errmsg = "success", data = json.dumps(nodesinfo))
 
 @app.route('/control_path_nodes',methods = ['GET'])
@@ -1016,25 +1013,25 @@ def getTrafficPathinfo():
             equ_dict = json.loads(equ_in_out)
             d1['input_pps'] = int(equ_dict[equ_name]['rpc_reply']['pfe-statistics']['pfe-traffic-statistics']['input-pps'])
             print("input pps is ",type(d1['input_pps']))
-            if d1['input_pps'] <= 10:
-                d1['input_pps'] = 1
-            elif d1['input_pps'] >10 and d1['input_pps'] <= 100 :
-                d1['input_pps'] = 2
-            elif d1['input_pps'] > 100 and d1['input_pps'] <= 1000 :
-                d1['input_pps'] = 3
-            else:
-                d1['input_pps'] = 4   
+            # if d1['input_pps'] <= 10:
+            #     d1['input_pps'] = 1
+            # elif d1['input_pps'] >10 and d1['input_pps'] <= 100 :
+            #     d1['input_pps'] = 2
+            # elif d1['input_pps'] > 100 and d1['input_pps'] <= 1000 :
+            #     d1['input_pps'] = 3
+            # else:
+            #     d1['input_pps'] = 4   
                 
             d1['output_pps'] = int(equ_dict[equ_name]['rpc_reply']['pfe-statistics']['pfe-traffic-statistics']['output-pps'])
             print("output pps is ",type(d1['output_pps']))
-            if d1['output_pps'] <= 10:
-                d1['output_pps'] = 1
-            elif d1['output_pps'] >10 and d1['output_pps'] <= 100 :
-                d1['output_pps'] = 2
-            elif d1['output_pps'] > 100 and d1['output_pps'] <= 1000 :
-                d1['output_pps'] = 3
-            else:
-                d1['output_pps'] = 4 
+            # if d1['output_pps'] <= 10:
+            #     d1['output_pps'] = 1
+            # elif d1['output_pps'] >10 and d1['output_pps'] <= 100 :
+            #     d1['output_pps'] = 2
+            # elif d1['output_pps'] > 100 and d1['output_pps'] <= 1000 :
+            #     d1['output_pps'] = 3
+            # else:
+            #     d1['output_pps'] = 4 
             nodesinfo_basic.append(d1)
     # cpe_cloud_json_dup = subprocess.check_output("salt 'cpeCloud' junos.rpc 'get-ike-active-peers-information' --output=json", shell=True)
     # cpe_cloud_json_dup = cpe_cloud_json_dup.strip()
@@ -1075,206 +1072,51 @@ def getTrafficPathinfo():
 def applyVPNtemplate_1():
     global LASTAPPLY_TID
     tid = request.json['tid']
+    dest_ip = str(request.json['ip'])
+    node_name = str(request.json['node_name'])
     LASTAPPLY_TID = tid
     # device_name = request.json['device_name']
     device_name1 = "Agent-2"
     device_name2 = "cpe1"
     tmp = db_session.query(VPN).filter_by(tid = tid).first()
     #拿到对应的模板 
-    # str_arp = "salt '"+device_name2+"' junos.rpc 'get-arp-table-information' --output=json"
-    # device_vpn_num = subprocess.check_output(str_arp, shell=True)
-    # devices_info = json.loads(device_vpn_num)
-    # print(devices_info)
-    # vpn_num = len(devices_info[device_name2]['rpc_reply']['arp-table-information']['arp-table-entry'])
+    lines = []
+    output = open('lte_access.yml','a+')
+    flag = 0
+    for line in output.readlines():
+        lines.append(line)
+    output.close()
+    pirnt lines
+    lines.insert(1,dest_ip)
+    str = "local_identity = '"+node_name+"'"
+    lines.insert(7,str)
+    s = ''+join(lines)
+    f=open('lte_access.yml','w')
+    f.write(s)
+    f.close()
+    ff = subprocess.check_output("cp -f lte_centor.yml /srv/salt/base/let_centor.yml",shell = True)
+    f = subprocess.check_output("cp -f lte_access.yml /srv/salt/base/let_access.yml",shell = True)
+    str_access = "salt "+node_name+" cp.get_file salt://lte_access.yml /etc/ansible/lte_access.yml"
+    cp_access = subprocess.check_output(str_centor,shell = True)
+    str_centor = "salt "+node_name+" cp.get_file salt://lte_centor.yml /etc/ansible/lte_centor.yml"
+    cp_centor = subprocess.check_output(str_centor,shell = True)
 
-    vpn_num = 30
-    vpn_ip = "10.66."+str(vpn_num)+".254/24"
+    run_access = "salt "+node_name+" cmd.run 'ansible-playbook -i lte_access.yml customize_lte_access_vpn.yml' cwd='/etc/ansible'"
+    run_yml_access = subprocess.check_output(run_access,shell = True，stderr = subprocess.STDOUT)
+    run_centor = "salt "+node_name+" cmd.run 'ansible-playbook -i lte_centor.yml customize_lte_centor_vpn.yml' cwd='/etc/ansible'"
+    run_yml_centor = subprocess.check_output(run_centor,shell = True, stderr = subprocess.STDOUT)
 
+    
     # print(tmp.network_segment)
 
-    url_segment = []
-
-    url_segment = str(tmp.network_segment).split('-')
-    print("hello:",str(tmp.network_segment).split('-'))
-    url1 = url_segment[0]
-    url2 = url_segment[1]
-    #拼 config.set文件 
-    output = open('/srv/salt/base/config.set','w')
-    input_str = "set interfaces st0 unit " + str(vpn_num) + " family inet address " + vpn_ip + "\n"
-    output.write(input_str)
-    # input_str = "set routing-options static route 0.0.0.0/0 next-hop 192.168.0.11" + "\n"
-    # output.write(input_str)
-    input_str = "set routing-options static route "+url1+" next-hop st0." + str(vpn_num)+ "\n"
-    output.write(input_str)
-    input_str = "set security zones security-zone untrust interfaces ge-0/0/1.0"+ "\n"
-    output.write(input_str)
-    input_str = "set security zones security-zone untrust host-inbound-traffic system-services ike"+ "\n"
-    output.write(input_str)
-    input_str = "set security zones security-zone trust interfaces ge-0/0/2.0"+ "\n"
-    output.write(input_str)
-    input_str = "set security zones security-zone trust host-inbound-traffic system-services all"+ "\n"
-    output.write(input_str)
-    input_str = "set security zones security-zone "+str(tmp.name) + " interfaces st0." + str(vpn_num)+ "\n"
-    output.write(input_str)
-    input_str = "set security ike proposal ike-phase1-proposal"+str(vpn_num) +" authentication-method pre-shared-keys"+ "\n"
-    output.write(input_str)
-    input_str = "set security ike proposal ike-phase1-proposal"+str(vpn_num) +" dh-group "+str(tmp.dh_group)+ "\n"
-    output.write(input_str)
-    input_str = "set security ike proposal ike-phase1-proposal"+str(vpn_num) +" authentication-algorithm "+str(tmp.authentication_algorithm)+ "\n"
-    output.write(input_str)
-    input_str = "set security ike proposal ike-phase1-proposal"+str(vpn_num) +" encryption-algorithm "+str(tmp.encryption_algorithm)+ "\n"
-    output.write(input_str)
-    input_str = "set security ike policy ike-phase1-policy"+str(vpn_num) +" mode aggressive"+ "\n"
-    output.write(input_str)
-    input_str = "set security ike policy ike-phase1-policy"+str(vpn_num) +" proposals ike-phase1-proposal"+str(vpn_num)+ "\n"
-    output.write(input_str)
-    input_str = "set security ike policy ike-phase1-policy"+str(vpn_num) +" pre-shared-key "+str(tmp.pre_shared_key)+ "\n"
-    output.write(input_str)
-    input_str = "set security ike gateway gw-"+str(tmp.name)+" external-interface ge-0/0/0.0"+ "\n"
-    output.write(input_str)
-    input_str = "set security ike gateway gw-"+str(tmp.name)+" ike-policy ike-phase1-policy"+str(vpn_num)+ "\n"
-    output.write(input_str)
-    input_str = "set security ike gateway gw-"+str(tmp.name)+" address 192.168.0.11"+ "\n"
-    output.write(input_str)
-    input_str = "set security ipsec proposal ipsec-phase2-proposal"+str(vpn_num) +" protocol "+str(tmp.ipsec_protocol)+ "\n"
-    output.write(input_str)
-    input_str = "set security ipsec proposal ipsec-phase2-proposal"+str(vpn_num) +" authentication-algorithm hmac-sha1-96"+ "\n"
-    output.write(input_str)
-    input_str = "set security ipsec proposal ipsec-phase2-proposal"+str(vpn_num) +" encryption-algorithm "+str(tmp.encryption_algorithm)+ "\n"
-    output.write(input_str)
-    input_str = "set security ipsec policy ipsec-phase2-policy"+str(vpn_num) +" proposals ipsec-phase2-proposal"+str(vpn_num)+ "\n"
-    output.write(input_str)
-    input_str = "set security ipsec policy ipsec-phase2-policy"+str(vpn_num) +" perfect-forward-secrecy keys "+str(tmp.dh_group)+ "\n"
-    output.write(input_str)
-    input_str = "set security ipsec vpn ike-"+str(tmp.name)+" ike gateway gw-"+str(tmp.name)+ "\n"
-    output.write(input_str)
-    input_str = "set security ipsec vpn ike-"+str(tmp.name)+" ike ipsec-policy ipsec-phase2-policy"+str(vpn_num)+ "\n"
-    output.write(input_str)
-    input_str = "set security ipsec vpn ike-"+str(tmp.name)+" bind-interface st0."+str(vpn_num)+ "\n"
-    output.write(input_str)
-    input_str = "set security ipsec vpn ike-"+str(tmp.name)+" establish-tunnels immediately"+ "\n"
-    output.write(input_str)
-    input_str = "set security policies from-zone trust to-zone "+str(tmp.name)+" policy tr-"+str(tmp.name)+" match source-address any"+ "\n"
-    output.write(input_str)
-    input_str = "set security policies from-zone trust to-zone "+str(tmp.name)+" policy tr-"+str(tmp.name)+" match destination-address any"+ "\n"
-    output.write(input_str)
-    input_str = "set security policies from-zone trust to-zone "+str(tmp.name)+" policy tr-"+str(tmp.name)+" match application any"+ "\n"
-    output.write(input_str)
-    input_str = "set security policies from-zone trust to-zone "+str(tmp.name)+" policy tr-"+str(tmp.name)+" then permit"+ "\n"
-    output.write(input_str)
-    input_str = "set security policies from-zone "+str(tmp.name)+" to-zone trust policy "+str(tmp.name)+"-tr match source-address any"+ "\n"
-    output.write(input_str)
-    input_str = "set security policies from-zone "+str(tmp.name)+" to-zone trust policy "+str(tmp.name)+"-tr match destination-address any" + "\n"
-    output.write(input_str)
-    input_str = "set security policies from-zone "+str(tmp.name)+" to-zone trust policy "+str(tmp.name)+"-tr match application any"+ "\n"
-    output.write(input_str)
-    input_str = "set security policies from-zone "+str(tmp.name)+" to-zone trust policy "+str(tmp.name)+"-tr then permit"+ "\n"
-    output.write(input_str)
-    input_str = "set security flow tcp-mss ipsec-vpn mss 1350"+ "\n"
-    output.write(input_str)
+   
     
 
-    output.close()
-
     #调用命令行下发配置
-    strpush = "salt "+str(device_name1)+" cp.get_file salt://config.set /etc/ansible/roles/Juniper.junos/config.set"
-    f = subprocess.check_output(strpush, shell=True) 
-    strrun = "salt "+str(device_name1)+" cmd.run cmd='ansible-playbook roles/Juniper.junos/"+str(device_name2)+".yml' cwd='/etc/ansible'"
-    print strpush    
-    print strrun
-    g = subprocess.check_output(strrun, shell=True,stderr = subprocess.STDOUT)
-    print(g)
-    strerrmsg = g
+    
+    strerrmsg = run_yml_centor + run_yml_access
 
-    # # 这里开始配置给CPECloud的模板
-    # str_arp_cpeCloud = "salt 'cpeCloud' junos.rpc 'get-arp-table-information' --output=json"
-    # device_vpn_num_cpeCloud = subprocess.check_output(str_arp_cpeCloud, shell = True)
-    # devices_info_cepCloud = json.loads(device_vpn_num_cpeCloud)
-    # print(devices_info_cepCloud)
-    # vpn_num_cpeCloud = len(devices_info_cepCloud['cpeCloud']['rpc_reply']['arp-table-information']['arp-table-entry'])
 
-    # vpn_ip_cpeCloud = "10.66.20.254/24"
-
-    # output = open('/srv/salt/base/config.set','w')
-    # input_str = "set interfaces st0 unit 20 family inet address 10.66.20.254/24\n"
-    # output.write(input_str)
-    # input_str = "set routing-options static route 192.168.1.0/24 next-hop st0.20\n"
-    # output.write(input_str)
-    # input_str = "set security zones security-zone untrust interfaces ge-0/0/0.0\n"
-    # output.write(input_str)
-    # input_str = "set security zones security-zone untrust host-inbound-traffic system-services ike\n"
-    # output.write(input_str)
-    # input_str = "set security zones security-zone trust interfaces ge-0/0/1.0\n"
-    # output.write(input_str)
-    # input_str = "set security zones security-zone trust host-inbound-traffic system-services all\n"
-    # output.write(input_str)
-    # input_str = "set security zones security-zone normal3 interfaces st0.20\n"
-    # output.write(input_str)
-    # input_str = "set security ike proposal ike-phase1-proposal20 authentication-method pre-shared-keys\n"
-    # output.write(input_str)
-    # input_str = "set security ike proposal ike-phase1-proposal20 dh-group group1\n"
-    # output.write(input_str)
-    # input_str = "set security ike proposal ike-phase1-proposal20 authentication-algorithm md5\n"
-    # output.write(input_str)
-    # input_str = "set security ike proposal ike-phase1-proposal20 encryption-algorithm 3des-cbc\n"
-    # output.write(input_str)
-    # input_str = "set security ike policy ike-phase1-policy20 mode aggressive\n"
-    # output.write(input_str)
-    # input_str = "set security ike policy ike-phase1-policy20 proposals ike-phase1-proposal20\n"
-    # output.write(input_str)
-    # input_str = "set security ike policy ike-phase1-policy20 pre-shared-key ascii-text $ABC123\n"
-    # output.write(input_str)
-    # input_str = "set security ike gateway gw-normal3 external-interface ge-0/0/0.0\n"
-    # output.write(input_str)
-    # input_str = "set security ike gateway gw-normal3 ike-policy ike-phase1-policy20\n"
-    # output.write(input_str)
-    # input_str = "set security ike gateway gw-normal3 address 192.168.0.14\n"
-    # output.write(input_str)
-    # input_str = "set security ipsec proposal ipsec-phase2-proposal20 authentication-algorithm hmac-sha1-96\n"
-    # output.write(input_str)
-    # input_str = "set security ipsec proposal ipsec-phase2-proposal20 encryption-algorithm 3des-cbc\n"
-    # output.write(input_str)
-    # input_str = "set security ipsec policy ipsec-phase2-policy20 proposals ipsec-phase2-proposal20\n"
-    # output.write(input_str)
-    # input_str = "set security ipsec policy ipsec-phase2-policy20 perfect-forward-secrecy keys group1\n"
-    # output.write(input_str)
-    # input_str = "set security ipsec vpn ike-normal3 ike gateway gw-normal3\n"
-    # output.write(input_str)
-    # input_str = "set security ipsec vpn ike-normal3 ike ipsec-policy ipsec-phase2-policy20\n"
-    # output.write(input_str)
-    # input_str = "set security ipsec vpn ike-normal3 bind-interface st0.20\n"
-    # output.write(input_str)
-    # input_str = "set security ipsec vpn ike-normal3 establish-tunnels immediately\n"
-    # output.write(input_str)
-    # input_str = "set security policies from-zone trust to-zone normal3 policy tr-normal3 match source-address any\n"
-    # output.write(input_str)
-    # input_str = "set security policies from-zone trust to-zone normal3 policy tr-normal3 match destination-address any\n"
-    # output.write(input_str)
-    # input_str = "set security policies from-zone trust to-zone normal3 policy tr-normal3 match application any\n"
-    # output.write(input_str)
-    # input_str = "set security policies from-zone trust to-zone normal3 policy tr-normal3 then permit\n"
-    # output.write(input_str)
-    # input_str = "set security policies from-zone normal3 to-zone trust policy normal3-tr match source-address any\n"
-    # output.write(input_str)
-    # input_str = "set security policies from-zone normal3 to-zone trust policy normal3-tr match destination-address any\n"
-    # output.write(input_str)
-    # input_str = "set security policies from-zone normal3 to-zone trust policy normal3-tr match application any\n"
-    # output.write(input_str)
-    # input_str = "set security policies from-zone normal3 to-zone trust policy normal3-tr then permit\n"
-    # output.write(input_str)
-    # input_str = "set security flow tcp-mss ipsec-vpn mss 1350\n"
-    # output.write(input_str)
-
-    # output.close()
-    # # 向cpeCloud下发配置
-    # str_cpeCloud_push = "salt cpeCloud cp.get_file salt://config.set /etc/ansible/roles/Juniper.junos/config.set"
-    # f_cpeCloud = subprocess.check_output(str_cpeCloud_push,shell = True)
-    # str_cpeCloud_run = "salt cpeCloud cmd.run cmd='ansible-playbook roles/Juniper.junos/cpeCloud.yml' cwd='/etc/ansible'"
-    # print str_cpeCloud_push
-    # print str_cpeCloud_run
-    # g_cpeCloud = subprocess.check_output(str_cpeCloud_run, shell=False,stderr = subprocess.STDOUT)
-    # print(g_cpeCloud)
-    # strerrmsg_cpeCloud = g_cpeCloud
     if "failed=0" in strerrmsg:
         return jsonify(errmsg = "success", status = 0)
     elif "failed=1" in strerrmsg:
@@ -1296,3 +1138,101 @@ def reject_key(key):
     content = request.json
     client.run('key.reject', client="wheel", arg = key)['data']['return']
     return redirect(url_for('minios_keys'))
+
+
+@app.route('/testjinja_centor',methods = ['POST'])
+@login_required
+def jinja_centor_test():
+    tid = request.json['tid']
+    tmp = db_session.query(VPN).filter_by(tid = tid).first()
+    hub_ip = str(tmp.LTE_cloudGW)
+    minion_id = str(tmp.tid)
+    ext_interface = str(tmp.cloud_external_interface)
+    local_identity = str(tmp.LTE_remote_identity)
+    remote_identity = str(tmp.LTE_local_identity)
+    local_address = str(tmp.cloud_local_address)
+
+    ike_auth_algorithm = str(tmp.phase1_authentication_algorithm)
+    ike_enc_algorithm = str(tmp.phase1_encryption_algorithm)
+    dh_group = str(tmp.phase1_dh_group)
+    shared_secret = str(tmp.phase1_pre_shared_key)
+    DPD_interval = str(tmp.phase1_dead_peer_detection_nterval)
+    DPD_threshold = str(tmp.phase1_dead_peer_detection_threshold)
+
+    ipsec_auth_algorithm = str(tmp.phase2_authentication_algorithm)
+    ipsec_enc_algorithm = str(tmp.phase2_encryption_algorithm)
+    PFS_keys = str(tmp.phase2_perfect_forward_secrecy_keys)
+
+    dict = [
+        "hub_ip":hub_ip,
+        "minion_id"=minion_id,
+        "ext_interface"=ext_interface,
+        "local_identity"=local_identity,
+        "remote_identity"=remote_identity,
+        "local_address"=local_address,
+        "ike_auth_algorithm"=ike_auth_algorithm,
+        "ike_enc_algorithm"=ike_enc_algorithm,
+        "dh_group"=dh_group,
+        "shared_secret"=shared_secret,
+        "DPD_interval"=DPD_interval,
+        "DPD_threshold"=DPD_threshold,
+        "ipsec_auth_algorithm"=ipsec_auth_algorithm,
+        "ipsec_enc_algorithm"=ipsec_enc_algorithm,
+        "PFS_keys"=PFS_keys
+    ]
+
+    return render_template('lte_centor.yml', **dict)
+
+@app.route('/testjinja_access',methods = ['POST'])
+@login_required
+def jinja_access_test():
+    tid = request.json['tid']
+    tmp = db_session.query(VPN).filter_by(tid = tid).first()
+    # hub_ip = str(tmp.LTE_cloudGW)
+    minion_id = str(tmp.tid)
+    CLOUD_GW = str(tmp.LTE_cloudGW)
+    ext_interface = str(tmp.LTE_external_interface)
+    # local_identity = str(tmp.LTE_local_identity)
+    remote_identity = str(tmp.LTE_remote_identity)
+    # local_address = str(tmp.cloud_local_address)
+
+    ike_auth_algorithm = str(tmp.phase1_authentication_algorithm)
+    ike_enc_algorithm = str(tmp.phase1_encryption_algorithm)
+    dh_group = str(tmp.phase1_dh_group)
+    shared_secret = str(tmp.phase1_pre_shared_key)
+    DPD_interval = str(tmp.phase1_dead_peer_detection_nterval)
+    DPD_threshold = str(tmp.phase1_dead_peer_detection_threshold)
+
+    ipsec_auth_algorithm = str(tmp.phase2_authentication_algorithm)
+    ipsec_enc_algorithm = str(tmp.phase2_encryption_algorithm)
+    PFS_keys = str(tmp.phase2_perfect_forward_secrecy_keys)
+
+    dict = [
+        # "hub_ip":hub_ip,
+        "minion_id"=minion_id,
+        "CLOUD_GW"=CLOUD_GW
+        "ext_interface"=ext_interface,
+        # "local_identity"=local_identity,
+        "remote_identity"=remote_identity,
+        # "local_address"=local_address,
+        "ike_auth_algorithm"=ike_auth_algorithm,
+        "ike_enc_algorithm"=ike_enc_algorithm,
+        "dh_group"=dh_group,
+        "shared_secret"=shared_secret,
+        "DPD_interval"=DPD_interval,
+        "DPD_threshold"=DPD_threshold,
+        "ipsec_auth_algorithm"=ipsec_auth_algorithm,
+        "ipsec_enc_algorithm"=ipsec_enc_algorithm,
+        "PFS_keys"=PFS_keys
+    ]
+
+    return render_template('lte_access.yml', **dict)
+
+@app.route('/apply_centor',methods = ['GET'])
+@login_required
+def apply_jinja_centor():
+    ff = subprocess.check_output("cp -f lte_centor.yml /srv/salt/base/let_centor.yml",shell = True)
+    f = subprocess.check_output("cp -f lte_access.yml /srv/salt/base/let_access.yml",shell = True)
+    run_yml = subprocess.check_output(,shell = True)
+
+    return jsonify(errmsg = 'success')

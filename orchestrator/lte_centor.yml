@@ -1,0 +1,20 @@
+[hub]
+{{ hub_ip }}
+
+[hub:vars]
+minion_id= {{ dict['hub_ip'] }}
+ext_interface = {{ dict['ext_interface'] }}
+local_identity = {{ dict['local_identity'] }}
+remote_identity = {{ dict['remote_identity'] }}
+local_address = {{ dict['local_address'] }}
+
+ike_auth_algorithm = {{ dict['ike_auth_algorithm'] }}
+ike_enc_algorithm = {{ dict['ike_enc_algorithm'] }}
+dh_group = {{ dict['dh_group'] }}
+shared_secret = {{ dict['shared_secret'] }}
+DPD_interval = {{ dict['DPD_interval'] }}
+DPD_threshold = {{ dict['DPD_threshold'] }}
+ 
+ipsec_auth_algorithm = {{ dict['DPD_threshold'] }}
+ipsec_enc_algorithm = {{ dict['ipsec_enc_algorithm'] }}
+PFS_keys = {{ dict['PFS_keys'] }}
