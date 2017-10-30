@@ -1086,7 +1086,7 @@ def applyVPNtemplate_1():
     for line in output.readlines():
         lines.append(line)
     output.close()
-    pirnt lines
+    print lines
     lines.insert(1,dest_ip)
     str = "local_identity = '"+node_name+"'"
     lines.insert(7,str)
@@ -1102,7 +1102,7 @@ def applyVPNtemplate_1():
     cp_centor = subprocess.check_output(str_centor,shell = True)
 
     run_access = "salt "+node_name+" cmd.run 'ansible-playbook -i lte_access.yml customize_lte_access_vpn.yml' cwd='/etc/ansible'"
-    run_yml_access = subprocess.check_output(run_access,shell = True，stderr = subprocess.STDOUT)
+    run_yml_access = subprocess.check_output(run_access,shell = True,stderr = subprocess.STDOUT)
     run_centor = "salt "+node_name+" cmd.run 'ansible-playbook -i lte_centor.yml customize_lte_centor_vpn.yml' cwd='/etc/ansible'"
     run_yml_centor = subprocess.check_output(run_centor,shell = True, stderr = subprocess.STDOUT)
 
@@ -1132,12 +1132,6 @@ def applyVPNtemplate_1():
 def shutdown_session(exception=None):
   db_session.remove()
 
-@app.route('/keys/reject/<key>')
-@login_required
-def reject_key(key):
-    content = request.json
-    client.run('key.reject', client="wheel", arg = key)['data']['return']
-    return redirect(url_for('minios_keys'))
 
 
 @app.route('/testjinja_centor',methods = ['POST'])
@@ -1163,25 +1157,25 @@ def jinja_centor_test():
     ipsec_enc_algorithm = str(tmp.phase2_encryption_algorithm)
     PFS_keys = str(tmp.phase2_perfect_forward_secrecy_keys)
 
-    dict = [
-        "hub_ip":hub_ip,
-        "minion_id"=minion_id,
-        "ext_interface"=ext_interface,
-        "local_identity"=local_identity,
-        "remote_identity"=remote_identity,
-        "local_address"=local_address,
-        "ike_auth_algorithm"=ike_auth_algorithm,
-        "ike_enc_algorithm"=ike_enc_algorithm,
-        "dh_group"=dh_group,
-        "shared_secret"=shared_secret,
-        "DPD_interval"=DPD_interval,
-        "DPD_threshold"=DPD_threshold,
-        "ipsec_auth_algorithm"=ipsec_auth_algorithm,
-        "ipsec_enc_algorithm"=ipsec_enc_algorithm,
-        "PFS_keys"=PFS_keys
-    ]
+    d= dict() 
+    d["hub_ip"]=hub_ip
+    d["minion_id"]=minion_id
+    d["ext_interface"]=ext_interface
+    d["local_identity"]=local_identity
+    d["remote_identity"]=remote_identity
+    d["local_address"]=local_address
+    d["ike_auth_algorithm"]=ike_auth_algorithm
+    d["ike_enc_algorithm"]=ike_enc_algorithm
+    d["dh_group"]=dh_group
+    d["shared_secret"]=shared_secret
+    d["DPD_interval"]=DPD_interval
+    d["DPD_threshold"]=DPD_threshold
+    d["ipsec_auth_algorithm"]=ipsec_auth_algorithm
+    d["ipsec_enc_algorithm"]=ipsec_enc_algorithm
+    d["PFS_keys"]=PFS_keys
+    
 
-    return render_template('lte_centor.yml', **dict)
+    return render_template('lte_centor.yml', **d)
 
 @app.route('/testjinja_access',methods = ['POST'])
 @login_required
@@ -1207,32 +1201,25 @@ def jinja_access_test():
     ipsec_enc_algorithm = str(tmp.phase2_encryption_algorithm)
     PFS_keys = str(tmp.phase2_perfect_forward_secrecy_keys)
 
-    dict = [
+    d= dict()
         # "hub_ip":hub_ip,
-        "minion_id"=minion_id,
-        "CLOUD_GW"=CLOUD_GW
-        "ext_interface"=ext_interface,
+    d["minion_id"]=minion_id
+    d["CLOUD_GW"]=CLOUD_GW
+    d["ext_interface"]=ext_interface
         # "local_identity"=local_identity,
-        "remote_identity"=remote_identity,
+    d["remote_identity"]=remote_identity
         # "local_address"=local_address,
-        "ike_auth_algorithm"=ike_auth_algorithm,
-        "ike_enc_algorithm"=ike_enc_algorithm,
-        "dh_group"=dh_group,
-        "shared_secret"=shared_secret,
-        "DPD_interval"=DPD_interval,
-        "DPD_threshold"=DPD_threshold,
-        "ipsec_auth_algorithm"=ipsec_auth_algorithm,
-        "ipsec_enc_algorithm"=ipsec_enc_algorithm,
-        "PFS_keys"=PFS_keys
-    ]
+    d["ike_auth_algorithm"]=ike_auth_algorithm
+    d["ike_enc_algorithm"]=ike_enc_algorithm
+    d["dh_group"]=dh_group
+    d["shared_secret"]=shared_secret
+    d["DPD_interval"]=DPD_interval
+    d["DPD_threshold"]=DPD_threshold
+    d["ipsec_auth_algorithm"]=ipsec_auth_algorithm
+    d["ipsec_enc_algorithm"]=ipsec_enc_algorithm
+    d["PFS_keys"]=PFS_keys
+    
 
-    return render_template('lte_access.yml', **dict)
+    return render_template('lte_access.yml', **d)
 
-@app.route('/apply_centor',methods = ['GET'])
-@login_required
-def apply_jinja_centor():
-    ff = subprocess.check_output("cp -f lte_centor.yml /srv/salt/base/let_centor.yml",shell = True)
-    f = subprocess.check_output("cp -f lte_access.yml /srv/salt/base/let_access.yml",shell = True)
-    run_yml = subprocess.check_output(,shell = True)
 
-    return jsonify(errmsg = 'success')
