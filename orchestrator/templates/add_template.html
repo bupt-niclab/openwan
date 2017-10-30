@@ -58,12 +58,18 @@
                 <form method="POST" class="form-horizontal" role="form" action="{{ url_for('add_template') }}" id="vpn_template_form">
                   {{ vpn_form.csrf_token }}
                   {{ render_field(vpn_form.name) }}
-                  {{ render_field(vpn_form.network_segment) }}
-                  {{ render_field(vpn_form.dh_group) }}
-                  {{ render_field(vpn_form.authentication_algorithm) }}
-                  {{ render_field(vpn_form.encryption_algorithm) }}
-                  {{ render_field(vpn_form.pre_shared_key) }}
-                  {{ render_field(vpn_form.ipsec_protocol)}}
+                  {{ render_field(vpn_form.LTE_cloudGW) }}
+                  {{ render_field(vpn_form.LTE_external_interface) }}
+                  {{ render_field(vpn_form.LTE_internal_interface) }}
+                  {{ render_field(vpn_form.LTE_local_identity) }}
+                  {{ render_field(vpn_form.LTE_remote_identity) }}                  
+                  {{ render_field(vpn_form.cloud_external_interface) }}
+                  {{ render_field(vpn_form.cloud_internal_interface)}}
+                  {{ render_field(vpn_form.cloud_local_address)}}
+                  {{ render_field(vpn_form.dh_group)}}
+                  {{ render_field(vpn_form.authentication_algorithm)}}
+                  {{ render_field(vpn_form.encryption_algorithm)}}
+                  {{ render_field(vpn_form.pre_shared_key)}}
           
                   <div class="panel panel-default" id="vpn_optional_panel" style="display: none">
                     <div class="panel-heading">

@@ -260,10 +260,10 @@ def add_template():
     # probe_form = ProbeForm()
     if vpn_form.validate_on_submit():   
       # ((?:(?:25[0-5]|2[0-4]\d|(?:1\d{2}|[1-9]?\d))\.){3}(?:25[0-5]|2[0-4]\d|(?:1\d{2}|[1-9]?\d)))/24         
-      tmp = VPN(vpn_form.name.data,vpn_form.LTE_cloudGW.data,vpn_form.LTE_external_interface.data,vpn_form.LTE_internal_interface.data,
-    vpn_form.LTE_local_identity.data,vpn_form.LTE_local_identity.data,vpn_form.LTE_remote_identity.data,vpn_form.cloud_external_interface.data,
+      tmp = VPN(vpn_form.name.data, vpn_form.LTE_cloudGW.data, vpn_form.LTE_external_interface.data,vpn_form.LTE_internal_interface.data,
+    vpn_form.LTE_local_identity.data, vpn_form.LTE_remote_identity.data,vpn_form.cloud_external_interface.data,
     vpn_form.cloud_internal_interface.data,vpn_form.cloud_local_address.data,
-    vpn_form.dh_group.data, vpn_form.authentication_algorithm.data,vpn_form.encryption_algorithm.data, vpn_form.pre_shared_key.data,vpn_form.ipsec_protocol.data)
+    vpn_form.dh_group.data, vpn_form.authentication_algorithm.data,vpn_form.encryption_algorithm.data, vpn_form.pre_shared_key.data)
 
       db_session.add(tmp)
       db_session.commit()

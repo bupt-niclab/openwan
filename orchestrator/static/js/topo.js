@@ -92,9 +92,9 @@ $(document).ready(function(){
             render: function(data, type, row, meta) {
               // return '<a href="' + data + '" target="_blank">' + row.title + '</a>';
               if (data) {
-                return '<button class="btn btn-primary" disabled>已应用</button>';
+                return '<button class="btn btn-primary" disabled>已应用</button><button class="btn btn-primary" onclick="editTemplate">编辑模板</button>';
               } else {
-                return '<button class="btn btn-primary" onclick="applyTemplate(' + row.tid + ')">应用</button>';                
+                return '<button class="btn btn-primary" onclick="applyTemplate(' + row.tid + ')">应用</button><button class="btn btn-primary" onclick="editeditTemplate">编辑模板</button>';                
               }           
             },
             //指定是第三列
