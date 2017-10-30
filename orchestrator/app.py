@@ -479,25 +479,25 @@ class ProbeForm(Form):
 
 class VPNForm(Form):
     name = StringField('name', validators=[DataRequired()])#必填
-    LTE_cloudGW = SelectField('LTE-cloudGW', choices=LTE_cloudGW)
-    LTE_external_interface = SelectField('LTE-external-interface',choices=LTE_external_interface)
+    LTE_cloudGW = SelectField('LTE-cloudGW', choices=LTE_cloudGW, default='112.35.30.67')
+    LTE_external_interface = SelectField('LTE-external-interface',choices=LTE_external_interface, default='ge-0/0/0')
     # LTE_internal_interface = SelectField('LTE-internal-interface',choices=LTE_internal_interface)
     LTE_local_identity = StringField('LTE-local-identity',validators=[DataRequired()])
-    LTE_remote_identity = StringField('LTE-remote-identity', validators=[DataRequired()])
-    cloud_external_interface = StringField('cloud-external-interface',validators=[DataRequired()])
+    LTE_remote_identity = StringField('LTE-remote-identity', validators=[DataRequired()], default='CGW-2')
+    cloud_external_interface = StringField('cloud-external-interface',validators=[DataRequired()], default='ge-0/0/0')
     # cloud_internal_interface = SelectField('cloud-internal-interface', choices=cloud_internal_interface)
-    cloud_local_address = StringField('cloud-local-address',validators=[DataRequired()])
+    cloud_local_address = StringField('cloud-local-address',validators=[DataRequired()], default='10.112.44.113')
     # network_segment = StringField('network-segment', validators=[DataRequired()])#必填
-    phase1_dh_group = SelectField('phase1-dh-group',choices=dh_group)
-    phase1_authentication_algorithm = SelectField('phase1-authentication-algorithm',choices=phase1_authentication_algorithm)
-    phase1_encryption_algorithm = SelectField('phase1-encryption-algorithm',choices=phase1_encryption_algorithm)
-    phase1_pre_shared_key = SelectField('phase1-pre-shared-key',choices=phase1_pre_shared_key)
+    phase1_dh_group = SelectField('phase1-dh-group',choices=dh_group, default='group2')
+    phase1_authentication_algorithm = SelectField('phase1-authentication-algorithm',choices=phase1_authentication_algorithm, default='sha1')
+    phase1_encryption_algorithm = SelectField('phase1-encryption-algorithm',choices=phase1_encryption_algorithm, default='aes-128-cbc')
+    phase1_pre_shared_key = SelectField('phase1-pre-shared-key',choices=phase1_pre_shared_key, default='ascii-text $ABC123')
     # ipsec_protocol = SelectField('ipsec-protocol',choices=ipsec_protocol)
-    phase1_dead_peer_detection_nterval = StringField('phase1_dead_peer_detection_nterval',validators=[DataRequired])
-    phase1_dead_peer_detection_threshold = StringField('phase1_dead_peer_detection_threshold',validators=[DataRequired])
+    phase1_dead_peer_detection_nterval = StringField('phase1_dead_peer_detection_nterval',validators=[DataRequired], default=10)
+    phase1_dead_peer_detection_threshold = StringField('phase1_dead_peer_detection_threshold',validators=[DataRequired], default=3)
     phase2_authentication_algorithm = SelectField('phase2_authentication_algorithm',choices=phase2_authentication_algorithm)
     phase2_encryption_algorithm = SelectField('phase2_encryption_algorithm',choices=phase2_encryption_algorithm)
-    phase2_perfect_forward_secrecy_keys = SelectField('phase2_perfect_forward_secrecy_keys',choices=phase2_perfect_forward_secrecy_keys)
+    phase2_perfect_forward_secrecy_keys = SelectField('phase2_perfect_forward_secrecy_keys',choices=phase2_perfect_forward_secrecy_keys, default='group2')
 def validate_network_segment(form, field):
   try: 
     startIpSegment = field.data.strip().split('-')[0] # 192.168.1.1/24
@@ -605,14 +605,12 @@ def delete_key(key):
     minions_keys = client.run('key.delete', client="wheel", match=key)['data']['return']
     return redirect(url_for('minions_keys'))
 
-
 @app.route('/keys/reject/<key>')
 @login_required
 def reject_key(key):
     content = request.json
-    client.run('key.reject', client="wheel", match=key)['data']['return']
-    return redirect(url_for('minions_keys'))
-
+    client.run('key.reject', client="wheel", arg = key)['data']['return']
+    return redirect(url_for('minios_keys'))
 
 @app.route('/keys/accept/<key>')
 @login_required
@@ -769,7 +767,6 @@ def add_VPN_template():
     tmp = VPN(vpn_form.name.data,
     vpn_form.LTE_cloudGW.data,
     vpn_form.LTE_external_interface.data,
-    vpn_form.LTE_local_identity.data,
     vpn_form.LTE_local_identity.data,
     vpn_form.LTE_remote_identity.data,
     vpn_form.cloud_external_interface.data,

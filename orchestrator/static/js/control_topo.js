@@ -8,8 +8,8 @@ $(document).ready(function(){
   
   // 创建公网节点
   var local = createSingleNode({
-    x: 500,
-    y: 250,
+    x: 350,
+    y: 200,
     w: 40,
     h: 40,
     text: 'Cloud-GW',

@@ -13,7 +13,7 @@ $(document).ready(function(){
   
   // 创建云端节点
   var local = createSingleNode({
-    x: 270,
+    x: 350,
     y: 200,
     w: 40,
     h: 40,
@@ -25,7 +25,7 @@ $(document).ready(function(){
 
   // 创建 cpe 节点
   var cpe1 = createSingleNode({
-    x: 290,
+    x: 380,
     y: 225,
     w: 40,
     h: 40,
@@ -36,7 +36,7 @@ $(document).ready(function(){
   }, scene);
 
   var cpe2 = createSingleNode({
-    x: 290,
+    x: 380,
     y: 305,
     w: 40,
     h: 40,
@@ -47,7 +47,7 @@ $(document).ready(function(){
   }, scene);
 
   var cpe3 = createSingleNode({
-    x: 390,
+    x: 450,
     y: 305,
     w: 40,
     h: 40,
@@ -58,7 +58,7 @@ $(document).ready(function(){
   }, scene);
 
   var cpe4 = createSingleNode({
-    x: 390,
+    x: 450,
     y: 225,
     w: 40,
     h: 40,
@@ -92,9 +92,9 @@ $(document).ready(function(){
             render: function(data, type, row, meta) {
               // return '<a href="' + data + '" target="_blank">' + row.title + '</a>';
               if (data) {
-                return '<button class="btn btn-primary" disabled>已应用</button><button class="btn btn-primary" onclick="editTemplate">编辑模板</button>';
+                return '<button class="btn btn-primary" disabled>已应用</button><button class="btn btn-primary" onclick="editTemplate("' + row.tid + ')">编辑模板</button>';
               } else {
-                return '<button class="btn btn-primary" onclick="applyTemplate(' + row.tid + ')">应用</button><button class="btn btn-primary" onclick="editeditTemplate">编辑模板</button>';                
+                return '<button class="btn btn-primary" onclick="applyTemplate(' + row.tid + ')">应用</button><button class="btn btn-primary" onclick="editTemplate(' + row.tid + ')">编辑模板</button>';                
               }           
             },
             //指定是第三列
@@ -177,8 +177,8 @@ $(document).ready(function(){
   getNodes(function(nodeList) {
     console.log(nodeList);
     nodeList.forEach(function(node){
-      node.x = Math.random() * 600;
-      node.y = Math.random() * 500;
+      node.x = randomNodePosition('x');
+      node.y = randomNodePosition('y');
       node.w = 40;
       node.h = 40;
       node.text = node.name;
@@ -188,7 +188,9 @@ $(document).ready(function(){
     })
     var addedNodeList = createNodes(nodeList, scene);
     for (var i = 0, j = addedNodeList.length;i < j;i++) {
-      createLink(addedNodeList[i], local, '', scene);
+      var linkText = '入节点PPS: ' + addedNodeList[i].input_pps + '; 出节点PPS: ' + addedNodeList[i].output_pps;
+      createLink(addedNodeList[i], local, linkText, scene);
+      // createLink(local, addedNodeList[i], '', scene, addedNodeList[i].input_pps);      
     }
   });
   // var nodeList = simulateNodes();
@@ -223,7 +225,7 @@ function randomNodePosition(type) {
   var result;
   if (type === 'x') {
     result = Math.random() * 800;
-    if(result >= 230 && result <= 480) {
+    if(result >= 320 && result <= 560) {
       return randomNodePosition('x');
     }
     else {
@@ -231,7 +233,7 @@ function randomNodePosition(type) {
     }
   } else {
     result = Math.random() * 500;
-    if(result >= 200 && result <= 400) {
+    if(result >= 170 && result <= 410) {
       return randomNodePosition('y');
     }
     else {
@@ -246,6 +248,8 @@ function createNodes (nodeList, scene) {
   for (var i = 0, j = nodeList.length;i < j;i++) {
     var node = nodeList[i];
     var addedNode = createSingleNode(node, scene);
+    addedNode.input_pps = node.input_pps;
+    addedNode.output_pps = node.output_pps;    
     addedNodeList.push(addedNode);
   }
   return addedNodeList;
@@ -278,27 +282,29 @@ function createSingleNode (nodeInfo, scene) {
 }
 
 // 创建节点间连线
-function createLink (fromNode, toNode, text, scene) {
+function createLink (fromNode, toNode, text, scene, level) {
   var link = new JTopo.Link(fromNode, toNode, text);
   // var path = link.getPath();
   // console.log(path);
   // var pathLength = Math.floor(Math.sqrt(Math.pow(path[0].x - path[1].x,2) + Math.pow(path[0].y - path[1].y, 2)));
   // console.log(pathLength);
   link.arrowsRadius = 10;
-  link.lineWidth = 3;
+  link.lineWidth = level ? level * 3 : 3;
+  link.offsetGap = 90;
   // link.dashedPattern = dashedPattern;
-  link.bundleOffset = 60; // 折线拐角处的长度
+  link.bundleOffset = 40; // 折线拐角处的长度
   link.bundleGap = 20; // 线条之间的间隔
-  link.arrowsOffset = -50;  
-  link.textOffsetY = 3; // 文本偏移量（向下3个像素）
+  // link.arrowsOffset = -10;  
+  link.textOffsetY = 30; // 文本偏移量（向下3个像素）
+  link.fontColor = '81,181,220'; // 文本偏移量（向下3个像素）  
   link.strokeColor = '81,181,220';    
-
-  setInterval(function(){
-    link.arrowsOffset++;
-    if (link.arrowsOffset === 0) {
-      link.arrowsOffset = -50;
-    }
-  }, 100);
+  console.log(link);
+  // setInterval(function(){
+  //   link.arrowsOffset++;
+  //   if (link.arrowsOffset === 0) {
+  //     link.arrowsOffset = -10;
+  //   }
+  // }, 100);
   scene.add(link);
   return link;
 }
@@ -427,5 +433,9 @@ function applyTemplate(tid) {
       alert(response.errmsg)
     }
   })
+}
+
+function editTemplate() {
+  
 }
 
