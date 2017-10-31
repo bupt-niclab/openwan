@@ -328,11 +328,11 @@ def edit_template(tid):
     vpn_form.phase1_authentication_algorithm.data = tmp.phase1_authentication_algorithm
     vpn_form.phase1_encryption_algorithm.data = tmp.phase1_encryption_algorithm
     vpn_form.phase1_pre_shared_key.data = tmp.phase1_pre_shared_key
-    vpn_form.phase1_dead_peer_detection_nterval = tmp.phase1_dead_peer_detection_nterval
-    vpn_form.phase1_dead_peer_detection_threshold = tmp.phase1_dead_peer_detection_threshold
-    vpn_form.phase2_authentication_algorithm = phase2_authentication_algorithm
-    vpn_form.phase2_encryption_algorithm = phase2_encryption_algorithm
-    vpn_form.phase2_perfect_forward_secrecy_keys = phase2_perfect_forward_secrecy_keys
+    vpn_form.phase1_dead_peer_detection_nterval.data = tmp.phase1_dead_peer_detection_nterval
+    vpn_form.phase1_dead_peer_detection_threshold.data = tmp.phase1_dead_peer_detection_threshold
+    vpn_form.phase2_authentication_algorithm.data = tmp.phase2_authentication_algorithm
+    vpn_form.phase2_encryption_algorithm.data = tmp.phase2_encryption_algorithm
+    vpn_form.phase2_perfect_forward_secrecy_keys.data = tmp.phase2_perfect_forward_secrecy_keys
     # vpn_form.ipsec_protocol.data = tmp.ipsec_protocol
     # probe_form = ProbeForm()
   
@@ -504,8 +504,8 @@ class VPNForm(Form):
     phase1_encryption_algorithm = SelectField('phase1-encryption-algorithm',choices=phase1_encryption_algorithm, default='aes-128-cbc')
     phase1_pre_shared_key = SelectField('phase1-pre-shared-key',choices=phase1_pre_shared_key, default='ascii-text $ABC123')
     # ipsec_protocol = SelectField('ipsec-protocol',choices=ipsec_protocol)
-    phase1_dead_peer_detection_nterval = StringField('phase1_dead_peer_detection_nterval',validators=[DataRequired()], default=10)
-    phase1_dead_peer_detection_threshold = StringField('phase1_dead_peer_detection_threshold',validators=[DataRequired()], default=3)
+    phase1_dead_peer_detection_nterval = StringField('phase1_dead_peer_detection_nterval',validators=[DataRequired()], default='10')
+    phase1_dead_peer_detection_threshold = StringField('phase1_dead_peer_detection_threshold',validators=[DataRequired()], default='3')
     phase2_authentication_algorithm = SelectField('phase2_authentication_algorithm',choices=phase2_authentication_algorithm)
     phase2_encryption_algorithm = SelectField('phase2_encryption_algorithm',choices=phase2_encryption_algorithm)
     phase2_perfect_forward_secrecy_keys = SelectField('phase2_perfect_forward_secrecy_keys',choices=phase2_perfect_forward_secrecy_keys, default='group2')
@@ -1004,9 +1004,10 @@ def getTrafficPathinfo():
     #获得cpe所有节点信息之后，遍历cpe节点连接的节点
     all_cpes_conn = []
     for cpe in all_cpes:
-        str = "salt '"+ cpe + "' junos.rpc 'get-ike-active-peers-information' --output=json"
+        # str = "salt '"+ cpe + "' junos.rpc 'get-ike-active-peers-information' --output=json"
+        str = "salt 'cpeCloud' junos.rpc 'get-ike-active-peers-information' --output=json"
         cpes_json_dup = subprocess.check_output(str,shell = True)
-        cpes_json_dup = cpes_dup.strip()
+        cpes_json_dup = cpes_json_dup.strip()
         cpe_json = cpes_json_dup
         print(cpe_json)
         vmx_dict = json.loads(cpe_json)
