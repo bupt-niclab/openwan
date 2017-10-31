@@ -898,12 +898,25 @@ def VPN2dict(vpns):
     single = {
       "tid": vpn.tid,
       "name":vpn.name,
-      "network_segment":vpn.network_segment,
-      "dh_group":vpn.dh_group,
-      "authentication_algorithm":vpn.authentication_algorithm,
-      "encryption_algorithm":vpn.encryption_algorithm,
-      "pre_shared_key":vpn.pre_shared_key,
-      "ipsec_protocol":vpn.ipsec_protocol
+      "LTE_cloudGW":vpn.LTE_cloudGW,
+      "LTE_external_interface":vpn.LTE_external_interface,
+      "LTE_local_identity":vpn.LTE_local_identity,
+      "LTE_remote_identity":vpn.LTE_remote_identity,
+      "cloud_external_interface":vpn.cloud_external_interface,
+      "cloud_local_address":vpn.cloud_local_address,
+
+    #   "network_segment":vpn.network_segment,
+      "phase1_dh_group":vpn.phase1_dh_group,
+      "phase1_authentication_algorithm":vpn.phase1_authentication_algorithm,
+      "encryption_algophase1_encryption_algorithmrithm":vpn.phase1_encryption_algorithm,
+      "phase1_pre_shared_key":vpn.phase1_pre_shared_key,
+      "phase1_dead_peer_detection_nterval":vpn.phase1_dead_peer_detection_nterval,
+      "phase1_dead_peer_detection_threshold":vpn.phase1_dead_peer_detection_threshold,
+
+      "phase2_authentication_algorithm":vpn.phase2_authentication_algorithm,
+      "phase2_encryption_algorithm":vpn.phase2_encryption_algorithm,
+      "phase2_perfect_forward_secrecy_keys":vpn.phase2_perfect_forward_secrecy_keys
+    #   "ipsec_protocol":vpn.ipsec_protocol
     }
     result.append(single)
   return result
@@ -1017,11 +1030,12 @@ def getTrafficPathinfo():
             d1['ip'] = vmx_dict['cpeCloud']['rpc_reply']['ike-active-peers-information']['ike-active-peers'][i]['ike-sa-remote-address']
             d1['name'] = vmx_dict['cpeCloud']['rpc_reply']['ike-active-peers-information']['ike-active-peers'][i]['ike-ike-id']
             equ_name = d1['name']
-            str = "salt '"+d1['name']+ "' junos.rpc 'get-pfe-statistics' --output=json"
-            equ_in_out = subprocess.check_output(str,shell = True)
-            equ_dict = json.loads(equ_in_out)
-            d1['input_pps'] = int(equ_dict[equ_name]['rpc_reply']['pfe-statistics']['pfe-traffic-statistics']['input-pps'])
-            print("input pps is ",type(d1['input_pps']))
+            if "agent" in equ_name:
+                str = "salt '"+d1['name']+ "' junos.rpc 'get-pfe-statistics' --output=json"
+                equ_in_out = subprocess.check_output(str,shell = True)
+                equ_dict = json.loads(equ_in_out)
+                d1['input_pps'] = int(equ_dict[equ_name]['rpc_reply']['pfe-statistics']['pfe-traffic-statistics']['input-pps'])
+                print("input pps is ",type(d1['input_pps']))
             # if d1['input_pps'] <= 10:
             #     d1['input_pps'] = 1
             # elif d1['input_pps'] >10 and d1['input_pps'] <= 100 :
@@ -1031,8 +1045,8 @@ def getTrafficPathinfo():
             # else:
             #     d1['input_pps'] = 4   
                 
-            d1['output_pps'] = int(equ_dict[equ_name]['rpc_reply']['pfe-statistics']['pfe-traffic-statistics']['output-pps'])
-            print("output pps is ",type(d1['output_pps']))
+                d1['output_pps'] = int(equ_dict[equ_name]['rpc_reply']['pfe-statistics']['pfe-traffic-statistics']['output-pps'])
+                print("output pps is ",type(d1['output_pps']))
             # if d1['output_pps'] <= 10:
             #     d1['output_pps'] = 1
             # elif d1['output_pps'] >10 and d1['output_pps'] <= 100 :
