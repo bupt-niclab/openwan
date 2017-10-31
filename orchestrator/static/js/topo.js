@@ -92,9 +92,9 @@ $(document).ready(function(){
             render: function(data, type, row, meta) {
               // return '<a href="' + data + '" target="_blank">' + row.title + '</a>';
               if (data) {
-                return '<button class="btn btn-primary" disabled>已应用</button><button class="btn btn-primary" onclick="editTemplate("' + row.tid + ')">编辑模板</button>';
+                return '<button class="btn btn-primary" disabled style="margin-right: 10px">已应用</button><button class="btn btn-primary" onclick="editTemplate("' + row.tid + ')">编辑模板</button>';
               } else {
-                return '<button class="btn btn-primary" onclick="applyTemplate(' + row.tid + ')">应用</button><button class="btn btn-primary" onclick="editTemplate(' + row.tid + ')">编辑模板</button>';                
+                return '<button class="btn btn-primary" style="margin-right: 10px" onclick="applyTemplate(' + row.tid + ')">应用</button><button class="btn btn-primary" onclick="editTemplate(' + row.tid + ')">编辑模板</button>';                
               }           
             },
             //指定是第三列
@@ -248,6 +248,7 @@ function createNodes (nodeList, scene) {
   for (var i = 0, j = nodeList.length;i < j;i++) {
     var node = nodeList[i];
     var addedNode = createSingleNode(node, scene);
+    addedNode.ip = node.ip;
     addedNode.input_pps = node.input_pps;
     addedNode.output_pps = node.output_pps;    
     addedNodeList.push(addedNode);
@@ -423,7 +424,8 @@ function applyTemplate(tid) {
     contentType: "application/json",
     data: JSON.stringify({
       tid: tid,
-      device_name: currentNode.text
+      ip: currentNode.ip,
+      node_name: currentNode.text
     })
   }).done(function(response){
     if (response.status === 0) {
@@ -435,7 +437,7 @@ function applyTemplate(tid) {
   })
 }
 
-function editTemplate() {
-  
+function editTemplate(tid) {
+  window.location.href = '/template/edit/' + tid;
 }
 
