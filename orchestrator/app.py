@@ -254,17 +254,29 @@ def run_template(template):
     return redirect(url_for('job_result', jid=jid))
 
 @app.route("/templates/new", methods=['GET', 'POST'])
-@login_required
+# @login_required
 def add_template():
     # form = NewTemplateForm()
     vpn_form = VPNForm()
     # probe_form = ProbeForm()
     if vpn_form.validate_on_submit():   
       # ((?:(?:25[0-5]|2[0-4]\d|(?:1\d{2}|[1-9]?\d))\.){3}(?:25[0-5]|2[0-4]\d|(?:1\d{2}|[1-9]?\d)))/24         
-      tmp = VPN(vpn_form.name.data, vpn_form.LTE_cloudGW.data, vpn_form.LTE_external_interface.data,vpn_form.LTE_internal_interface.data,
-    vpn_form.LTE_local_identity.data, vpn_form.LTE_remote_identity.data,vpn_form.cloud_external_interface.data,
-    vpn_form.cloud_internal_interface.data,vpn_form.cloud_local_address.data,
-    vpn_form.dh_group.data, vpn_form.authentication_algorithm.data,vpn_form.encryption_algorithm.data, vpn_form.pre_shared_key.data)
+      tmp = VPN(vpn_form.name.data, 
+        vpn_form.LTE_cloudGW.data, 
+        vpn_form.LTE_external_interface.data,
+        vpn_form.LTE_local_identity.data, 
+        vpn_form.LTE_remote_identity.data,
+        vpn_form.cloud_external_interface.data,
+        vpn_form.cloud_local_address.data,
+        vpn_form.phase1_dh_group.data, 
+        vpn_form.phase1_authentication_algorithm.data,
+        vpn_form.phase1_encryption_algorithm.data, 
+        vpn_form.phase1_pre_shared_key.data,
+        vpn_form.phase1_dead_peer_detection_nterval.data,
+        vpn_form.phase1_dead_peer_detection_threshold.data,
+        vpn_form.phase2_authentication_algorithm.data,
+        vpn_form.phase2_encryption_algorithm.data,
+        vpn_form.phase2_perfect_forward_secrecy_keys.data)
 
       db_session.add(tmp)
       db_session.commit()
@@ -333,7 +345,6 @@ def edit_template(tid):
     vpn_form.LTE_external_interface.data,
     vpn_form.LTE_local_identity.data,
     vpn_form.LTE_local_identity.data,
-    vpn_form.LTE_remote_identity.data,
     vpn_form.cloud_external_interface.data,
     vpn_form.cloud_local_address.data,
     vpn_form.phase1_dh_group.data, 
@@ -493,8 +504,8 @@ class VPNForm(Form):
     phase1_encryption_algorithm = SelectField('phase1-encryption-algorithm',choices=phase1_encryption_algorithm, default='aes-128-cbc')
     phase1_pre_shared_key = SelectField('phase1-pre-shared-key',choices=phase1_pre_shared_key, default='ascii-text $ABC123')
     # ipsec_protocol = SelectField('ipsec-protocol',choices=ipsec_protocol)
-    phase1_dead_peer_detection_nterval = StringField('phase1_dead_peer_detection_nterval',validators=[DataRequired], default=10)
-    phase1_dead_peer_detection_threshold = StringField('phase1_dead_peer_detection_threshold',validators=[DataRequired], default=3)
+    phase1_dead_peer_detection_nterval = StringField('phase1_dead_peer_detection_nterval',validators=[DataRequired()], default=10)
+    phase1_dead_peer_detection_threshold = StringField('phase1_dead_peer_detection_threshold',validators=[DataRequired()], default=3)
     phase2_authentication_algorithm = SelectField('phase2_authentication_algorithm',choices=phase2_authentication_algorithm)
     phase2_encryption_algorithm = SelectField('phase2_encryption_algorithm',choices=phase2_encryption_algorithm)
     phase2_perfect_forward_secrecy_keys = SelectField('phase2_perfect_forward_secrecy_keys',choices=phase2_perfect_forward_secrecy_keys, default='group2')
