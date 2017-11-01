@@ -1099,8 +1099,22 @@ def getTrafficPathinfo():
 def applyVPNtemplate_1():
     global LASTAPPLY_TID
     tid = request.json['tid']
-    dest_ip = str(request.json['ip'])
-    node_name = str(request.json['node_name'])
+    dest_ip = request.json['ip']
+    node_name = request.json['node_name']
+    output = open('lte_centor.yml','w')
+    cont =  []
+    for line in jinja_centor_test(tid):
+        cont.append(line)
+        output.write(line)
+    output.close()
+    # print("cont is ",cont)
+    output = open('lte_access.yml','w')
+    cont =  []
+    for line in jinja_access_test(tid):
+        cont.append(line)
+        output.write(line)
+    output.close()
+    node_name = str(node_name)
     LASTAPPLY_TID = tid
     # device_name = request.json['device_name']
     device_name1 = "Agent-2"
@@ -1108,23 +1122,31 @@ def applyVPNtemplate_1():
     tmp = db_session.query(VPN).filter_by(tid = tid).first()
     #拿到对应的模板 
     lines = []
-    output = open('lte_access.yml','a+')
+    output = open('lte_access.yml','r')
     flag = 0
     for line in output.readlines():
+        if flag == 1:
+            line = line + dest_ip
+            flag = flag + 1
+            lines.append(line)
+            continue
+        if flag == 7:
+            line = line.strip("\n") +"'"+node_name + "'" + "\n" 
+            flag = flag + 1
+            lines.append(line)
+            continue
+        flag = flag + 1
         lines.append(line)
     output.close()
-    print lines
-    lines.insert(1,dest_ip)
-    str = "local_identity = '"+node_name+"'"
-    lines.insert(7,str)
-    s = ''+join(lines)
+    print("lines is",lines)
+    s = ''.join(lines)
     f=open('lte_access.yml','w')
     f.write(s)
     f.close()
-    ff = subprocess.check_output("cp -f lte_centor.yml /srv/salt/base/let_centor.yml",shell = True)
-    f = subprocess.check_output("cp -f lte_access.yml /srv/salt/base/let_access.yml",shell = True)
+    ff = subprocess.check_output("cp lte_centor.yml /srv/salt/base/lte_centor.yml",shell = True)
+    f = subprocess.check_output("cp lte_access.yml /srv/salt/base/lte_access.yml",shell = True)
     str_access = "salt "+node_name+" cp.get_file salt://lte_access.yml /etc/ansible/lte_access.yml"
-    cp_access = subprocess.check_output(str_centor,shell = True)
+    cp_access = subprocess.check_output(str_access,shell = True)
     str_centor = "salt "+node_name+" cp.get_file salt://lte_centor.yml /etc/ansible/lte_centor.yml"
     cp_centor = subprocess.check_output(str_centor,shell = True)
 
@@ -1161,10 +1183,10 @@ def shutdown_session(exception=None):
 
 
 
-@app.route('/testjinja_centor',methods = ['POST'])
-@login_required
-def jinja_centor_test():
-    tid = request.json['tid']
+@app.route('/testjinja_centor',methods = ['GET'])
+# @login_required
+def jinja_centor_test(tid):
+    # tid = request.json['tid']
     tmp = db_session.query(VPN).filter_by(tid = tid).first()
     hub_ip = str(tmp.LTE_cloudGW)
     minion_id = str(tmp.tid)
@@ -1202,12 +1224,28 @@ def jinja_centor_test():
     d["PFS_keys"]=PFS_keys
     
 
+    # d["hub_ip"]="112.35.30.67"
+    # d["minion_id"]="22"
+    # d["ext_interface"]="ge-0/0/0.0"
+    # d["local_identity"]="CGW-2"
+    # d["remote_identity"]="LTE-node-2"
+    # d["local_address"]="10.112.44.113"
+    # d["ike_auth_algorithm"]="sha1"
+    # d["ike_enc_algorithm"]="aes-128-cbc"
+    # d["dh_group"]="group2"
+    # d["shared_secret"]="ascii-text $ABC123"
+    # d["DPD_interval"]="10"
+    # d["DPD_threshold"]="3"
+    # d["ipsec_auth_algorithm"]="hmac-sha1-96"
+    # d["ipsec_enc_algorithm"]="aes-128-cbc"
+    # d["PFS_keys"]="group2"
+
     return render_template('lte_centor.yml', **d)
 
-@app.route('/testjinja_access',methods = ['POST'])
-@login_required
-def jinja_access_test():
-    tid = request.json['tid']
+@app.route('/testjinja_access',methods = ['GET'])
+# @login_required
+def jinja_access_test(tid):
+    # tid = request.json['tid']
     tmp = db_session.query(VPN).filter_by(tid = tid).first()
     # hub_ip = str(tmp.LTE_cloudGW)
     minion_id = str(tmp.tid)

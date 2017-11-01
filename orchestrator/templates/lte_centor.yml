@@ -1,12 +1,12 @@
-[vFW]
+[hub]
+{{ hub_ip }}
 
-
-[vFW:vars]
+[hub:vars]
 minion_id= {{ minion_id }}
-CLOUD_GW = '{{ CLOUD_GW }}'
 ext_interface = '{{ ext_interface }}'
-local_identity = 
+local_identity = '{{ local_identity }}'
 remote_identity = '{{ remote_identity }}'
+local_address = '{{ local_address }}'
 
 ike_auth_algorithm = '{{ ike_auth_algorithm }}'
 ike_enc_algorithm = '{{ ike_enc_algorithm }}'

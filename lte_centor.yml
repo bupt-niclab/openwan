@@ -1,0 +1,20 @@
+[hub]
+112.35.30.67
+
+[hub:vars]
+minion_id= 2
+ext_interface = ge-0/0/0
+local_identity = CGW-2
+remote_identity = test2
+local_address = 10.112.44.113
+
+ike_auth_algorithm = sha1
+ike_enc_algorithm = aes-128-cbc
+dh_group = group2
+shared_secret = ascii-text $ABC123
+DPD_interval = 10
+DPD_threshold = 3
+ 
+ipsec_auth_algorithm = 3
+ipsec_enc_algorithm = 3des-cbc
+PFS_keys = group2
