@@ -359,7 +359,7 @@ def edit_template(tid):
     vpn_form.phase1_dead_peer_detection_threshold.data,
     vpn_form.phase2_authentication_algorithm.data,
     vpn_form.phase2_encryption_algorithm.data,
-    vpn_form.phase2_perfect_forward_secrecy_keys)
+    vpn_form.phase2_perfect_forward_secrecy_keys.data)
     print(tmp2)
 
     db_session.add(tmp2)
