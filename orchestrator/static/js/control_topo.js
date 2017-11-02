@@ -1,18 +1,22 @@
+var currentNode = null;
+var templateTable;
+
 $(document).ready(function(){
-  console.log(JTopo.Effect);
   var canvas = document.getElementById('canvas'); 
   var stage = new JTopo.Stage(canvas); // 创建一个舞台对象
 
   var scene = new JTopo.Scene(stage); // 创建一个场景对象
-  scene.background = '/static/images/bg.jpg';
+  // scene.background = '/static/images/bg.jpg';
+  scene.alpha = 1;
+  scene.backgroundColor = '242,242,242';  
   
   // 创建公网节点
   var local = createSingleNode({
     x: 350,
     y: 200,
-    w: 40,
-    h: 40,
-    text: 'Cloud-GW',
+    w: 128,
+    h: 128,
+    text: 'Orchestrator',
     img: 'control-cloud.png',
     dragable: false
   }, scene);
@@ -25,6 +29,42 @@ $(document).ready(function(){
   menuItem.click(function() {
     if($(this)[0].id === 'config-template') {
       $('#config-template-modal').modal();
+      if(!templateTable) {
+        templateTable = $('#templates').DataTable({
+          ajax: {
+            url: '/api_templates/' + currentNode.text
+          },
+          pageLength: 5,
+          columns: [{
+            data: "tid"
+          }, {
+            data: "name"
+          }, {
+            data: "applied"
+          }],
+          columnDefs: [
+          {
+            render: function(data, type, row, meta) {
+              // return '<a href="' + data + '" target="_blank">' + row.title + '</a>';
+              if (data) {
+                return '<button class="btn btn-primary" disabled style="margin-right: 10px">已应用</button><button class="btn btn-primary" onclick="editTemplate("' + row.tid + ')">编辑模板</button>';
+              } else {
+                return '<button class="btn btn-primary" style="margin-right: 10px" onclick="applyTemplate(' + row.tid + ')">应用</button><button class="btn btn-primary" onclick="editTemplate(' + row.tid + ')">编辑模板</button>';                
+              }           
+            },
+            //指定是第三列
+            targets: 2
+          }]
+        });
+        // templateTable.on('order.dt search.dt', function() {
+        //     t.column(0, {
+        //       "search": 'applied',
+        //       "order": 'applied'
+        //     }).nodes().each(function(cell, i) {
+        //       cell.innerHTML = i + 1;
+        //   });
+        // }).draw();
+      }
     } 
     menuList.hide();
   });
@@ -37,8 +77,8 @@ $(document).ready(function(){
 
   getNodes(function(nodeList) {
     nodeList.forEach(function(node){
-      node.x = Math.random() * 600;
-      node.y = Math.random() * 500;
+      node.x = randomNodePosition('x');
+      node.y = randomNodePosition('y');
       node.w = 40;
       node.h = 40;
       node.text = node.node_name;
@@ -77,6 +117,28 @@ function simulateNodes () {
   return nodeList;
 }
 
+// 生成节点位置
+function randomNodePosition(type) {
+  var result;
+  if (type === 'x') {
+    result = Math.random() * 800;
+    if(result >= 320 && result <= 560) {
+      return randomNodePosition('x');
+    }
+    else {
+      return result;
+    }
+  } else {
+    result = Math.random() * 500;
+    if(result >= 170 && result <= 410) {
+      return randomNodePosition('y');
+    }
+    else {
+      return result;
+    }
+  }
+}
+
 // 添加节点数组至拓扑
 function createNodes (nodeList, scene) {
   var addedNodeList = []
@@ -90,11 +152,12 @@ function createNodes (nodeList, scene) {
 
 // 添加单个节点至拓扑
 function createSingleNode (nodeInfo, scene) {
+  console.log(nodeInfo);
   var node = new JTopo.Node(nodeInfo.text);
   node.setLocation(nodeInfo.x, nodeInfo.y);
   node.setSize(nodeInfo.w, nodeInfo.h);
   if (nodeInfo.img) {
-    node.setImage('/static/images/' + nodeInfo.img, true);
+    node.setImage('/static/images/' + nodeInfo.img, false);
   }
   node.dragable = nodeInfo.dragable;
   if(nodeInfo.node_state === 'up') {
@@ -105,6 +168,11 @@ function createSingleNode (nodeInfo, scene) {
   }
   node.fontColor = nodeInfo.fontColor || '0,0,0';  
   scene.add(node);
+  if (nodeInfo.node_type === 'agent') {
+    node.addEventListener('mouseup', function(event) {
+      handler(event, node);
+    });
+  }
   return node;
 }
 
@@ -169,6 +237,19 @@ function makeNodeEditable (scene) {
   });
 }
 
+// 右键弹出菜单
+function handler (event, node) {
+  // console.log(node);
+  currentNode = node;
+  if (event.button === 2) {
+    // console.log(event);
+    $('#contextmenu').css({
+      top: event.layerY,
+      left: event.layerX + 40
+    }).show();
+  }
+}  
+
 
 // 获取节点信息
 function getNodes(callback) {
@@ -181,5 +262,46 @@ function getNodes(callback) {
       }
     }
   });
+}
+
+function getTemplates(callback) {
+  $.ajax({
+    type: 'get',
+    url: '/api_templates',
+    success: function(response) {
+      if (response.err_msg === 'success') {
+        callback(response.data);
+      }
+    }
+  })
+}
+
+// 应用模板
+function applyTemplate(tid) {
+  if(currentNode.text === '192.168.0.13') {
+    currentNode.text = 'cpe2';
+  }
+  $.ajax({
+    type: 'post',
+    url: '/apply_vpn_template',
+    contentType: "application/json",
+    data: JSON.stringify({
+      tid: tid,
+      ip: currentNode.ip,
+      node_name: currentNode.text
+    })
+  }).done(function(response){
+    if (response.status === 0) {
+      alert('应用成功');
+      templateTable.ajax.reload();  
+    } else {
+      alert(response.errmsg)
+    }
+  })
+}
+
+// 跳转至编辑模板页面
+function editTemplate(tid) {
+  window.location.href = '/template/edit/' + tid;
 }
 

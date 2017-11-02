@@ -2,14 +2,13 @@ var currentNode = null;
 var templateTable;
 
 $(document).ready(function(){
-
-  console.log(new JTopo.Link);
-  console.log(new JTopo.Node);  
   var canvas = document.getElementById('canvas'); 
   var stage = new JTopo.Stage(canvas); // 创建一个舞台对象
 
   var scene = new JTopo.Scene(stage); // 创建一个场景对象
-  scene.background = '/static/images/bg.jpg';
+  // scene.background = '/static/images/bg.jpg';
+  scene.alpha = 1;
+  scene.backgroundColor = '242,242,242';  
   
   // 创建云端节点
   var local = createSingleNode({
@@ -72,46 +71,8 @@ $(document).ready(function(){
   menuItem = menuList.find('a');
   
   menuItem.click(function() {
-    if($(this)[0].id === 'config-template') {
-      $('#config-template-modal').modal();
-      if(!templateTable) {
-        templateTable = $('#templates').DataTable({
-          ajax: {
-            url: '/api_templates/' + currentNode.text
-          },
-          pageLength: 5,
-          columns: [{
-            data: "tid"
-          }, {
-            data: "name"
-          }, {
-            data: "applied"
-          }],
-          columnDefs: [
-          {
-            render: function(data, type, row, meta) {
-              // return '<a href="' + data + '" target="_blank">' + row.title + '</a>';
-              if (data) {
-                return '<button class="btn btn-primary" disabled style="margin-right: 10px">已应用</button><button class="btn btn-primary" onclick="editTemplate("' + row.tid + ')">编辑模板</button>';
-              } else {
-                return '<button class="btn btn-primary" style="margin-right: 10px" onclick="applyTemplate(' + row.tid + ')">应用</button><button class="btn btn-primary" onclick="editTemplate(' + row.tid + ')">编辑模板</button>';                
-              }           
-            },
-            //指定是第三列
-            targets: 2
-          }]
-        });
-        // templateTable.on('order.dt search.dt', function() {
-        //     t.column(0, {
-        //       "search": 'applied',
-        //       "order": 'applied'
-        //     }).nodes().each(function(cell, i) {
-        //       cell.innerHTML = i + 1;
-        //   });
-        // }).draw();
-      }
-    } else {
-      alert('查看成功');
+    if($(this)[0].id === 'check-info') {
+      alert('这里会跳转到 health check 界面， todo')
     }
     menuList.hide();
   });
@@ -182,7 +143,7 @@ $(document).ready(function(){
       node.w = 40;
       node.h = 40;
       node.text = node.name;
-      node.img = 'switch.png';
+      node.img = 'switch_2.png';
       node.dragable = true;
       node.nodeType = 'switch'
     })
@@ -210,7 +171,7 @@ function simulateNodes () {
       y: randomNodePosition('y'),
       w: 40,
       h: 40,
-      img: 'switch.png',
+      img: 'switch_2.png',
       dragable: true,
       text: 'Node ' + i,
       // fontColor: '170,170,170'    
@@ -221,6 +182,7 @@ function simulateNodes () {
   return nodeList;
 }
 
+// 生成节点位置
 function randomNodePosition(type) {
   var result;
   if (type === 'x') {
@@ -400,44 +362,3 @@ function getNodes(callback) {
     }
   });
 }
-
-// 获取模板列表
-function getTemplates(callback) {
-  $.ajax({
-    type: 'get',
-    url: '/api_templates',
-    success: function(response) {
-      if (response.err_msg === 'success') {
-        callback(response.data);
-      }
-    }
-  })
-}
-
-function applyTemplate(tid) {
-  if(currentNode.text === '192.168.0.13') {
-    currentNode.text = 'cpe2';
-  }
-  $.ajax({
-    type: 'post',
-    url: '/apply_vpn_template',
-    contentType: "application/json",
-    data: JSON.stringify({
-      tid: tid,
-      ip: currentNode.ip,
-      node_name: currentNode.text
-    })
-  }).done(function(response){
-    if (response.status === 0) {
-      alert('应用成功');
-      templateTable.ajax.reload();  
-    } else {
-      alert(response.errmsg)
-    }
-  })
-}
-
-function editTemplate(tid) {
-  window.location.href = '/template/edit/' + tid;
-}
-
