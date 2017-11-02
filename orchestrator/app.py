@@ -11,7 +11,6 @@ from os.path import join, dirname
 reload(sys)  # Reload is a hack
 sys.setdefaultencoding('UTF8')
 from flask import Flask, redirect, render_template, url_for, session, request, flash, jsonify
-from flask_assets import Environment, Bundle
 from .core import HTTPSaltStackClient, ExpiredToken, Unauthorized, JobNotStarted
 from .utils import login_url, parse_highstate, NotHighstateOutput, parse_argspec
 from .utils import format_arguments, Call, validate_permissions, REQUIRED_PERMISSIONS
@@ -58,7 +57,15 @@ except ImportError:
 
 
 # Flask assets
-assets = Environment(app)
+# from flask_assets import Environment, Bundle
+# assets = Environment(app)
+
+# Flask Babel
+from flask_babel import Babel, gettext as _, get_translations
+app.config['BABEL_DEFAULT_LOCALE'] = 'zh_Hans_CN'
+babel = Babel(app)
+
+print (get_translations())
 
 client = FlaskHTTPSaltStackClient(app.config['API_URL'],
     app.config.get('VERIFY_SSL', True))
