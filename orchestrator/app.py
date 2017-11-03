@@ -11,12 +11,14 @@ from os.path import join, dirname
 reload(sys)  # Reload is a hack
 sys.setdefaultencoding('UTF8')
 from flask import Flask, redirect, render_template, url_for, session, request, flash, jsonify
+from flask_assets import Environment, Bundle
 from .core import HTTPSaltStackClient, ExpiredToken, Unauthorized, JobNotStarted
 from .utils import login_url, parse_highstate, NotHighstateOutput, parse_argspec
 from .utils import format_arguments, Call, validate_permissions, REQUIRED_PERMISSIONS
 from .utils import get_filtered_post_arguments
 from flask_admin import Admin
 from . import settings
+from flask.ext.babel import Babel,gettext,ngettext,lazy_gettext
 # from flask_sqlalchemy import sqlalchemy
 from .database import db_session
 from models import Templates,VPN,Probe
@@ -979,10 +981,13 @@ def getControlPathinfo():
         d1 = dict()
         if flag % 2 == 0:
             d['node_name'] = line.strip().strip(':')
-            str = "salt '"+d['node_name']+"' grains.item os --output=json"
+            # print(type(d['node_name']))
+            str_node = "salt '"+d['node_name']+"' grains.item os --output=json"
             node_name = d['node_name']
-            fff = subprocess.check_output(str,shell = True)
+            fff = subprocess.check_output(str_node,shell = True)
             node_info = json.loads(fff)
+            # print("node info type is ",node_info[node_name],d['node_name'])
+            # print("node info type is ",node_info[node_name]['os'])
             node_type = node_info[node_name]['os']
             print("node type is ",node_type)
             if node_type != "proxy":
