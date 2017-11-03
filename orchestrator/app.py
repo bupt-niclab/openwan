@@ -65,9 +65,13 @@ except ImportError:
 # Flask Babel
 from flask_babel import Babel, gettext as _, get_translations
 app.config['BABEL_DEFAULT_LOCALE'] = 'zh_Hans_CN'
-babel = Babel(app)
+babel = Babel()
 
-print (get_translations())
+@babel.localeselector
+def get_locale():
+  return 'zh_Hans_CN'
+
+babel.init_app(app)
 
 client = FlaskHTTPSaltStackClient(app.config['API_URL'],
     app.config.get('VERIFY_SSL', True))
