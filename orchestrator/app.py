@@ -65,13 +65,9 @@ except ImportError:
 # Flask Babel
 from flask_babel import Babel, gettext as _, get_translations
 app.config['BABEL_DEFAULT_LOCALE'] = 'zh_Hans_CN'
-babel = Babel()
+babel = Babel(app)
 
-@babel.localeselector
-def get_locale():
-  return 'zh_Hans_CN'
-
-babel.init_app(app)
+print (get_translations())
 
 client = FlaskHTTPSaltStackClient(app.config['API_URL'],
     app.config.get('VERIFY_SSL', True))
@@ -335,9 +331,9 @@ def add_template():
     #     return redirect(url_for('templates'))
     return render_template("add_template.html", vpn_form=vpn_form)
 
-@app.route("/template/edit/<tid>", methods=['GET', 'POST'])
+@app.route("/template/edit/VPN/<tid>", methods=['GET', 'POST'])
 @login_required
-def edit_template(tid):
+def edit_VPN_template(tid):
   tmp = db_session.query(VPN).filter_by(tid=tid).first()
   vpn_form = VPNForm()    
   if request.method == 'GET':
@@ -394,8 +390,72 @@ def edit_template(tid):
   # if probe_form.validate_on_submit():
   #   return jsonify(errmsg="success")      
   return render_template("edit_template.html", vpn_form=vpn_form, tid=tid)
+@app.route("/template/edit/UTM/<tid>", methods=['GET', 'POST'])
+@login_required
+def edit_UTM_template(tid):
+    tmp = db_session.query(UTM).filter_by(tid = tid).first()
+    utm_form = UTMForm()
+    if request.method == 'GET':
+        utm_form.name.data = tmp.name
+        utm_form.content_filtering.data =  tmp.content_filtering
+        utm_form.anti_virus.data = tmp.anti_virus
+        utm_form.antivirus_http.data = tmp.antivirus_http
+        utm_form.antivirus_smtp.data = tmp.antivirus_smtp
+        utm_form.antivirus_ftp.data = tmp.antivirus_ftp
+        utm_form.anti_spam.data = tmp.anti_spam
+        utm_form.antispam_default.data = tmp.antispam_default
+        utm_form.antispam_custom.data = tmp.antispam_custom
+        utm_form.url_filtering.data = tmp.url_filtering
+        utm_form.spam_black_list_value.data = tmp.spam_black_list_value
+        utm_form.spam_black_list_pattern_name.data = tmp.spam_black_list_pattern_name
+        utm_form.spam_white_list_value.data = tmp.spam_white_list_value
+        utm_form.spam_white_list_pattern_name.data = tmp.spam_white_list_pattern_name
+        utm_form.spam_action.data = tmp.spam_action
+        utm_form.custom_tag_string.data = tmp.custom_tag_string
+        utm_form.sbl_profile_name.data = tmp.sbl_profile_name
+        utm_form.url_black_list_value.data = tmp.url_black_list_value
+        utm_form.url_black_list_pattern_name.data = tmp.url_black_list_pattern_name
+        utm_form.url_black_list_category_name.data = tmp.url_black_list_category_name
+        utm_form.url_black_list_action.data = tmp.url_black_list_action
+        utm_form.url_white_list_value.data = tmp.url_white_list_value
+        utm_form.url_white_list_pattern_name.data = tmp.url_white_list_pattern_name
+        utm_form.url_white_list_category_name.data = tmp.url_white_list_category_name
+        utm_form.url_white_list_action.data = tmp.url_white_list_action
+        utm_form.fallback_setting_default.data = tmp.fallback_setting_default
+        utm_form.fallback_setting_server_connectivity.data = tmp.fallback_setting_server_connectivity
+        utm_form.fallback_setting_timeout.data = tmp.fallback_setting_timeout
+        utm_form.fallback_setting_too_many_requests.data = tmp.fallback_setting_too_many_requests
+        utm_form.url_filtering_name.data = tmp.url_filtering_name
+        utm_form.file_ext_name.data = tmp.file_ext_name
+        utm_form.file_ext_val.data = tmp.file_ext_val
+        utm_form.mine_name.data = tmp.mine_name
+        utm_form.mine_val.data = tmp.mine_val
+        utm_form.ex_mine_name.data = tmp.ex_mine_name
+        utm_form.ex_mine_val.data = tmp.ex_mine_val
+        utm_form.confilter_name.data = tmp.confilter_name
+        utm_form.block_contype.data = tmp.block_contype
+        utm_form.old_status.data = tmp.old_status
+        utm_form.old_policy_name.data = tmp.old_policy_name
+        utm_form.old_src_zone.data = tmp.old_src_zone
+        utm_form.old_dst_zone.data = tmp.old_dst_zone
+        utm_form.src_zone.data = tmp.src_zone
+        utm_form.dst_zone.data = tmp.dst_zone
+        utm_form.src_address.data = tmp.src_address
+        utm_form.dst_address.data = tmp.dst_address
+        utm_form.new_policy_name.data = tmp.new_policy_name
+    if utm_form.validate_on_submit():
+        db_session.delete(tmp)
+        db_session.commit()
+        tmp2 = UTM(
+            utm_form.name.data,
+            utm.content_filtering.data
+        )
+        db_session.add(tmp2)
+        db_session.commit()
+        flash('template saved successfully')
+        return redirect(url_for('templates'))
 
-
+    return None
 @app.route("/deployments")
 @login_required
 def deployments():
@@ -1080,7 +1140,7 @@ def UTM2dict(utms):
             "name":utm.name,
             "content_filtering":utm.content_filtering,
             "anti_virus":utm.anti_virus,
-            "antivirus_http":utm.antivirus_http
+            "antivirus_http":utm.antivirus_http,
             "antivirus_smtp":utm.antivirus_smtp,
             "antivirus_ftp":utm.antivirus_ftp,
             "anti_spam":utm.anti_spam,
@@ -1307,7 +1367,7 @@ def getTrafficPathinfo():
     #     d1['ip'] = vmx_dict['cpeCloud']['rpc_reply']['ike-active-peers-information']['ike-active-peers'][i]['ike-sa-remote-address']
     #     d1['name'] = vmx_dict['cpeCloud']['rpc_reply']['ike-active-peers-information']['ike-active-peers'][i]['ike-ike-id']
     #     nodesinfo_basic.append(d1)
-    print nodesinfo_basic
+    print(nodesinfo_basic)
     # for j in range(len(nodesinfo_basic)):
     #     d3 = dict()        
     #     str = "salt '"+ nodesinfo_basic[j]['name']+"' junos.rpc 'get-ike-active-peers-information' --output=json"
