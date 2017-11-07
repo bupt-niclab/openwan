@@ -20,8 +20,8 @@ from flask_admin import Admin
 from . import settings
 # from flask_sqlalchemy import sqlalchemy
 from .database import db_session
-from models import Templates,VPN,Probe,UTM
-from jinja2 import Environment, select_autoescape,Template
+from models import Templates, VPN, Probe, UTM
+from jinja2 import Environment, select_autoescape, Template
 # from models import db
 # from flask.ext.sqlalchemy import sqlalchemy
 
@@ -30,14 +30,16 @@ LASTAPPLY_TID = False
 
 # Init app
 
-class FlaskHTTPSaltStackClient(HTTPSaltStackClient):
 
+class FlaskHTTPSaltStackClient(HTTPSaltStackClient):
     def get_token(self):
         return session.get('user_token')
 
+
 template_folder = join(dirname(__file__), 'templates')
 static_folder = join(dirname(__file__), 'static')
-app = Flask("Controller", template_folder=template_folder, static_folder=static_folder)
+app = Flask(
+    "Controller", template_folder=template_folder, static_folder=static_folder)
 app.config.from_object(settings)
 admin = Admin()
 # Setup logging
@@ -53,37 +55,26 @@ try:
 except ImportError:
     if app.config.get('SENTRY_DSN'):
         install_cmd = "pip install raven[flask]"
-        print("Couldn't import raven, please install it with '%s'" % install_cmd)
+        print(
+            "Couldn't import raven, please install it with '%s'" % install_cmd)
         sys.exit(1)
-
 
 # Flask assets
 # from flask_assets import Environment, Bundle
 # assets = Environment(app)
 
 # Flask Babel
-<<<<<<< Updated upstream
-from flask_babel import Babel, gettext as _, get_translations
+from flask_babel import Babel, gettext as _
 app.config['BABEL_DEFAULT_LOCALE'] = 'zh_Hans_CN'
 babel = Babel(app)
 
-print (get_translations())
-=======
-from flask_babel import Babel, lazy_gettext as _
-# app.config['BABEL_DEFAULT_LOCALE'] = 'zh_Hans_CN'
-
-babel = Babel(app)
-@babel.localeselector
-def get_locale():
-  return 'zh_Hans_CN'
->>>>>>> Stashed changes
-
 client = FlaskHTTPSaltStackClient(app.config['API_URL'],
-    app.config.get('VERIFY_SSL', True))
+                                  app.config.get('VERIFY_SSL', True))
 
 from flask_wtf import FlaskForm as Form
 from wtforms import StringField, PasswordField, TextAreaField
 from wtforms.validators import DataRequired
+
 
 class LoginForm(Form):
     username = StringField('username', validators=[DataRequired()])
@@ -109,10 +100,12 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         try:
-            user_token = client.login(form['username'].data, form['password'].data)
+            user_token = client.login(form['username'].data,
+                                      form['password'].data)
             if not validate_permissions(user_token['perms']):
                 perms = REQUIRED_PERMISSIONS
-                msg = 'Invalid permissions,It needs {0} for user {1}'.format(perms, form['username'].data)
+                msg = 'Invalid permissions,It needs {0} for user {1}'.format(
+                    perms, form['username'].data)
                 flash(msg, 'error')
             else:
                 session['username'] = form['username'].data
@@ -123,6 +116,7 @@ def login():
             flash('Invalid credentials', 'error')
 
     return render_template("login.html", form=form)
+
 
 @app.route('/logout', methods=["GET"])
 def logout():
@@ -140,8 +134,9 @@ def index():
 
     jobs = sorted(list(client.jobs().items()), reverse=True)[:10]
 
-    return render_template('dashboard.html', minions=minions,
-        ok_status=sync_number, jobs=jobs)
+    return render_template(
+        'dashboard.html', minions=minions, ok_status=sync_number, jobs=jobs)
+
 
 @app.route("/minions")
 @login_required
@@ -155,10 +150,17 @@ def minions_status():
     for minion in minions_status['down']:
         minions.setdefault(minion, {})['state'] = 'down'
 
-    jobs = client.select_jobs('state.highstate', minions, with_details=True,
-        test=True, default_arguments_values={'test': False})
+    jobs = client.select_jobs(
+        'state.highstate',
+        minions,
+        with_details=True,
+        test=True,
+        default_arguments_values={
+            'test': False
+        })
 
     return render_template('minions.html', minions=minions, jobs=jobs)
+
 
 @app.route("/minions_deployments")
 @login_required
@@ -172,32 +174,46 @@ def minions_deployments():
     for minion in minions_status['down']:
         minions.setdefault(minion, {})['state'] = 'down'
 
-    jobs = client.select_jobs('state.highstate', minions, with_details=True,
-        test=False, default_arguments_values={'test': False})
+    jobs = client.select_jobs(
+        'state.highstate',
+        minions,
+        with_details=True,
+        test=False,
+        default_arguments_values={
+            'test': False
+        })
 
-    return render_template('minions_deployments.html', minions=minions, jobs=jobs)
+    return render_template(
+        'minions_deployments.html', minions=minions, jobs=jobs)
 
 
 @app.route("/minions/<minion>/do_deploy")
 @login_required
 def minions_do_deploy(minion):
-    jid = client.run('state.highstate', client="local_async",
-        tgt=minion)['jid']
-    return redirect(url_for('job_result', minion=minion, jid=jid, renderer='highstate'))
+    jid = client.run(
+        'state.highstate', client="local_async", tgt=minion)['jid']
+    return redirect(
+        url_for('job_result', minion=minion, jid=jid, renderer='highstate'))
 
 
 @app.route("/minions/<minion>/do_check_sync")
 @login_required
 def minions_do_check_sync(minion):
-    jid = client.run('state.highstate', client="local_async",
-        tgt=minion, args=Call(test=True))['jid']
-    return redirect(url_for('job_result', minion=minion, jid=jid, renderer='highstate'))
+    jid = client.run(
+        'state.highstate',
+        client="local_async",
+        tgt=minion,
+        args=Call(test=True))['jid']
+    return redirect(
+        url_for('job_result', minion=minion, jid=jid, renderer='highstate'))
+
 
 @app.route("/jobs")
 @login_required
 def jobs():
     jobs = sorted(list(client.jobs().items()), reverse=True)
     return render_template('jobs.html', jobs=jobs)
+
 
 @app.route("/job_result/<jid>")
 @login_required
@@ -212,24 +228,31 @@ def job_result(jid):
         try:
             job = parse_highstate(job)
         except NotHighstateOutput:
-            return redirect(url_for('job_result', jid=jid, minion=minion,
-                            renderer='raw'))
+            return redirect(
+                url_for('job_result', jid=jid, minion=minion, renderer='raw'))
     elif renderer == 'aggregate':
         aggregate_result = {}
 
         for minion, minion_return in job['return'].items():
             aggregate_result.setdefault(str(minion_return), []).append(minion)
 
-        missing_minions = set(job['info']['Minions']) - set(job['return'].keys())
+        missing_minions = set(job['info']['Minions']) - set(
+            job['return'].keys())
         if missing_minions:
             aggregate_result['Missing results'] = missing_minions
         job['aggregate_return'] = aggregate_result
-        context['total_minions'] = sum(len(minions) for minions in aggregate_result.values())
+        context['total_minions'] = sum(
+            len(minions) for minions in aggregate_result.values())
 
     if not job:
         return "Unknown jid", 404
-    return render_template('job_result_{0}.html'.format(renderer), job=job, minion=minion,
-                           renderer=renderer, **context)
+    return render_template(
+        'job_result_{0}.html'.format(renderer),
+        job=job,
+        minion=minion,
+        renderer=renderer,
+        **context)
+
 
 @app.route("/templates")
 @login_required
@@ -241,39 +264,44 @@ def templates():
 
     # return jsonify(errmsg = "success", data = json.dumps(tmp ,default = VPN2dict))
 
-
     return render_template("templates.html", templates=tmp)
+
 
 @app.route("/api_templates/<switchname>")
 # @login_required
 def api_templates(switchname):
-  global LASTAPPLY_TID
-  tmp = db_session.query(VPN).all()
-  tmp_dict = VPN2dict(tmp)
-  for t in tmp_dict:
-      if t['tid'] == LASTAPPLY_TID:
-          t['applied'] = True
-      else:
-          t['applied'] = False
-  # data = VPN2dict(tmp)
-  # data[0]['applied'] = True
-  return jsonify(errmsg = "success", data = tmp_dict)
+    global LASTAPPLY_TID
+    tmp = db_session.query(VPN).all()
+    tmp_dict = VPN2dict(tmp)
+    for t in tmp_dict:
+        if t['tid'] == LASTAPPLY_TID:
+            t['applied'] = True
+        else:
+            t['applied'] = False
+    # data = VPN2dict(tmp)
+    # data[0]['applied'] = True
+    return jsonify(errmsg="success", data=tmp_dict)
 
 
 @app.route("/templates/run/<template>")
 @login_required
 def run_template(template):
-    master_config = client.run('config.values', client="wheel")['data']['return']
+    master_config = client.run(
+        'config.values', client="wheel")['data']['return']
     template_data = master_config['templates'].get(template)
 
     if not template_data:
         return "Unknown template", 404
 
-    jid = client.run(template_data['fun'], client="local_async",
-        tgt=template_data['tgt'], expr_form=template_data['expr_form'],
+    jid = client.run(
+        template_data['fun'],
+        client="local_async",
+        tgt=template_data['tgt'],
+        expr_form=template_data['expr_form'],
         args=Call(**template_data['args']))['jid']
 
     return redirect(url_for('job_result', jid=jid))
+
 
 @app.route("/templates/new", methods=['GET', 'POST'])
 # @login_required
@@ -282,41 +310,37 @@ def add_template():
     vpn_form = VPNForm()
     utm_form = UTMForm()
     # probe_form = ProbeForm()
-    if vpn_form.validate_on_submit():   
-      # ((?:(?:25[0-5]|2[0-4]\d|(?:1\d{2}|[1-9]?\d))\.){3}(?:25[0-5]|2[0-4]\d|(?:1\d{2}|[1-9]?\d)))/24         
-      tmp = VPN(vpn_form.name.data, 
-        vpn_form.LTE_cloudGW.data, 
-        vpn_form.LTE_external_interface.data,
-        vpn_form.LTE_local_identity.data, 
-        vpn_form.LTE_remote_identity.data,
-        vpn_form.cloud_external_interface.data,
-        vpn_form.cloud_local_address.data,
-        vpn_form.phase1_dh_group.data, 
-        vpn_form.phase1_authentication_algorithm.data,
-        vpn_form.phase1_encryption_algorithm.data, 
-        vpn_form.phase1_pre_shared_key.data,
-        vpn_form.phase1_dead_peer_detection_nterval.data,
-        vpn_form.phase1_dead_peer_detection_threshold.data,
-        vpn_form.phase2_authentication_algorithm.data,
-        vpn_form.phase2_encryption_algorithm.data,
-        vpn_form.phase2_perfect_forward_secrecy_keys.data)
+    if vpn_form.validate_on_submit():
+        # ((?:(?:25[0-5]|2[0-4]\d|(?:1\d{2}|[1-9]?\d))\.){3}(?:25[0-5]|2[0-4]\d|(?:1\d{2}|[1-9]?\d)))/24
+        tmp = VPN(vpn_form.name.data, vpn_form.LTE_cloudGW.data,
+                  vpn_form.LTE_external_interface.data,
+                  vpn_form.LTE_local_identity.data,
+                  vpn_form.LTE_remote_identity.data,
+                  vpn_form.cloud_external_interface.data,
+                  vpn_form.cloud_local_address.data,
+                  vpn_form.phase1_dh_group.data,
+                  vpn_form.phase1_authentication_algorithm.data,
+                  vpn_form.phase1_encryption_algorithm.data,
+                  vpn_form.phase1_pre_shared_key.data,
+                  vpn_form.phase1_dead_peer_detection_nterval.data,
+                  vpn_form.phase1_dead_peer_detection_threshold.data,
+                  vpn_form.phase2_authentication_algorithm.data,
+                  vpn_form.phase2_encryption_algorithm.data,
+                  vpn_form.phase2_perfect_forward_secrecy_keys.data)
 
-      db_session.add(tmp)
-      db_session.commit()
-      flash('template saved successfully')
-      return redirect(url_for('templates'))
+        db_session.add(tmp)
+        db_session.commit()
+        flash('template saved successfully')
+        return redirect(url_for('templates'))
     if utm_form.validate_on_submit():
-      tmp = UTM(utm_form.name.data,
-        utm_form.confilter_name.data
+        tmp = UTM(utm_form.name.data, utm_form.confilter_name.data)
 
-      )
-
-      db_session.add(tmp)
-      db_session.commit()
-      flash('template saved successfully')
-      return redirect(url_for('templates'))
+        db_session.add(tmp)
+        db_session.commit()
+        flash('template saved successfully')
+        return redirect(url_for('templates'))
     # if probe_form.validate_on_submit():
-    #   return jsonify(errmsg="success")      
+    #   return jsonify(errmsg="success")
     #     master_config = client.run('config.values', client="wheel")['data']['return']
 
     #     BLACKLIST_ARGS = ('csrf_token', 'tgt', 'fun', 'expr_form', 'name', 'description','owner')
@@ -334,79 +358,80 @@ def add_template():
     #     client.run('config.apply', client="wheel", key="templates", value=templates)
 
     #     master_config = client.run('config.values', client="wheel")
-        
+
     #     flash('Template {0} has been successfully saved'.format(form.name.data.strip()))
 
     #     return redirect(url_for('templates'))
     return render_template("add_template.html", vpn_form=vpn_form)
 
+
 @app.route("/template/edit/VPN/<tid>", methods=['GET', 'POST'])
 @login_required
 def edit_VPN_template(tid):
-  tmp = db_session.query(VPN).filter_by(tid=tid).first()
-  vpn_form = VPNForm()    
-  if request.method == 'GET':
-    vpn_form.name.data = tmp.name
-    vpn_form.LTE_cloudGW.data = tmp.LTE_cloudGW
-    vpn_form.LTE_external_interface.data = tmp.LTE_external_interface
-    # vpn_form.LTE_internal_interface.data = tmp.LTE_internal_interface
-    vpn_form.LTE_local_identity.data = tmp.LTE_local_identity
-    vpn_form.LTE_remote_identity.data = tmp.LTE_remote_identity
-    vpn_form.cloud_external_interface.data = tmp.cloud_external_interface
-    # vpn_form.cloud_internal_interface.data = tmp.cloud_internal_interface
-    vpn_form.cloud_local_address.data = tmp.cloud_local_address
-    # vpn_form.network_segment.data = tmp.network_segment
-    vpn_form.phase1_dh_group.data = tmp.phase1_dh_group
-    vpn_form.phase1_authentication_algorithm.data = tmp.phase1_authentication_algorithm
-    vpn_form.phase1_encryption_algorithm.data = tmp.phase1_encryption_algorithm
-    vpn_form.phase1_pre_shared_key.data = tmp.phase1_pre_shared_key
-    vpn_form.phase1_dead_peer_detection_nterval.data = tmp.phase1_dead_peer_detection_nterval
-    vpn_form.phase1_dead_peer_detection_threshold.data = tmp.phase1_dead_peer_detection_threshold
-    vpn_form.phase2_authentication_algorithm.data = tmp.phase2_authentication_algorithm
-    vpn_form.phase2_encryption_algorithm.data = tmp.phase2_encryption_algorithm
-    vpn_form.phase2_perfect_forward_secrecy_keys.data = tmp.phase2_perfect_forward_secrecy_keys
-    # vpn_form.ipsec_protocol.data = tmp.ipsec_protocol
-    # probe_form = ProbeForm()
-  
-  if vpn_form.validate_on_submit():            
-    db_session.delete(tmp)
-    db_session.commit()
-    print(vpn_form.name.data)
-    tmp2 = VPN(vpn_form.name.data,
-    vpn_form.LTE_cloudGW.data,
-    vpn_form.LTE_external_interface.data,
-    vpn_form.LTE_local_identity.data,
-    vpn_form.LTE_local_identity.data,
-    vpn_form.cloud_external_interface.data,
-    vpn_form.cloud_local_address.data,
-    vpn_form.phase1_dh_group.data, 
-    vpn_form.phase1_authentication_algorithm.data,
-    vpn_form.phase1_encryption_algorithm.data, 
-    vpn_form.phase1_pre_shared_key.data,
-    vpn_form.phase1_dead_peer_detection_nterval.data,
-    vpn_form.phase1_dead_peer_detection_threshold.data,
-    vpn_form.phase2_authentication_algorithm.data,
-    vpn_form.phase2_encryption_algorithm.data,
-    vpn_form.phase2_perfect_forward_secrecy_keys.data)
-    print(tmp2)
+    tmp = db_session.query(VPN).filter_by(tid=tid).first()
+    vpn_form = VPNForm()
+    if request.method == 'GET':
+        vpn_form.name.data = tmp.name
+        vpn_form.LTE_cloudGW.data = tmp.LTE_cloudGW
+        vpn_form.LTE_external_interface.data = tmp.LTE_external_interface
+        # vpn_form.LTE_internal_interface.data = tmp.LTE_internal_interface
+        vpn_form.LTE_local_identity.data = tmp.LTE_local_identity
+        vpn_form.LTE_remote_identity.data = tmp.LTE_remote_identity
+        vpn_form.cloud_external_interface.data = tmp.cloud_external_interface
+        # vpn_form.cloud_internal_interface.data = tmp.cloud_internal_interface
+        vpn_form.cloud_local_address.data = tmp.cloud_local_address
+        # vpn_form.network_segment.data = tmp.network_segment
+        vpn_form.phase1_dh_group.data = tmp.phase1_dh_group
+        vpn_form.phase1_authentication_algorithm.data = tmp.phase1_authentication_algorithm
+        vpn_form.phase1_encryption_algorithm.data = tmp.phase1_encryption_algorithm
+        vpn_form.phase1_pre_shared_key.data = tmp.phase1_pre_shared_key
+        vpn_form.phase1_dead_peer_detection_nterval.data = tmp.phase1_dead_peer_detection_nterval
+        vpn_form.phase1_dead_peer_detection_threshold.data = tmp.phase1_dead_peer_detection_threshold
+        vpn_form.phase2_authentication_algorithm.data = tmp.phase2_authentication_algorithm
+        vpn_form.phase2_encryption_algorithm.data = tmp.phase2_encryption_algorithm
+        vpn_form.phase2_perfect_forward_secrecy_keys.data = tmp.phase2_perfect_forward_secrecy_keys
+        # vpn_form.ipsec_protocol.data = tmp.ipsec_protocol
+        # probe_form = ProbeForm()
 
-    db_session.add(tmp2)
-    db_session.commit()
+    if vpn_form.validate_on_submit():
+        db_session.delete(tmp)
+        db_session.commit()
+        print(vpn_form.name.data)
+        tmp2 = VPN(
+            vpn_form.name.data, vpn_form.LTE_cloudGW.data,
+            vpn_form.LTE_external_interface.data,
+            vpn_form.LTE_local_identity.data, vpn_form.LTE_local_identity.data,
+            vpn_form.cloud_external_interface.data,
+            vpn_form.cloud_local_address.data, vpn_form.phase1_dh_group.data,
+            vpn_form.phase1_authentication_algorithm.data,
+            vpn_form.phase1_encryption_algorithm.data,
+            vpn_form.phase1_pre_shared_key.data,
+            vpn_form.phase1_dead_peer_detection_nterval.data,
+            vpn_form.phase1_dead_peer_detection_threshold.data,
+            vpn_form.phase2_authentication_algorithm.data,
+            vpn_form.phase2_encryption_algorithm.data,
+            vpn_form.phase2_perfect_forward_secrecy_keys.data)
+        print(tmp2)
 
-    flash('template saved successfully')    
-    return redirect(url_for('templates'))
+        db_session.add(tmp2)
+        db_session.commit()
 
-  # if probe_form.validate_on_submit():
-  #   return jsonify(errmsg="success")      
-  return render_template("edit_template.html", vpn_form=vpn_form, tid=tid)
+        flash('template saved successfully')
+        return redirect(url_for('templates'))
+
+    # if probe_form.validate_on_submit():
+    #   return jsonify(errmsg="success")
+    return render_template("edit_template.html", vpn_form=vpn_form, tid=tid)
+
+
 @app.route("/template/edit/UTM/<tid>", methods=['GET', 'POST'])
 @login_required
 def edit_UTM_template(tid):
-    tmp = db_session.query(UTM).filter_by(tid = tid).first()
+    tmp = db_session.query(UTM).filter_by(tid=tid).first()
     utm_form = UTMForm()
     if request.method == 'GET':
         utm_form.name.data = tmp.name
-        utm_form.content_filtering.data =  tmp.content_filtering
+        utm_form.content_filtering.data = tmp.content_filtering
         utm_form.anti_virus.data = tmp.anti_virus
         utm_form.antivirus_http.data = tmp.antivirus_http
         utm_form.antivirus_smtp.data = tmp.antivirus_smtp
@@ -455,16 +480,15 @@ def edit_UTM_template(tid):
     if utm_form.validate_on_submit():
         db_session.delete(tmp)
         db_session.commit()
-        tmp2 = UTM(
-            utm_form.name.data,
-            utm.content_filtering.data
-        )
+        tmp2 = UTM(utm_form.name.data, utm.content_filtering.data)
         db_session.add(tmp2)
         db_session.commit()
         flash('template saved successfully')
         return redirect(url_for('templates'))
 
     return None
+
+
 @app.route("/deployments")
 @login_required
 def deployments():
@@ -475,267 +499,259 @@ from flask_wtf import FlaskForm as Form
 from wtforms import StringField, SelectField
 from wtforms.validators import DataRequired
 
-matchers = [
-    ('glob', 'Glob'),
-    ('pcre', 'Perl regular expression'),
-    ('list', 'List'),
-    ('grain', 'Grain'),
-    ('grain_pcre', 'Grain perl regex'),
-    ('pillar', 'Pillar'),
-    ('nodegroup', 'Nodegroup'),
-    ('range', 'Range'),
-    ('compound', 'Compound')
-]
-probe_type = [
-    ('0','0'),
-    ('1','1'),
-    ('2','2'),
-    ('3','3'),
-    ('4','4'),
-    ('5','5'),
-    ('6','6')
-]
+matchers = [('glob', 'Glob'), ('pcre', 'Perl regular expression'), ('list',
+                                                                    'List'),
+            ('grain', 'Grain'), ('grain_pcre', 'Grain perl regex'), ('pillar',
+                                                                     'Pillar'),
+            ('nodegroup', 'Nodegroup'), ('range', 'Range'), ('compound',
+                                                             'Compound')]
+probe_type = [('0', '0'), ('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'),
+              ('5', '5'), ('6', '6')]
 
-hardware_time = [
-    ('True', 'True'),
-    ('False', 'False')
-]
-LTE_cloudGW = [
-    ('112.35.30.65','112.35.30.65'),
-    ('112.35.30.67','112.35.30.67'),
-    ('112.35.30.69','112.35.30.69')
-]
-LTE_external_interface = [
-    ('ge-0/0/0','ge-0/0/0'),
-    ('ge-0/0/1','ge-0/0/1')
-]
-LTE_internal_interface = [
-    ('ge-0/0/2','ge-0/0/2'),
-    ('ge-0/0/1','ge-0/0/1')
-]
-cloud_internal_interface = [
-    ('ge-0/0/1','ge-0/0/1'),
-    ('ge-0/0/2','ge-0/0/2')
-]
-dh_group = [
-    ('group1', 'group1'),
-    ('group2', 'group2'),
-    ('group5', 'group5')
-]
+hardware_time = [('True', 'True'), ('False', 'False')]
+LTE_cloudGW = [('112.35.30.65', '112.35.30.65'),
+               ('112.35.30.67', '112.35.30.67'), ('112.35.30.69',
+                                                  '112.35.30.69')]
+LTE_external_interface = [('ge-0/0/0', 'ge-0/0/0'), ('ge-0/0/1', 'ge-0/0/1')]
+LTE_internal_interface = [('ge-0/0/2', 'ge-0/0/2'), ('ge-0/0/1', 'ge-0/0/1')]
+cloud_internal_interface = [('ge-0/0/1', 'ge-0/0/1'), ('ge-0/0/2', 'ge-0/0/2')]
+dh_group = [('group1', 'group1'), ('group2', 'group2'), ('group5', 'group5')]
 
-phase1_authentication_algorithm = [
-    ('md5', 'md5'),
-    ('sha-256','sha-256'),
-    ('sha1','sha1')
-]
+phase1_authentication_algorithm = [('md5', 'md5'), ('sha-256', 'sha-256'),
+                                   ('sha1', 'sha1')]
 
-phase1_encryption_algorithm = [
-    ('3des-cbc','3des-cbc'),
-    ('aes-128-cbc','aes-128-cbc'),
-    ('aes-192-cbc', 'aes-192-cbc'),
-    ('aes-256-cbc','aes-256-cbc'),
-    ('des-cbc','des-cbc')
-]
+phase1_encryption_algorithm = [('3des-cbc', '3des-cbc'),
+                               ('aes-128-cbc', 'aes-128-cbc'), ('aes-192-cbc',
+                                                                'aes-192-cbc'),
+                               ('aes-256-cbc', 'aes-256-cbc'), ('des-cbc',
+                                                                'des-cbc')]
 
-phase1_pre_shared_key = [
-    ('ascii-text $ABC123','ascii-text $ABC123')
-]
+phase1_pre_shared_key = [('ascii-text $ABC123', 'ascii-text $ABC123')]
 
-ipsec_protocol = [
-    ('ah','ah'),
-    ('esp','esp')
-]
-phase2_authentication_algorithm = [
-    ('hmac-md5-96','hmac-md5-96'),
-    ('hmac-sha1-96','hmac-sha1-96')
-]
-phase2_encryption_algorithm = [
-    ('3des-cbc','3des-cbc'),
-    ('aes-128-cbc','aes-128-cbc'),
-    ('aes-192-cbc', 'aes-192-cbc'),
-    ('aes-256-cbc','aes-256-cbc'),
-    ('des-cbc','des-cbc')
-]
-phase2_perfect_forward_secrecy_keys = [
-    ('group1', 'group1'),
-    ('group2', 'group2'),
-    ('group5', 'group5')
-]
+ipsec_protocol = [('ah', 'ah'), ('esp', 'esp')]
+phase2_authentication_algorithm = [('hmac-md5-96', 'hmac-md5-96'),
+                                   ('hmac-sha1-96', 'hmac-sha1-96')]
+phase2_encryption_algorithm = [('3des-cbc', '3des-cbc'),
+                               ('aes-128-cbc', 'aes-128-cbc'), ('aes-192-cbc',
+                                                                'aes-192-cbc'),
+                               ('aes-256-cbc', 'aes-256-cbc'), ('des-cbc',
+                                                                'des-cbc')]
+phase2_perfect_forward_secrecy_keys = [('group1', 'group1'),
+                                       ('group2', 'group2'), ('group5',
+                                                              'group5')]
 
 #utm
-anti_virus = [
-    ('enable','enable'),
-    ('noenable','noenable')
-]
-content_filtering = [
-    ('enable','enable'),
-    ('noenable','noenable')
-]
-antivirus_http = [
-    ('enable','enable'),
-    ('noenable','noenable')
-]
-antivirus_smtp = [
-    ('enable','enable'),
-    ('noenable','noenable')
-]
-antivirus_ftp = [
-    ('enable','enable'),
-    ('noenable','noenable')
-]
-anti_spam = [
-    ('enable','enable'),
-    ('noenable','noenable')
-]
-antispam_default = [
-    ('enable','enable'),
-    ('noenable','noenable')
-]
-antispam_custom = [
-    ('enable','enable'),
-    ('noenable','noenable')
-]
-url_filtering = [
-    ('enable','enable'),
-    ('noenable','noenable')
-]
-spam_action = [
-    ('block','block'),
-    ('tag-header','tag-header'),
-    ('tag-subject','tag-subject')
-]
-url_black_list_action = [
-    ('block','block'),
-    ('peimit','permit'),
-    ('log and permit','log and permit')
-]
-url_white_list_action = [
-    ('block','block'),
-    ('peimit','permit'),
-    ('log and permit','log and permit')
-]
-fallback_setting_default = [
-    ('block','block'),
-    ('log and permit','log and permit')
-]
-fallback_setting_server_connectivity = [
-    ('block','block'),
-    ('log and permit','log and permit')
-]
-fallback_setting_timeout = [
-    ('block','block'),
-    ('log and permit','log and permit')
-]
-fallback_setting_too_many_requests = [
-    ('block','block'),
-    ('log and permit','log and permit')
-]
-old_status = [
-    ('enable','enable'),
-    ('noenable','noenable')
-]
-src_zone = [
-    ('trust','trust'),
-    ('untrust','untrust')
-]
-dst_zone = [
-    ('trust','trust'),
-    ('untrust','untrust')
-]
+anti_virus = [('enable', 'enable'), ('noenable', 'noenable')]
+content_filtering = [('enable', 'enable'), ('noenable', 'noenable')]
+antivirus_http = [('enable', 'enable'), ('noenable', 'noenable')]
+antivirus_smtp = [('enable', 'enable'), ('noenable', 'noenable')]
+antivirus_ftp = [('enable', 'enable'), ('noenable', 'noenable')]
+anti_spam = [('enable', 'enable'), ('noenable', 'noenable')]
+antispam_default = [('enable', 'enable'), ('noenable', 'noenable')]
+antispam_custom = [('enable', 'enable'), ('noenable', 'noenable')]
+url_filtering = [('enable', 'enable'), ('noenable', 'noenable')]
+spam_action = [('block', 'block'), ('tag-header', 'tag-header'),
+               ('tag-subject', 'tag-subject')]
+url_black_list_action = [('block', 'block'), ('peimit', 'permit'),
+                         ('log and permit', 'log and permit')]
+url_white_list_action = [('block', 'block'), ('peimit', 'permit'),
+                         ('log and permit', 'log and permit')]
+fallback_setting_default = [('block', 'block'), ('log and permit',
+                                                 'log and permit')]
+fallback_setting_server_connectivity = [('block', 'block'), ('log and permit',
+                                                             'log and permit')]
+fallback_setting_timeout = [('block', 'block'), ('log and permit',
+                                                 'log and permit')]
+fallback_setting_too_many_requests = [('block', 'block'), ('log and permit',
+                                                           'log and permit')]
+old_status = [('enable', 'enable'), ('noenable', 'noenable')]
+src_zone = [('trust', 'trust'), ('untrust', 'untrust')]
+dst_zone = [('trust', 'trust'), ('untrust', 'untrust')]
+
+
 class RunForm(Form):
     expr_form = SelectField('matcher', choices=matchers)
     tgt = StringField('target', validators=[DataRequired()])
     fun = StringField('function', validators=[DataRequired()])
-    arg= StringField('arg', validators=None)
+    arg = StringField('arg', validators=None)
+
 
 class ProbeForm(Form):
-    owner = StringField('owner', validators=[DataRequired()])#32字符
-    test_name = StringField('test-name', validators = [DataRequired])#32字符
-    probe_type = SelectField('probe-type', choices=probe_type)#0-6
-    data_size = StringField('data-size', validators=[DataRequired])#0-65507
-    data_fill = StringField('datafill', validators=[DataRequired])#1-800h 16进制 和data-size要都有或都没有
-    destination_port = StringField('destination-port', validators=[DataRequired])#7 或 49160-65535
-    dscp_code_point = StringField('dscp-code-point', validators=[DataRequired])#6bits
-    hardware_time = SelectField('hardware-timestamp', choices=hardware_time)#yes or no
-    history_size = StringField('history-size',validators=[DataRequired])#0-255
-    moving_average_size = StringField('moving-average-size', validators=[DataRequired])#0-255
-    probe_count = StringField('probe-count', validators=[DataRequired])#1-15
-    probe_interval = StringField('probe-interval', validators=[DataRequired])#1-255
-    source_address = StringField('source_address', validators=[DataRequired])#接口地址
-    target = StringField('target', validators=[DataRequired])#http必须要有，或者用ip
-    test_interval = StringField('test-interval', validators=[DataRequired])#0-86400
+    owner = StringField('owner', validators=[DataRequired()])  #32字符
+    test_name = StringField('test-name', validators=[DataRequired])  #32字符
+    probe_type = SelectField('probe-type', choices=probe_type)  #0-6
+    data_size = StringField('data-size', validators=[DataRequired])  #0-65507
+    data_fill = StringField(
+        'datafill', validators=[DataRequired])  #1-800h 16进制 和data-size要都有或都没有
+    destination_port = StringField(
+        'destination-port', validators=[DataRequired])  #7 或 49160-65535
+    dscp_code_point = StringField(
+        'dscp-code-point', validators=[DataRequired])  #6bits
+    hardware_time = SelectField(
+        'hardware-timestamp', choices=hardware_time)  #yes or no
+    history_size = StringField(
+        'history-size', validators=[DataRequired])  #0-255
+    moving_average_size = StringField(
+        'moving-average-size', validators=[DataRequired])  #0-255
+    probe_count = StringField('probe-count', validators=[DataRequired])  #1-15
+    probe_interval = StringField(
+        'probe-interval', validators=[DataRequired])  #1-255
+    source_address = StringField(
+        'source_address', validators=[DataRequired])  #接口地址
+    target = StringField('target', validators=[DataRequired])  #http必须要有，或者用ip
+    test_interval = StringField(
+        'test-interval', validators=[DataRequired])  #0-86400
+
 
 class VPNForm(Form):
-    name = StringField('name', validators=[DataRequired()])#必填
-    LTE_cloudGW = SelectField('LTE-cloudGW', choices=LTE_cloudGW, default='112.35.30.67')
-    LTE_external_interface = SelectField('LTE-external-interface',choices=LTE_external_interface, default='ge-0/0/0')
+    name = StringField('name', validators=[DataRequired()])  #必填
+    LTE_cloudGW = SelectField(
+        'LTE-cloudGW', choices=LTE_cloudGW, default='112.35.30.67')
+    LTE_external_interface = SelectField(
+        'LTE-external-interface',
+        choices=LTE_external_interface,
+        default='ge-0/0/0')
     # LTE_internal_interface = SelectField('LTE-internal-interface',choices=LTE_internal_interface)
-    LTE_local_identity = StringField('LTE-local-identity',validators=[DataRequired()])
-    LTE_remote_identity = StringField('LTE-remote-identity', validators=[DataRequired()], default='CGW-2')
-    cloud_external_interface = StringField('cloud-external-interface',validators=[DataRequired()], default='ge-0/0/0')
+    LTE_local_identity = StringField(
+        'LTE-local-identity', validators=[DataRequired()])
+    LTE_remote_identity = StringField(
+        'LTE-remote-identity', validators=[DataRequired()], default='CGW-2')
+    cloud_external_interface = StringField(
+        'cloud-external-interface',
+        validators=[DataRequired()],
+        default='ge-0/0/0')
     # cloud_internal_interface = SelectField('cloud-internal-interface', choices=cloud_internal_interface)
-    cloud_local_address = StringField('cloud-local-address',validators=[DataRequired()], default='10.112.44.113')
+    cloud_local_address = StringField(
+        'cloud-local-address',
+        validators=[DataRequired()],
+        default='10.112.44.113')
     # network_segment = StringField('network-segment', validators=[DataRequired()])#必填
-    phase1_dh_group = SelectField('phase1-dh-group',choices=dh_group, default='group2')
-    phase1_authentication_algorithm = SelectField('phase1-authentication-algorithm',choices=phase1_authentication_algorithm, default='sha1')
-    phase1_encryption_algorithm = SelectField('phase1-encryption-algorithm',choices=phase1_encryption_algorithm, default='aes-128-cbc')
-    phase1_pre_shared_key = SelectField('phase1-pre-shared-key',choices=phase1_pre_shared_key, default='ascii-text $ABC123')
+    phase1_dh_group = SelectField(
+        'phase1-dh-group', choices=dh_group, default='group2')
+    phase1_authentication_algorithm = SelectField(
+        'phase1-authentication-algorithm',
+        choices=phase1_authentication_algorithm,
+        default='sha1')
+    phase1_encryption_algorithm = SelectField(
+        'phase1-encryption-algorithm',
+        choices=phase1_encryption_algorithm,
+        default='aes-128-cbc')
+    phase1_pre_shared_key = SelectField(
+        'phase1-pre-shared-key',
+        choices=phase1_pre_shared_key,
+        default='ascii-text $ABC123')
     # ipsec_protocol = SelectField('ipsec-protocol',choices=ipsec_protocol)
-    phase1_dead_peer_detection_nterval = StringField('phase1_dead_peer_detection_nterval',validators=[DataRequired()], default='10')
-    phase1_dead_peer_detection_threshold = StringField('phase1_dead_peer_detection_threshold',validators=[DataRequired()], default='3')
-    phase2_authentication_algorithm = SelectField('phase2_authentication_algorithm',choices=phase2_authentication_algorithm)
-    phase2_encryption_algorithm = SelectField('phase2_encryption_algorithm',choices=phase2_encryption_algorithm)
-    phase2_perfect_forward_secrecy_keys = SelectField('phase2_perfect_forward_secrecy_keys',choices=phase2_perfect_forward_secrecy_keys, default='group2')
+    phase1_dead_peer_detection_nterval = StringField(
+        'phase1_dead_peer_detection_nterval',
+        validators=[DataRequired()],
+        default='10')
+    phase1_dead_peer_detection_threshold = StringField(
+        'phase1_dead_peer_detection_threshold',
+        validators=[DataRequired()],
+        default='3')
+    phase2_authentication_algorithm = SelectField(
+        'phase2_authentication_algorithm',
+        choices=phase2_authentication_algorithm)
+    phase2_encryption_algorithm = SelectField(
+        'phase2_encryption_algorithm', choices=phase2_encryption_algorithm)
+    phase2_perfect_forward_secrecy_keys = SelectField(
+        'phase2_perfect_forward_secrecy_keys',
+        choices=phase2_perfect_forward_secrecy_keys,
+        default='group2')
+
+
 def validate_network_segment(form, field):
-  try: 
-    startIpSegment = field.data.strip().split('-')[0] # 192.168.1.1/24
-    startIp = startIpSegment.split('/')[0]  # 192.168.1.1
-    startSubnetMask = startIpSegment.split('/')[1]  # 24
+    try:
+        startIpSegment = field.data.strip().split('-')[0]  # 192.168.1.1/24
+        startIp = startIpSegment.split('/')[0]  # 192.168.1.1
+        startSubnetMask = startIpSegment.split('/')[1]  # 24
 
-    endIpSegment = field.data.strip().split('-')[1] # 192.168.1.10/24
-    endIp = endIpSegment.split('/')[0]   # 192.168.1.10
-    endSubnetMask = endIpSegment.split('/')[1]  # 24
-  except:
-    raise ValidationError("please input correct format like '10.0.0.1/24-10.1.0.0/24'")
+        endIpSegment = field.data.strip().split('-')[1]  # 192.168.1.10/24
+        endIp = endIpSegment.split('/')[0]  # 192.168.1.10
+        endSubnetMask = endIpSegment.split('/')[1]  # 24
+    except:
+        raise ValidationError(
+            "please input correct format like '10.0.0.1/24-10.1.0.0/24'")
 
-  # if form.validators.IPAddress(ipv4=True):
+
+    # if form.validators.IPAddress(ipv4=True):
 class UTMForm(Form):
-    name = StringField('name', validators=[DataRequired()])#必填
-    content_filtering = SelectField('content_filtering',choices=content_filtering, default = 'enable')
-    anti_virus = SelectField('anti_virus', choices=anti_virus, default = 'enable')
-    antivirus_http = SelectField('antivirus_http', choices=antivirus_http, default = 'enable')
-    antivirus_smtp = SelectField('antivirus_smtp', choices=antivirus_smtp, default = 'enable')
-    antivirus_ftp = SelectField('antivirus_ftp', choices=antivirus_ftp, default = 'enable')
-    anti_spam = SelectField('anti_spam',choices=anti_spam,default = 'anti_spam')
-    antispam_default = SelectField('antispam_custom',choices=antispam_custom,default = 'noenable')
-    antispam_custom = SelectField('antispam_custom',choices=antispam_custom,default = 'enable')
+    name = StringField('name', validators=[DataRequired()])  #必填
+    content_filtering = SelectField(
+        'content_filtering', choices=content_filtering, default='enable')
+    anti_virus = SelectField(
+        'anti_virus', choices=anti_virus, default='enable')
+    antivirus_http = SelectField(
+        'antivirus_http', choices=antivirus_http, default='enable')
+    antivirus_smtp = SelectField(
+        'antivirus_smtp', choices=antivirus_smtp, default='enable')
+    antivirus_ftp = SelectField(
+        'antivirus_ftp', choices=antivirus_ftp, default='enable')
+    anti_spam = SelectField(
+        'anti_spam', choices=anti_spam, default='anti_spam')
+    antispam_default = SelectField(
+        'antispam_custom', choices=antispam_custom, default='noenable')
+    antispam_custom = SelectField(
+        'antispam_custom', choices=antispam_custom, default='enable')
 
-    url_filtering = SelectField('url_filtering',choices=url_filtering,default = 'enable')
-    spam_black_list_value = StringField('url_black_list_value', validators=[DataRequired()])
-    spam_black_list_pattern_name = StringField('url_black_list_pattern_name', validators=[DataRequired()])
-    spam_white_list_value = StringField('url_white_list_value',validators=[DataRequired()])
-    spam_white_list_pattern_name = StringField('url_white_list_pattern_name', validators=[DataRequired()])
+    url_filtering = SelectField(
+        'url_filtering', choices=url_filtering, default='enable')
+    spam_black_list_value = StringField(
+        'url_black_list_value', validators=[DataRequired()])
+    spam_black_list_pattern_name = StringField(
+        'url_black_list_pattern_name', validators=[DataRequired()])
+    spam_white_list_value = StringField(
+        'url_white_list_value', validators=[DataRequired()])
+    spam_white_list_pattern_name = StringField(
+        'url_white_list_pattern_name', validators=[DataRequired()])
 
-    spam_action = SelectField('spam_action', choices=spam_action, default = 'block')
-    custom_tag_string = StringField('custom_tag_string',validators=[DataRequired()],default='***spam***')
-    sbl_profile_name = StringField('sbl_profile_name',validators=[DataRequired()])
+    spam_action = SelectField(
+        'spam_action', choices=spam_action, default='block')
+    custom_tag_string = StringField(
+        'custom_tag_string', validators=[DataRequired()], default='***spam***')
+    sbl_profile_name = StringField(
+        'sbl_profile_name', validators=[DataRequired()])
 
     # url_filtering = SelectField('url_filtering', choices= url_filtering, default = 'enable')
-    url_black_list_value = StringField('url_black_list_value', validators=[DataRequired()])
-    url_black_list_pattern_name = StringField('url_black_list_pattern_name',validators=[DataRequired()])
-    url_black_list_category_name = StringField('url_black_list_category_name', validators=[DataRequired()])
-    url_black_list_action = SelectField('url_black_list_action', choices=url_black_list_action, default = 'block')
-    url_white_list_value = StringField('url_white_list_value', validators=[DataRequired()])
-    url_white_list_pattern_name = StringField('url_white_list_pattern_name',validators=[DataRequired()])
-    url_white_list_category_name = StringField('url_white_list_category_name', validators=[DataRequired()])
-    url_white_list_action = SelectField('url_white_list_action', choices=url_white_list_action, default = 'permit')
+    url_black_list_value = StringField(
+        'url_black_list_value', validators=[DataRequired()])
+    url_black_list_pattern_name = StringField(
+        'url_black_list_pattern_name', validators=[DataRequired()])
+    url_black_list_category_name = StringField(
+        'url_black_list_category_name', validators=[DataRequired()])
+    url_black_list_action = SelectField(
+        'url_black_list_action',
+        choices=url_black_list_action,
+        default='block')
+    url_white_list_value = StringField(
+        'url_white_list_value', validators=[DataRequired()])
+    url_white_list_pattern_name = StringField(
+        'url_white_list_pattern_name', validators=[DataRequired()])
+    url_white_list_category_name = StringField(
+        'url_white_list_category_name', validators=[DataRequired()])
+    url_white_list_action = SelectField(
+        'url_white_list_action',
+        choices=url_white_list_action,
+        default='permit')
 
-
-    fallback_setting_default = SelectField('fallback_setting_default', choices=fallback_setting_default ,default = 'block')
-    fallback_setting_server_connectivity = SelectField('fallback_setting_server_connectivity', choices=fallback_setting_server_connectivity, deafult = 'block')
-    fallback_setting_timeout = SelectField('fallback_setting_timeout', choices=fallback_setting_timeout, default = 'block')
-    fallback_setting_too_many_requests = SelectField('fallback_setting_too_many_requests', choices=fallback_setting_too_many_requests,default = 'block')
-    url_filtering_name = StringField('url_filtering_name', validators=[DataRequired()])
+    fallback_setting_default = SelectField(
+        'fallback_setting_default',
+        choices=fallback_setting_default,
+        default='block')
+    fallback_setting_server_connectivity = SelectField(
+        'fallback_setting_server_connectivity',
+        choices=fallback_setting_server_connectivity,
+        deafult='block')
+    fallback_setting_timeout = SelectField(
+        'fallback_setting_timeout',
+        choices=fallback_setting_timeout,
+        default='block')
+    fallback_setting_too_many_requests = SelectField(
+        'fallback_setting_too_many_requests',
+        choices=fallback_setting_too_many_requests,
+        default='block')
+    url_filtering_name = StringField(
+        'url_filtering_name', validators=[DataRequired()])
 
     file_ext_name = StringField('file_ext_name', validators=[DataRequired()])
     file_ext_val = StringField('file_ext_val', validators=[DataRequired()])
@@ -746,20 +762,26 @@ class UTMForm(Form):
     confilter_name = StringField('confilter_name', validators=[DataRequired()])
     block_contype = StringField('block_contype', validators=[DataRequired()])
 
-    old_status = SelectField('old_status',choices=old_status, default = 'enable')
-    old_policy_name = StringField('old_policy_name', validators=[DataRequired()])
+    old_status = SelectField(
+        'old_status', choices=old_status, default='enable')
+    old_policy_name = StringField(
+        'old_policy_name', validators=[DataRequired()])
     old_src_zone = StringField('old_src_zone', validators=[DataRequired()])
     old_dst_zone = StringField('old_dst_zone', validators=[DataRequired()])
 
-    src_zone = SelectField('src_zone',choices=dst_zone, default = 'trust')
-    dst_zone = SelectField('dst_zone',choices=dst_zone , default = 'untrust')
-    src_address = StringField('src_address', validators=[DataRequired()], default='any')
-    dst_address = StringField('dst_address', validators=[DataRequired()], default='any')
-    new_policy_name = StringField('new_policy_name',validators=[DataRequired()])
+    src_zone = SelectField('src_zone', choices=dst_zone, default='trust')
+    dst_zone = SelectField('dst_zone', choices=dst_zone, default='untrust')
+    src_address = StringField(
+        'src_address', validators=[DataRequired()], default='any')
+    dst_address = StringField(
+        'dst_address', validators=[DataRequired()], default='any')
+    new_policy_name = StringField(
+        'new_policy_name', validators=[DataRequired()])
+
+
 class NewTemplateForm(RunForm):
     name = StringField('name', validators=[DataRequired()])
     description = TextAreaField('description', validators=[DataRequired()])
-    
 
 
 @app.route('/run', methods=["GET", "POST"])
@@ -768,10 +790,15 @@ def run():
     form = RunForm()
     if form.validate_on_submit():
 
-        args = get_filtered_post_arguments(('csrf_token', 'tgt', 'fun', 'args','expr_form', 'arg'))
+        args = get_filtered_post_arguments(('csrf_token', 'tgt', 'fun', 'args',
+                                            'expr_form', 'arg'))
         #print args,"==================================================>"
-        jid = client.run(form.fun.data.strip(), client="local_async",
-            tgt=form.tgt.data.strip(), arg=form.arg.data.strip(), expr_form=form.expr_form.data.strip(),
+        jid = client.run(
+            form.fun.data.strip(),
+            client="local_async",
+            tgt=form.tgt.data.strip(),
+            arg=form.arg.data.strip(),
+            expr_form=form.expr_form.data.strip(),
             args=Call(**args))['jid']
         return redirect(url_for('job_result', jid=jid))
     return render_template("run.html", form=form)
@@ -788,17 +815,22 @@ def redo_job(jid):
         return "Unknown jid", 404
 
     try:
-        new_jid = client.run(job['info']['Function'], client="local_async",
-            tgt=job['info']['Target'], expr_form=job['info']['Target-type'],
+        new_jid = client.run(
+            job['info']['Function'],
+            client="local_async",
+            tgt=job['info']['Target'],
+            expr_form=job['info']['Target-type'],
             args=job['info']['Arguments'])['jid']
     except JobNotStarted:
         msg = "Couldn't redo the job, check salt api log for more details"
         flash(msg, 'error')
-        return redirect(url_for('job_result', minion=minion, jid=jid,
-            renderer='highstate'))
+        return redirect(
+            url_for(
+                'job_result', minion=minion, jid=jid, renderer='highstate'))
 
-    return redirect(url_for('job_result', minion=minion, jid=new_jid,
-        renderer='highstate'))
+    return redirect(
+        url_for(
+            'job_result', minion=minion, jid=new_jid, renderer='highstate'))
 
 
 @app.route('/doc_search', methods=["POST", "OPTIONS"])
@@ -806,8 +838,11 @@ def redo_job(jid):
 def doc_search():
     content = request.json
 
-    arg_specs = client.run('sys.argspec', client='local',
-        tgt=content['tgt'].strip(), expr_form=content['expr_form'],
+    arg_specs = client.run(
+        'sys.argspec',
+        client='local',
+        tgt=content['tgt'].strip(),
+        expr_form=content['expr_form'],
         args=Call(content['fun'].strip()))
 
     if not arg_specs:
@@ -818,8 +853,12 @@ def doc_search():
 
     module_function_names = list(arg_specs.keys())
 
-    docs = client.run('sys.doc', client='local', tgt=content['tgt'].strip(),
-        expr_form=content['expr_form'], args=Call(*module_function_names))
+    docs = client.run(
+        'sys.doc',
+        client='local',
+        tgt=content['tgt'].strip(),
+        expr_form=content['expr_form'],
+        args=Call(*module_function_names))
 
     # Take only first result
     docs = list(docs.values())[0]
@@ -829,7 +868,8 @@ def doc_search():
     for module_function_name in module_function_names:
         result[module_function_name] = {
             'spec': parse_argspec(arg_specs[module_function_name]),
-            'doc': docs[module_function_name]}
+            'doc': docs[module_function_name]
+        }
 
     return jsonify(result)
 
@@ -846,15 +886,18 @@ def minions_keys():
 @login_required
 def delete_key(key):
     content = request.json
-    minions_keys = client.run('key.delete', client="wheel", match=key)['data']['return']
+    minions_keys = client.run(
+        'key.delete', client="wheel", match=key)['data']['return']
     return redirect(url_for('minions_keys'))
+
 
 @app.route('/keys/reject/<key>')
 @login_required
 def reject_key(key):
     content = request.json
-    client.run('key.reject', client="wheel", arg = key)['data']['return']
+    client.run('key.reject', client="wheel", arg=key)['data']['return']
     return redirect(url_for('minios_keys'))
+
 
 @app.route('/keys/accept/<key>')
 @login_required
@@ -862,6 +905,7 @@ def accept_key(key):
     content = request.json
     client.run('key.accept', client="wheel", match=key)['data']['return']
     return redirect(url_for('minions_keys'))
+
 
 @app.route('/minion/<minion>')
 @login_required
@@ -872,7 +916,9 @@ def minion_details(minion):
     else:
         minion_details['status'] = 'up'
     minion_details['name'] = minion
-    return render_template("minion_details.html", minion_details=minion_details)
+    return render_template(
+        "minion_details.html", minion_details=minion_details)
+
 
 @app.route('/debug/')
 @login_required
@@ -888,20 +934,29 @@ def debug():
 
     return render_template('debug.html', minions=minions)
 
+
 @app.route('/debug/<minion>')
 @login_required
 def debug_minion(minion):
 
-    pillar_data = client.run("pillar.items", client="local", tgt=minion)[minion]
+    pillar_data = client.run(
+        "pillar.items", client="local", tgt=minion)[minion]
     # Make a PR for that
     #pillar_top = client.run("pillar.show_top", client="runner", minion=minion)
-    state_top = client.run("state.show_top", client="local", tgt=minion)[minion]
-    lowstate = client.run("state.show_lowstate", client="local", tgt=minion)[minion]
+    state_top = client.run(
+        "state.show_top", client="local", tgt=minion)[minion]
+    lowstate = client.run(
+        "state.show_lowstate", client="local", tgt=minion)[minion]
     grains = client.run("grains.items", client="local", tgt=minion)[minion]
 
-    return render_template('debug_minion.html', minion=minion,
-        pillar_data=pillar_data, state_top=state_top, lowstate=lowstate,
+    return render_template(
+        'debug_minion.html',
+        minion=minion,
+        pillar_data=pillar_data,
+        state_top=state_top,
+        lowstate=lowstate,
         grains=grains)
+
 
 @app.route('/wip')
 @login_required
@@ -911,30 +966,35 @@ def wip():
 
 @app.template_filter("aggregate_len_sort")
 def aggregate_len_sort(unsorted_dict):
-    return sorted(unsorted_dict.items(), key=lambda x: len(x[1]),
-        reverse=True)
+    return sorted(unsorted_dict.items(), key=lambda x: len(x[1]), reverse=True)
+
 
 @app.template_filter("format_arguments")
 def format_argument(arguments):
     return " ".join(format_arguments(arguments))
 
+
 @app.template_filter("dict_sort_value_subkey")
 def format_argument(arguments, sort_key):
     return sorted(list(arguments.items()), key=lambda item: item[1][sort_key])
+
 
 @app.template_filter("is_string")
 def format_argument(instance):
     return isinstance(instance, string_types)
 
+
 @app.route('/topo/traffic_path')
 @login_required
 def traffic_path():
-  return render_template('traffic_path.html', isTopo=True)
+    return render_template('traffic_path.html', isTopo=True)
+
 
 @app.route('/topo/control_path')
 @login_required
 def control_path():
-  return render_template('control_path.html', isTopo=True)
+    return render_template('control_path.html', isTopo=True)
+
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from bs4 import BeautifulSoup, SoupStrainer
@@ -951,44 +1011,53 @@ log.addHandler(h)
 
 ike_data_list = []
 ike_remote_address = []
+
+
 def run_script():
-  content = subprocess.check_output("python getVPNinfo.py", shell=True)
-  # content = open('mock.txt', 'r')
-  data = BeautifulSoup(content, "html.parser")
+    content = subprocess.check_output("python getVPNinfo.py", shell=True)
+    # content = open('mock.txt', 'r')
+    data = BeautifulSoup(content, "html.parser")
 
-  ike_data = data.find_all('rpc-reply')[0]
-  ipsec_data = data.find_all('rpc-reply')[1]
+    ike_data = data.find_all('rpc-reply')[0]
+    ipsec_data = data.find_all('rpc-reply')[1]
 
-  node_data = ike_data.find_all('ike-security-associations')
-  
-  global ike_data_list
-  global ike_remote_address
-  for node in node_data:
-    single_ike_data = {
-      'remote_address': node.find('ike-sa-remote-address').string,
-      'index': node.find('ike-sa-index').string,
-      'state': node.find('ike-sa-state').string,
-      'initiator_cookie': node.find('ike-sa-initiator-cookie').string,
-      'responder_cookie': node.find('ike-sa-responder-cookie').string,
-      'exchange_type': node.find('ike-sa-exchange-type').string,
-    }
-    if single_ike_data['remote_address'] not in ike_remote_address:
-      ike_remote_address.append(single_ike_data['remote_address'])
-      ike_data_list.append(single_ike_data)
+    node_data = ike_data.find_all('ike-security-associations')
+
+    global ike_data_list
+    global ike_remote_address
+    for node in node_data:
+        single_ike_data = {
+            'remote_address': node.find('ike-sa-remote-address').string,
+            'index': node.find('ike-sa-index').string,
+            'state': node.find('ike-sa-state').string,
+            'initiator_cookie': node.find('ike-sa-initiator-cookie').string,
+            'responder_cookie': node.find('ike-sa-responder-cookie').string,
+            'exchange_type': node.find('ike-sa-exchange-type').string,
+        }
+        if single_ike_data['remote_address'] not in ike_remote_address:
+            ike_remote_address.append(single_ike_data['remote_address'])
+            ike_data_list.append(single_ike_data)
+
 
 @app.route('/vpn_info')
 def getVpnInfo():
-  return jsonify(data=ike_data_list, err_msg="success")
+    return jsonify(data=ike_data_list, err_msg="success")
+
 
 def timer_mission():
-  scheduler = BackgroundScheduler()
-  scheduler.add_job(run_script, 'interval', start_date=datetime.datetime.now() + datetime.timedelta(seconds=1), minutes=15)
-  scheduler.start()
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(
+        run_script,
+        'interval',
+        start_date=datetime.datetime.now() + datetime.timedelta(seconds=1),
+        minutes=15)
+    scheduler.start()
 
-@app.route("/templates/VPN/new", methods = ['POST'])
-@login_required 
+
+@app.route("/templates/VPN/new", methods=['POST'])
+@login_required
 def add_VPN_template():
-    
+
     VPN_name = request.json['name']
     LTE_cloudGW = request.json['LTE_cloudGW']
     LTE_external_interface = request.json['LTE_external_interface']
@@ -998,34 +1067,36 @@ def add_VPN_template():
     cloud_local_address = request.json['cloud_local_address']
     # network_segment = request.json['network_segment']
     phase1_dh_group = request.json['phase1_dh_group']
-    phase1_authentication_algorithm = request.json['phase1_authentication_algorithm']
+    phase1_authentication_algorithm = request.json[
+        'phase1_authentication_algorithm']
     phase1_encryption_algorithm = request.json['phase1_encryption_algorithm']
     phase1_pre_shared_key = request.json['phase1_pre_shared_key']
-    phase1_dead_peer_detection_nterval = request.json['phase1_dead_peer_detection_nterval']
-    phase1_dead_peer_detection_threshold = request.json['phase1_dead_peer_detection_threshold']
-    phase2_authentication_algorithm = request.json['phase2_authentication_algorithm']
+    phase1_dead_peer_detection_nterval = request.json[
+        'phase1_dead_peer_detection_nterval']
+    phase1_dead_peer_detection_threshold = request.json[
+        'phase1_dead_peer_detection_threshold']
+    phase2_authentication_algorithm = request.json[
+        'phase2_authentication_algorithm']
     phase2_encryption_algorithm = request.json['phase2_encryption_algorithm']
-    phase2_perfect_forward_secrecy_keys = request.json['phase2_perfect_forward_secrecy_keys']
-    
+    phase2_perfect_forward_secrecy_keys = request.json[
+        'phase2_perfect_forward_secrecy_keys']
 
-    tmp = VPN(vpn_form.name.data,
-    vpn_form.LTE_cloudGW.data,
-    vpn_form.LTE_external_interface.data,
-    vpn_form.LTE_local_identity.data,
-    vpn_form.LTE_remote_identity.data,
-    vpn_form.cloud_external_interface.data,
-    vpn_form.cloud_local_address.data,
-    vpn_form.phase1_dh_group.data, 
-    vpn_form.phase1_authentication_algorithm.data,
-    vpn_form.phase1_encryption_algorithm.data, 
-    vpn_form.phase1_pre_shared_key.data,
-    vpn_form.phase1_dead_peer_detection_nterval.data,
-    vpn_form.phase1_dead_peer_detection_threshold.data,
-    vpn_form.phase2_authentication_algorithm.data,
-    vpn_form.phase2_encryption_algorithm.data,
-    vpn_form.phase2_perfect_forward_secrecy_keys)
-    print (tmp)
-    test = db_session.query(VPN).filter_by(name = VPN_name).first()
+    tmp = VPN(vpn_form.name.data, vpn_form.LTE_cloudGW.data,
+              vpn_form.LTE_external_interface.data,
+              vpn_form.LTE_local_identity.data,
+              vpn_form.LTE_remote_identity.data,
+              vpn_form.cloud_external_interface.data,
+              vpn_form.cloud_local_address.data, vpn_form.phase1_dh_group.data,
+              vpn_form.phase1_authentication_algorithm.data,
+              vpn_form.phase1_encryption_algorithm.data,
+              vpn_form.phase1_pre_shared_key.data,
+              vpn_form.phase1_dead_peer_detection_nterval.data,
+              vpn_form.phase1_dead_peer_detection_threshold.data,
+              vpn_form.phase2_authentication_algorithm.data,
+              vpn_form.phase2_encryption_algorithm.data,
+              vpn_form.phase2_perfect_forward_secrecy_keys)
+    print(tmp)
+    test = db_session.query(VPN).filter_by(name=VPN_name).first()
     if test.name != None:
         return jsonify(errmsg="primary key conflict", data="1")
 
@@ -1034,36 +1105,40 @@ def add_VPN_template():
 
     return jsonify(errmsg="success", data='0')
 
-@app.route('/templates/VPN/delete', methods = ['POST'])
+
+@app.route('/templates/VPN/delete', methods=['POST'])
 @login_required
 def del_VPN_template():
     # print(request.json)
     VPN_name = request.json['name']
     # network_segment = request.json['network_segment']
-    
-    
-    tmp = db_session.query(VPN).filter_by(name = VPN_name).first()
+
+    tmp = db_session.query(VPN).filter_by(name=VPN_name).first()
     if tmp.name == None:
-        return jsonify(errmsg="No such template",data='2')
+        return jsonify(errmsg="No such template", data='2')
 
     db_session.delete(tmp)
     db_session.commit()
 
-    return jsonify(errmsg = "success", data = '0')
-@app.route('/templates/UTM/delete', methods = ['POST'])
+    return jsonify(errmsg="success", data='0')
+
+
+@app.route('/templates/UTM/delete', methods=['POST'])
 @login_required
 def del_UTM_tempalte():
     UTM_name = request.json['name']
-    tmp = db_session.query(UTM).filter_by(name = UTM_name).first()
+    tmp = db_session.query(UTM).filter_by(name=UTM_name).first()
     if tmp.name == None:
-        return jsonify(errmsg = "No such tempalte", data = '2')
+        return jsonify(errmsg="No such tempalte", data='2')
     db_session.delete(tmp)
     db_session.commit()
-    return jsonify(errmsg = "success", data = '0')
-@app.route('/templates/VPN/modify', methods = ['POST'])
+    return jsonify(errmsg="success", data='0')
+
+
+@app.route('/templates/VPN/modify', methods=['POST'])
 @login_required
 def modify_VPN_template():
-    
+
     VPN_name = request.json['name']
     LTE_cloudGW = request.json['LTE_cloudGW']
     LTE_external_interface = request.json['LTE_external_interface']
@@ -1073,159 +1148,235 @@ def modify_VPN_template():
     cloud_local_address = request.json['cloud_local_address']
     # network_segment = request.json['network_segment']
     phase1_dh_group = request.json['phase1_dh_group']
-    phase1_authentication_algorithm = request.json['phase1_authentication_algorithm']
+    phase1_authentication_algorithm = request.json[
+        'phase1_authentication_algorithm']
     phase1_encryption_algorithm = request.json['phase1_encryption_algorithm']
     phase1_pre_shared_key = request.json['phase1_pre_shared_key']
-    phase1_dead_peer_detection_nterval = request.json['phase1_dead_peer_detection_nterval']
-    phase1_dead_peer_detection_threshold = request.json['phase1_dead_peer_detection_threshold']
-    phase2_authentication_algorithm = request.json['phase2_authentication_algorithm']
+    phase1_dead_peer_detection_nterval = request.json[
+        'phase1_dead_peer_detection_nterval']
+    phase1_dead_peer_detection_threshold = request.json[
+        'phase1_dead_peer_detection_threshold']
+    phase2_authentication_algorithm = request.json[
+        'phase2_authentication_algorithm']
     phase2_encryption_algorithm = request.json['phase2_encryption_algorithm']
-    phase2_perfect_forward_secrecy_keys = request.json['phase2_perfect_forward_secrecy_keys']
+    phase2_perfect_forward_secrecy_keys = request.json[
+        'phase2_perfect_forward_secrecy_keys']
 
-    tmp = db_session.query(VPN).filter_by(name = VPN_name).first()
+    tmp = db_session.query(VPN).filter_by(name=VPN_name).first()
 
     db_session.delete(tmp)
     db_session.commit()
 
-    tmp = VPN(vpn_form.name.data,
-    vpn_form.LTE_cloudGW.data,
-    vpn_form.LTE_external_interface.data,
-    vpn_form.LTE_local_identity.data,
-    vpn_form.LTE_local_identity.data,
-    vpn_form.LTE_remote_identity.data,
-    vpn_form.cloud_external_interface.data,
-    vpn_form.cloud_local_address.data,
-    vpn_form.phase1_dh_group.data, 
-    vpn_form.phase1_authentication_algorithm.data,
-    vpn_form.phase1_encryption_algorithm.data, 
-    vpn_form.phase1_pre_shared_key.data,
-    vpn_form.phase1_dead_peer_detection_nterval.data,
-    vpn_form.phase1_dead_peer_detection_threshold.data,
-    vpn_form.phase2_authentication_algorithm.data,
-    vpn_form.phase2_encryption_algorithm.data,
-    vpn_form.phase2_perfect_forward_secrecy_keys)
+    tmp = VPN(
+        vpn_form.name.data, vpn_form.LTE_cloudGW.data,
+        vpn_form.LTE_external_interface.data, vpn_form.LTE_local_identity.data,
+        vpn_form.LTE_local_identity.data, vpn_form.LTE_remote_identity.data,
+        vpn_form.cloud_external_interface.data,
+        vpn_form.cloud_local_address.data, vpn_form.phase1_dh_group.data,
+        vpn_form.phase1_authentication_algorithm.data,
+        vpn_form.phase1_encryption_algorithm.data,
+        vpn_form.phase1_pre_shared_key.data,
+        vpn_form.phase1_dead_peer_detection_nterval.data,
+        vpn_form.phase1_dead_peer_detection_threshold.data,
+        vpn_form.phase2_authentication_algorithm.data,
+        vpn_form.phase2_encryption_algorithm.data,
+        vpn_form.phase2_perfect_forward_secrecy_keys)
 
     db_session.add(tmp)
     db_session.commit()
 
     return jsonify(errmsg="success", data='0')
 
-@app.route('/templates/VPN/query', methods = ['POST'])
+
+@app.route('/templates/VPN/query', methods=['POST'])
 @login_required
 def query_VPN_template():
-    
+
     VPN_name = request.json['name']
 
-    tmp = db_session.query(VPN).filter_by(name = VPN_name).first()
+    tmp = db_session.query(VPN).filter_by(name=VPN_name).first()
 
     # print (tmp)
 
-    return jsonify(errmsg = "success", data = json.dumps(tmp ,default = VPN2dict))
-@app.route('/templates/UTM/query', methods = ['POST'])
+    return jsonify(errmsg="success", data=json.dumps(tmp, default=VPN2dict))
+
+
+@app.route('/templates/UTM/query', methods=['POST'])
 @login_required
 def query_UTM_tempalte():
     UTM_name = request.json['name']
-    tmp = db_session.query(UTM).filter_by(name = UTM_name).first()
-    return jsonify(errmsg = "success", data = json.dumps(tmp, default = UTM2dict))
-@app.route('/templates/UTM/all',methods = ['GET'])
+    tmp = db_session.query(UTM).filter_by(name=UTM_name).first()
+    return jsonify(errmsg="success", data=json.dumps(tmp, default=UTM2dict))
+
+
+@app.route('/templates/UTM/all', methods=['GET'])
 @login_required
 def query_allUTM_tempalte():
     tmp = db_session.query(UTM).all()
-    return jsonify(errmsg = "success", data = json.dumps(tmp, default = UTM2dict))
-@app.route('/templates/VPN/all', methods = ['GET'])
+    return jsonify(errmsg="success", data=json.dumps(tmp, default=UTM2dict))
+
+
+@app.route('/templates/VPN/all', methods=['GET'])
 @login_required
 def query_all_VPN_template():
-    
+
     # VPN_name = request.json['name']
 
     tmp = db_session.query(VPN).all()
 
+    return jsonify(errmsg="success", data=json.dumps(tmp, default=VPN2dict))
 
-    return jsonify(errmsg = "success", data = json.dumps(tmp ,default = VPN2dict))
+
 def UTM2dict(utms):
     result = []
     for utm in utms:
         single = {
-            "name":utm.name,
-            "content_filtering":utm.content_filtering,
-            "anti_virus":utm.anti_virus,
-            "antivirus_http":utm.antivirus_http,
-            "antivirus_smtp":utm.antivirus_smtp,
-            "antivirus_ftp":utm.antivirus_ftp,
-            "anti_spam":utm.anti_spam,
-            "antispam_default":utm.antispam_default,
-            "antispam_custom":utm.antispam_custom,
-            "url_filtering":utm.url_filtering,
-            "spam_black_list_value":utm.spam_black_list_value,
-            "spam_black_list_pattern_name":utm.spam_black_list_pattern_name,
-            "spam_white_list_value":utm.spam_white_list_value,
-            "spam_white_list_pattern_name":utm.spam_white_list_pattern_name,
-            "spam_action":utm.spam_action,
-            "custom_tag_string":utm.custom_tag_string,
-            "sbl_profile_name":utm.sbl_profile_name,
-            "url_black_list_value":utm.url_black_list_value,
-            "url_black_list_pattern_name":utm.url_black_list_pattern_name,
-            "url_black_list_category_name":utm.url_black_list_category_name,
-            "url_black_list_action":utm.url_black_list_action,
-            "url_white_list_value":utm.url_white_list_value,
-            "url_white_list_pattern_name":utm.url_white_list_pattern_name,
-            "url_white_list_category_name":utm.url_white_list_category_name,
-            "url_white_list_action":utm.url_white_list_action,
-            "fallback_setting_default":utm.fallback_setting_default,
-            "fallback_setting_server_connectivity":utm.fallback_setting_server_connectivity,
-            "fallback_setting_timeout":utm.fallback_setting_timeout,
-            "fallback_setting_too_many_requests":utm.fallback_setting_too_many_requests,
-            "url_filtering_name":utm.url_filtering_name,
-            "file_ext_name":utm.file_ext_name,
-            "file_ext_val":utm.file_ext_val,
-            "mine_name":utm.mine_name,
-            "mine_val":utm.mine_val,
-            "ex_mine_name":utm.ex_mine_name,
-            "ex_mine_val":utm.ex_mine_val,
-            "confilter_name":utm.confilter_name,
-            "block_contype":utm.block_contype,
-            "old_status":utm.old_status,
-            "old_policy_name":utm.old_policy_name,
-            "old_src_zone":utm.old_src_zone,
-            "old_dst_zone":utm.old_dst_zone,
-            "src_zone":utm.src_zone,
-            "dst_zone":utm.dst_zone,
-            "src_address":utm.src_address,
-            "dst_address":utm.dst_address,
-            "new_policy_name":utm.new_policy_name
+            "name":
+            utm.name,
+            "content_filtering":
+            utm.content_filtering,
+            "anti_virus":
+            utm.anti_virus,
+            "antivirus_http":
+            utm.antivirus_http,
+            "antivirus_smtp":
+            utm.antivirus_smtp,
+            "antivirus_ftp":
+            utm.antivirus_ftp,
+            "anti_spam":
+            utm.anti_spam,
+            "antispam_default":
+            utm.antispam_default,
+            "antispam_custom":
+            utm.antispam_custom,
+            "url_filtering":
+            utm.url_filtering,
+            "spam_black_list_value":
+            utm.spam_black_list_value,
+            "spam_black_list_pattern_name":
+            utm.spam_black_list_pattern_name,
+            "spam_white_list_value":
+            utm.spam_white_list_value,
+            "spam_white_list_pattern_name":
+            utm.spam_white_list_pattern_name,
+            "spam_action":
+            utm.spam_action,
+            "custom_tag_string":
+            utm.custom_tag_string,
+            "sbl_profile_name":
+            utm.sbl_profile_name,
+            "url_black_list_value":
+            utm.url_black_list_value,
+            "url_black_list_pattern_name":
+            utm.url_black_list_pattern_name,
+            "url_black_list_category_name":
+            utm.url_black_list_category_name,
+            "url_black_list_action":
+            utm.url_black_list_action,
+            "url_white_list_value":
+            utm.url_white_list_value,
+            "url_white_list_pattern_name":
+            utm.url_white_list_pattern_name,
+            "url_white_list_category_name":
+            utm.url_white_list_category_name,
+            "url_white_list_action":
+            utm.url_white_list_action,
+            "fallback_setting_default":
+            utm.fallback_setting_default,
+            "fallback_setting_server_connectivity":
+            utm.fallback_setting_server_connectivity,
+            "fallback_setting_timeout":
+            utm.fallback_setting_timeout,
+            "fallback_setting_too_many_requests":
+            utm.fallback_setting_too_many_requests,
+            "url_filtering_name":
+            utm.url_filtering_name,
+            "file_ext_name":
+            utm.file_ext_name,
+            "file_ext_val":
+            utm.file_ext_val,
+            "mine_name":
+            utm.mine_name,
+            "mine_val":
+            utm.mine_val,
+            "ex_mine_name":
+            utm.ex_mine_name,
+            "ex_mine_val":
+            utm.ex_mine_val,
+            "confilter_name":
+            utm.confilter_name,
+            "block_contype":
+            utm.block_contype,
+            "old_status":
+            utm.old_status,
+            "old_policy_name":
+            utm.old_policy_name,
+            "old_src_zone":
+            utm.old_src_zone,
+            "old_dst_zone":
+            utm.old_dst_zone,
+            "src_zone":
+            utm.src_zone,
+            "dst_zone":
+            utm.dst_zone,
+            "src_address":
+            utm.src_address,
+            "dst_address":
+            utm.dst_address,
+            "new_policy_name":
+            utm.new_policy_name
         }
         result.append(single)
     return result
+
+
 def VPN2dict(vpns):
-  result = []
-  for vpn in vpns:
-    single = {
-      "tid": vpn.tid,
-      "name":vpn.name,
-      "LTE_cloudGW":vpn.LTE_cloudGW,
-      "LTE_external_interface":vpn.LTE_external_interface,
-      "LTE_local_identity":vpn.LTE_local_identity,
-      "LTE_remote_identity":vpn.LTE_remote_identity,
-      "cloud_external_interface":vpn.cloud_external_interface,
-      "cloud_local_address":vpn.cloud_local_address,
+    result = []
+    for vpn in vpns:
+        single = {
+            "tid":
+            vpn.tid,
+            "name":
+            vpn.name,
+            "LTE_cloudGW":
+            vpn.LTE_cloudGW,
+            "LTE_external_interface":
+            vpn.LTE_external_interface,
+            "LTE_local_identity":
+            vpn.LTE_local_identity,
+            "LTE_remote_identity":
+            vpn.LTE_remote_identity,
+            "cloud_external_interface":
+            vpn.cloud_external_interface,
+            "cloud_local_address":
+            vpn.cloud_local_address,
 
-    #   "network_segment":vpn.network_segment,
-      "phase1_dh_group":vpn.phase1_dh_group,
-      "phase1_authentication_algorithm":vpn.phase1_authentication_algorithm,
-      "encryption_algophase1_encryption_algorithmrithm":vpn.phase1_encryption_algorithm,
-      "phase1_pre_shared_key":vpn.phase1_pre_shared_key,
-      "phase1_dead_peer_detection_nterval":vpn.phase1_dead_peer_detection_nterval,
-      "phase1_dead_peer_detection_threshold":vpn.phase1_dead_peer_detection_threshold,
+            #   "network_segment":vpn.network_segment,
+            "phase1_dh_group":
+            vpn.phase1_dh_group,
+            "phase1_authentication_algorithm":
+            vpn.phase1_authentication_algorithm,
+            "encryption_algophase1_encryption_algorithmrithm":
+            vpn.phase1_encryption_algorithm,
+            "phase1_pre_shared_key":
+            vpn.phase1_pre_shared_key,
+            "phase1_dead_peer_detection_nterval":
+            vpn.phase1_dead_peer_detection_nterval,
+            "phase1_dead_peer_detection_threshold":
+            vpn.phase1_dead_peer_detection_threshold,
+            "phase2_authentication_algorithm":
+            vpn.phase2_authentication_algorithm,
+            "phase2_encryption_algorithm":
+            vpn.phase2_encryption_algorithm,
+            "phase2_perfect_forward_secrecy_keys":
+            vpn.phase2_perfect_forward_secrecy_keys
+            #   "ipsec_protocol":vpn.ipsec_protocol
+        }
+        result.append(single)
+    return result
 
-      "phase2_authentication_algorithm":vpn.phase2_authentication_algorithm,
-      "phase2_encryption_algorithm":vpn.phase2_encryption_algorithm,
-      "phase2_perfect_forward_secrecy_keys":vpn.phase2_perfect_forward_secrecy_keys
-    #   "ipsec_protocol":vpn.ipsec_protocol
-    }
-    result.append(single)
-  return result
 
-@app.route('/applyVPNtemplate',methods = ['POST'])
+@app.route('/applyVPNtemplate', methods=['POST'])
 # @login_required
 def applyVPNtemplate():
     VPN_name = request.json['name']
@@ -1233,54 +1384,53 @@ def applyVPNtemplate():
     node_name = request.json['node_name']
     # network_segment = request.json['network_segment']
     nodesinfo = []
-    output = open('lte_access.yml','a+')
+    output = open('lte_access.yml', 'a+')
 
-    tmp = db_session.query(VPN).filter_by(name = VPN_name).first()
+    tmp = db_session.query(VPN).filter_by(name=VPN_name).first()
 
-    str  = tmp.name
-    #按行写入到指定的config文件中 
-    inputline = "set security zones security-zone" + tmp.name +"address-book address" + tmp.name + "-2"
+    str = tmp.name
+    #按行写入到指定的config文件中
+    inputline = "set security zones security-zone" + tmp.name + "address-book address" + tmp.name + "-2"
     print(inputline)
     # output.write(inputline)
-    
 
     output.close()
 
+    return jsonify(errmsg="success", data=json.dumps(nodesinfo))
 
-    return jsonify(errmsg = "success", data = json.dumps(nodesinfo))
 
-@app.route('/control_path_nodes',methods = ['GET'])
+@app.route('/control_path_nodes', methods=['GET'])
 # @login_required
 def getControlPathinfo():
     nodesinfo = []
-    #按行将获取到的配置信息写入xml文件中 
-    output = open('interface.txt','w')
-    ff = subprocess.check_output("salt '*' test.ping",shell = True)
+    #按行将获取到的配置信息写入xml文件中
+    output = open('interface.txt', 'w')
+    ff = subprocess.check_output("salt '*' test.ping", shell=True)
     # print(ff)
     # infoget = os.popen("salt 'cpe*' junos.rpc 'get-interface-information' '/home/user/interface.xml' interface_name='ge-0/0/0.0' terse=True")
     # for line in os.popen("salt 'cpe*' junos.rpc 'get-interface-information' interface_name='ge-0/0/0.0' terse=True"):
     for line in ff:
         output.write(line)
     output.close()
-    #按行读取保存好了的xml文件 
-    flag = 0;
+    #按行读取保存好了的xml文件
+    flag = 0
     node_name = None
     node_state = None
-    read_file = open('interface.txt','r')
+    read_file = open('interface.txt', 'r')
     d = dict()
     for line in read_file.readlines():
         d1 = dict()
         if flag % 2 == 0:
             d['node_name'] = line.strip().strip(':')
             # print(type(d['node_name']))
-            str_node = "salt '"+d['node_name']+"' grains.item os --output=json"
+            str_node = "salt '" + d['node_name'] + "' grains.item os --output=json"
             node_name = d['node_name']
-            fff = subprocess.check_output(str_node,shell = True)
+            fff = subprocess.check_output(str_node, shell=True)
             node_info = json.loads(fff)
             # print("node info type is ",node_info[node_name],d['node_name'])
             # print("node info type is ",node_info[node_name]['os'])
             node_type = node_info[node_name]['os']
-            print("node type is ",node_type)
+            print("node type is ", node_type)
             if node_type != "proxy":
                 d['node_type'] = "non-agent"
             else:
@@ -1295,23 +1445,24 @@ def getControlPathinfo():
             print(nodesinfo)
         flag = flag + 1
         # print(nodesinfo)
-    return jsonify(errmsg = "success", data = json.dumps(nodesinfo))
+    return jsonify(errmsg="success", data=json.dumps(nodesinfo))
 
-@app.route('/traffic_path_nodes',methods = ['GET'])
+
+@app.route('/traffic_path_nodes', methods=['GET'])
 @login_required
 def getTrafficPathinfo():
     nodesinfo_basic = []
     nodesinfo_full = []
     nodesinfo_result = []
     #获取cpe节点名称
-    output = open('cpeinfo.txt','w')
+    output = open('cpeinfo.txt', 'w')
     all_cpes = []
-    test_ping_info = subprocess.check_output("salt '*' test.ping",shell = True)
+    test_ping_info = subprocess.check_output("salt '*' test.ping", shell=True)
     for line in test_ping_info:
         output.write(line)
     output.close()
     cpe_name = None
-    read_file = open('cpeinfo.txt','r')
+    read_file = open('cpeinfo.txt', 'r')
     d_cpe = dict()
     for line in read_file.readlines():
         d1 = dict()
@@ -1326,34 +1477,42 @@ def getTrafficPathinfo():
     for cpe in all_cpes:
         # str = "salt '"+ cpe + "' junos.rpc 'get-ike-active-peers-information' --output=json"
         str = "salt 'cpeCloud' junos.rpc 'get-ike-active-peers-information' --output=json"
-        cpes_json_dup = subprocess.check_output(str,shell = True)
+        cpes_json_dup = subprocess.check_output(str, shell=True)
         cpes_json_dup = cpes_json_dup.strip()
         cpe_json = cpes_json_dup
         print(cpe_json)
         vmx_dict = json.loads(cpe_json)
         print(type(vmx_dict))
-        for i in range(len(vmx_dict['cpeCloud']['rpc_reply']['ike-active-peers-information']['ike-active-peers'])):
-            d1 = dict()      
-            d1['ip'] = vmx_dict['cpeCloud']['rpc_reply']['ike-active-peers-information']['ike-active-peers'][i]['ike-sa-remote-address']
-            d1['name'] = vmx_dict['cpeCloud']['rpc_reply']['ike-active-peers-information']['ike-active-peers'][i]['ike-ike-id']
+        for i in range(
+                len(vmx_dict['cpeCloud']['rpc_reply'][
+                    'ike-active-peers-information']['ike-active-peers'])):
+            d1 = dict()
+            d1['ip'] = vmx_dict['cpeCloud']['rpc_reply'][
+                'ike-active-peers-information']['ike-active-peers'][i][
+                    'ike-sa-remote-address']
+            d1['name'] = vmx_dict['cpeCloud']['rpc_reply'][
+                'ike-active-peers-information']['ike-active-peers'][i][
+                    'ike-ike-id']
             equ_name = d1['name']
             if "agent" in equ_name:
-                str = "salt '"+d1['name']+ "' junos.rpc 'get-pfe-statistics' --output=json"
-                equ_in_out = subprocess.check_output(str,shell = True)
+                str = "salt '" + d1['name'] + "' junos.rpc 'get-pfe-statistics' --output=json"
+                equ_in_out = subprocess.check_output(str, shell=True)
                 equ_dict = json.loads(equ_in_out)
-                d1['input_pps'] = int(equ_dict[equ_name]['rpc_reply']['pfe-statistics']['pfe-traffic-statistics']['input-pps'])
-                print("input pps is ",type(d1['input_pps']))
-            # if d1['input_pps'] <= 10:
-            #     d1['input_pps'] = 1
-            # elif d1['input_pps'] >10 and d1['input_pps'] <= 100 :
-            #     d1['input_pps'] = 2
-            # elif d1['input_pps'] > 100 and d1['input_pps'] <= 1000 :
-            #     d1['input_pps'] = 3
-            # else:
-            #     d1['input_pps'] = 4   
-                
-                d1['output_pps'] = int(equ_dict[equ_name]['rpc_reply']['pfe-statistics']['pfe-traffic-statistics']['output-pps'])
-                print("output pps is ",type(d1['output_pps']))
+                d1['input_pps'] = int(equ_dict[equ_name]['rpc_reply'][
+                    'pfe-statistics']['pfe-traffic-statistics']['input-pps'])
+                print("input pps is ", type(d1['input_pps']))
+                # if d1['input_pps'] <= 10:
+                #     d1['input_pps'] = 1
+                # elif d1['input_pps'] >10 and d1['input_pps'] <= 100 :
+                #     d1['input_pps'] = 2
+                # elif d1['input_pps'] > 100 and d1['input_pps'] <= 1000 :
+                #     d1['input_pps'] = 3
+                # else:
+                #     d1['input_pps'] = 4
+
+                d1['output_pps'] = int(equ_dict[equ_name]['rpc_reply'][
+                    'pfe-statistics']['pfe-traffic-statistics']['output-pps'])
+                print("output pps is ", type(d1['output_pps']))
             # if d1['output_pps'] <= 10:
             #     d1['output_pps'] = 1
             # elif d1['output_pps'] >10 and d1['output_pps'] <= 100 :
@@ -1361,24 +1520,24 @@ def getTrafficPathinfo():
             # elif d1['output_pps'] > 100 and d1['output_pps'] <= 1000 :
             #     d1['output_pps'] = 3
             # else:
-            #     d1['output_pps'] = 4 
+            #     d1['output_pps'] = 4
             nodesinfo_basic.append(d1)
     # cpe_cloud_json_dup = subprocess.check_output("salt 'cpeCloud' junos.rpc 'get-ike-active-peers-information' --output=json", shell=True)
     # cpe_cloud_json_dup = cpe_cloud_json_dup.strip()
     # # print cpe_cloud_json, type(cpe_cloud_json)
     # # cpe_cloud_json = cpe_cloud_json_dup[0: len(cpe_cloud_json_dup)/2]
-    # cpe_cloud_json = cpe_cloud_json_dup    
+    # cpe_cloud_json = cpe_cloud_json_dup
     # print cpe_cloud_json
     # vmx_dict = json.loads(cpe_cloud_json)
     # print type(vmx_dict)
     # for i in range(len(vmx_dict['cpeCloud']['rpc_reply']['ike-active-peers-information']['ike-active-peers'])):
-    #     d1 = dict()      
+    #     d1 = dict()
     #     d1['ip'] = vmx_dict['cpeCloud']['rpc_reply']['ike-active-peers-information']['ike-active-peers'][i]['ike-sa-remote-address']
     #     d1['name'] = vmx_dict['cpeCloud']['rpc_reply']['ike-active-peers-information']['ike-active-peers'][i]['ike-ike-id']
     #     nodesinfo_basic.append(d1)
     print(nodesinfo_basic)
     # for j in range(len(nodesinfo_basic)):
-    #     d3 = dict()        
+    #     d3 = dict()
     #     str = "salt '"+ nodesinfo_basic[j]['name']+"' junos.rpc 'get-ike-active-peers-information' --output=json"
     #     # child_nodes_json = os.popen(str)
     #     child_nodes_json = subprocess.check_output(str, shell=True)
@@ -1386,16 +1545,16 @@ def getTrafficPathinfo():
     #     d3['switch'] = nodesinfo_basic[j]
     #     for k in range(len(nodesinfo_basic[j]['name']['cpeCloud']
     #     ['rpc_reply']['ike-active-peers-information']['ike-active-peers'])):
-    #         d2 = dict()        
+    #         d2 = dict()
     #         d2['ip'] = nodesinfo_basic[j]['name']['cpeCloud']['rpc_reply']['ike-active-peers-information']['ike-active-peers'][k]['ike-sa-remote-address']
     #         d2['name'] = nodesinfo_basic[j]['name']['cpeCloud']['rpc_reply']['ike-active-peers-information']['ike-active-peers'][k]['ike-ike-id']
     #         nodesinfo_full[k].append(d2)
     #     d3['devices'] = nodesinfo_full[k]
     #     nodesinfo_result.append(d3)
     #     nodesinfo_full.clear()
-    
 
-    return jsonify(errmsg = "success", data = json.dumps(nodesinfo_basic))
+    return jsonify(errmsg="success", data=json.dumps(nodesinfo_basic))
+
 
 @app.route('/apply_vpn_template', methods=['POST'])
 # @login_required
@@ -1404,15 +1563,15 @@ def applyVPNtemplate_1():
     tid = request.json['tid']
     dest_ip = request.json['ip']
     node_name = request.json['node_name']
-    output = open('lte_centor.yml','w')
-    cont =  []
+    output = open('lte_centor.yml', 'w')
+    cont = []
     for line in jinja_centor_test(tid):
         cont.append(line)
         output.write(line)
     output.close()
     # print("cont is ",cont)
-    output = open('lte_access.yml','w')
-    cont =  []
+    output = open('lte_access.yml', 'w')
+    cont = []
     for line in jinja_access_test(tid):
         cont.append(line)
         output.write(line)
@@ -1422,10 +1581,10 @@ def applyVPNtemplate_1():
     # device_name = request.json['device_name']
     device_name1 = "Agent-2"
     device_name2 = "cpe1"
-    tmp = db_session.query(VPN).filter_by(tid = tid).first()
-    #拿到对应的模板 
+    tmp = db_session.query(VPN).filter_by(tid=tid).first()
+    #拿到对应的模板
     lines = []
-    output = open('lte_access.yml','r')
+    output = open('lte_access.yml', 'r')
     flag = 0
     for line in output.readlines():
         if flag == 1:
@@ -1434,63 +1593,60 @@ def applyVPNtemplate_1():
             lines.append(line)
             continue
         if flag == 7:
-            line = line.strip("\n") +"'"+node_name + "'" + "\n" 
+            line = line.strip("\n") + "'" + node_name + "'" + "\n"
             flag = flag + 1
             lines.append(line)
             continue
         flag = flag + 1
         lines.append(line)
     output.close()
-    print("lines is",lines)
+    print("lines is", lines)
     s = ''.join(lines)
-    f=open('lte_access.yml','w')
+    f = open('lte_access.yml', 'w')
     f.write(s)
     f.close()
-    ff = subprocess.check_output("cp lte_centor.yml /srv/salt/base/lte_centor.yml",shell = True)
-    f = subprocess.check_output("cp lte_access.yml /srv/salt/base/lte_access.yml",shell = True)
-    str_access = "salt "+node_name+" cp.get_file salt://lte_access.yml /etc/ansible/lte_access.yml"
-    cp_access = subprocess.check_output(str_access,shell = True)
-    str_centor = "salt "+node_name+" cp.get_file salt://lte_centor.yml /etc/ansible/lte_centor.yml"
-    cp_centor = subprocess.check_output(str_centor,shell = True)
+    ff = subprocess.check_output(
+        "cp lte_centor.yml /srv/salt/base/lte_centor.yml", shell=True)
+    f = subprocess.check_output(
+        "cp lte_access.yml /srv/salt/base/lte_access.yml", shell=True)
+    str_access = "salt " + node_name + " cp.get_file salt://lte_access.yml /etc/ansible/lte_access.yml"
+    cp_access = subprocess.check_output(str_access, shell=True)
+    str_centor = "salt " + node_name + " cp.get_file salt://lte_centor.yml /etc/ansible/lte_centor.yml"
+    cp_centor = subprocess.check_output(str_centor, shell=True)
 
-    run_access = "salt "+node_name+" cmd.run 'ansible-playbook -i lte_access.yml customize_lte_access_vpn.yml' cwd='/etc/ansible'"
-    run_yml_access = subprocess.check_output(run_access,shell = True,stderr = subprocess.STDOUT)
-    run_centor = "salt "+node_name+" cmd.run 'ansible-playbook -i lte_centor.yml customize_lte_centor_vpn.yml' cwd='/etc/ansible'"
-    run_yml_centor = subprocess.check_output(run_centor,shell = True, stderr = subprocess.STDOUT)
+    run_access = "salt " + node_name + " cmd.run 'ansible-playbook -i lte_access.yml customize_lte_access_vpn.yml' cwd='/etc/ansible'"
+    run_yml_access = subprocess.check_output(
+        run_access, shell=True, stderr=subprocess.STDOUT)
+    run_centor = "salt " + node_name + " cmd.run 'ansible-playbook -i lte_centor.yml customize_lte_centor_vpn.yml' cwd='/etc/ansible'"
+    run_yml_centor = subprocess.check_output(
+        run_centor, shell=True, stderr=subprocess.STDOUT)
 
-    
     # print(tmp.network_segment)
 
-   
-    
-
     #调用命令行下发配置
-    
+
     strerrmsg = run_yml_centor + run_yml_access
 
-
     if "failed=0" in strerrmsg:
-        return jsonify(errmsg = "success", status = 0)
+        return jsonify(errmsg="success", status=0)
     elif "failed=1" in strerrmsg:
-        return jsonify(errmsg = strerrmsg , status = -1)
+        return jsonify(errmsg=strerrmsg, status=-1)
     else:
-        return jsonify(errmsg = strerrmsg , status = 1)
-        
+        return jsonify(errmsg=strerrmsg, status=1)
 
-    # return jsonify(errmsg = "success") 
+    # return jsonify(errmsg = "success")
 
 
 @app.teardown_request
 def shutdown_session(exception=None):
-  db_session.remove()
+    db_session.remove()
 
 
-
-@app.route('/testjinja_centor',methods = ['GET'])
+@app.route('/testjinja_centor', methods=['GET'])
 # @login_required
 def jinja_centor_test(tid):
     # tid = request.json['tid']
-    tmp = db_session.query(VPN).filter_by(tid = tid).first()
+    tmp = db_session.query(VPN).filter_by(tid=tid).first()
     hub_ip = str(tmp.LTE_cloudGW)
     minion_id = str(tmp.tid)
     ext_interface = str(tmp.cloud_external_interface)
@@ -1509,23 +1665,22 @@ def jinja_centor_test(tid):
     ipsec_enc_algorithm = str(tmp.phase2_encryption_algorithm)
     PFS_keys = str(tmp.phase2_perfect_forward_secrecy_keys)
 
-    d= dict() 
-    d["hub_ip"]=hub_ip
-    d["minion_id"]=minion_id
-    d["ext_interface"]=ext_interface
-    d["local_identity"]=local_identity
-    d["remote_identity"]=remote_identity
-    d["local_address"]=local_address
-    d["ike_auth_algorithm"]=ike_auth_algorithm
-    d["ike_enc_algorithm"]=ike_enc_algorithm
-    d["dh_group"]=dh_group
-    d["shared_secret"]=shared_secret
-    d["DPD_interval"]=DPD_interval
-    d["DPD_threshold"]=DPD_threshold
-    d["ipsec_auth_algorithm"]=ipsec_auth_algorithm
-    d["ipsec_enc_algorithm"]=ipsec_enc_algorithm
-    d["PFS_keys"]=PFS_keys
-    
+    d = dict()
+    d["hub_ip"] = hub_ip
+    d["minion_id"] = minion_id
+    d["ext_interface"] = ext_interface
+    d["local_identity"] = local_identity
+    d["remote_identity"] = remote_identity
+    d["local_address"] = local_address
+    d["ike_auth_algorithm"] = ike_auth_algorithm
+    d["ike_enc_algorithm"] = ike_enc_algorithm
+    d["dh_group"] = dh_group
+    d["shared_secret"] = shared_secret
+    d["DPD_interval"] = DPD_interval
+    d["DPD_threshold"] = DPD_threshold
+    d["ipsec_auth_algorithm"] = ipsec_auth_algorithm
+    d["ipsec_enc_algorithm"] = ipsec_enc_algorithm
+    d["PFS_keys"] = PFS_keys
 
     # d["hub_ip"]="112.35.30.67"
     # d["minion_id"]="22"
@@ -1545,11 +1700,12 @@ def jinja_centor_test(tid):
 
     return render_template('lte_centor.yml', **d)
 
-@app.route('/testjinja_access',methods = ['GET'])
+
+@app.route('/testjinja_access', methods=['GET'])
 # @login_required
 def jinja_access_test(tid):
     # tid = request.json['tid']
-    tmp = db_session.query(VPN).filter_by(tid = tid).first()
+    tmp = db_session.query(VPN).filter_by(tid=tid).first()
     # hub_ip = str(tmp.LTE_cloudGW)
     minion_id = str(tmp.tid)
     CLOUD_GW = str(tmp.LTE_cloudGW)
@@ -1569,25 +1725,22 @@ def jinja_access_test(tid):
     ipsec_enc_algorithm = str(tmp.phase2_encryption_algorithm)
     PFS_keys = str(tmp.phase2_perfect_forward_secrecy_keys)
 
-    d= dict()
-        # "hub_ip":hub_ip,
-    d["minion_id"]=minion_id
-    d["CLOUD_GW"]=CLOUD_GW
-    d["ext_interface"]=ext_interface
-        # "local_identity"=local_identity,
-    d["remote_identity"]=remote_identity
-        # "local_address"=local_address,
-    d["ike_auth_algorithm"]=ike_auth_algorithm
-    d["ike_enc_algorithm"]=ike_enc_algorithm
-    d["dh_group"]=dh_group
-    d["shared_secret"]=shared_secret
-    d["DPD_interval"]=DPD_interval
-    d["DPD_threshold"]=DPD_threshold
-    d["ipsec_auth_algorithm"]=ipsec_auth_algorithm
-    d["ipsec_enc_algorithm"]=ipsec_enc_algorithm
-    d["PFS_keys"]=PFS_keys
-    
+    d = dict()
+    # "hub_ip":hub_ip,
+    d["minion_id"] = minion_id
+    d["CLOUD_GW"] = CLOUD_GW
+    d["ext_interface"] = ext_interface
+    # "local_identity"=local_identity,
+    d["remote_identity"] = remote_identity
+    # "local_address"=local_address,
+    d["ike_auth_algorithm"] = ike_auth_algorithm
+    d["ike_enc_algorithm"] = ike_enc_algorithm
+    d["dh_group"] = dh_group
+    d["shared_secret"] = shared_secret
+    d["DPD_interval"] = DPD_interval
+    d["DPD_threshold"] = DPD_threshold
+    d["ipsec_auth_algorithm"] = ipsec_auth_algorithm
+    d["ipsec_enc_algorithm"] = ipsec_enc_algorithm
+    d["PFS_keys"] = PFS_keys
 
     return render_template('lte_access.yml', **d)
-
-
