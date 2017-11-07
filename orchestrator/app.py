@@ -20,7 +20,7 @@ from flask_admin import Admin
 from . import settings
 # from flask_sqlalchemy import sqlalchemy
 from .database import db_session
-from models import Templates,VPN,Probe
+from models import Templates,VPN,Probe,UTM
 from jinja2 import Environment, select_autoescape,Template
 # from models import db
 # from flask.ext.sqlalchemy import sqlalchemy
