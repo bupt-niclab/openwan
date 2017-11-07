@@ -5,18 +5,18 @@
 <div class="row">
     <div class="col-lg-12">
         <h1>Minions
-            <small>Deployments</small>
+            <small>{{_("Deployments")}}</small>
         </h1>
         <ol class="breadcrumb">
-            <li><a href="{{ url_for('index') }}"><i class="fa fa-dashboard"></i> Controller</a></li>
-            <li class="active"><i class="fa fa-rocket"></i> Nodes Deployments</li>
+            <li><a href="{{ url_for('index') }}"><i class="fa fa-dashboard"></i> {{_("Controller")}}</a></li>
+            <li class="active"><i class="fa fa-rocket"></i> {{_("Nodes Deployments")}}</li>
         </ol>
     </div>
 </div><!-- /.row -->
 
 <div class="row">
     <div class="col-lg-12">
-        <h2>Nodes</h2>
+        <h2>{{_("Nodes")}}</h2>
         <div class="table-responsive">
             <table class="table table-bordered table-hover tablesorter" id="minions">
                 <thead>

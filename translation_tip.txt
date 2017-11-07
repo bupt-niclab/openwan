@@ -1,0 +1,10 @@
+# 提取带翻译字段
+pybabel extract -F babel.cfg -o messages.pot .
+
+# 创建中文翻译文件夹
+pybabel init -i messages.pot -d translations -l zh_CN
+# or 更新翻译文件夹
+pybabel update -i messages.pot -d translations
+
+# 编译翻译结果
+pybabel compile -d translations

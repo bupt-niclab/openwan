@@ -10,7 +10,7 @@ from six import string_types
 from os.path import join, dirname
 reload(sys)  # Reload is a hack
 sys.setdefaultencoding('UTF8')
-from flask import Flask, redirect, render_template, url_for, session, request, flash, jsonify
+from flask import Flask, redirect, render_template, url_for, session, request, flash, jsonify, current_app
 from flask_assets import Environment, Bundle
 from .core import HTTPSaltStackClient, ExpiredToken, Unauthorized, JobNotStarted
 from .utils import login_url, parse_highstate, NotHighstateOutput, parse_argspec
@@ -18,7 +18,6 @@ from .utils import format_arguments, Call, validate_permissions, REQUIRED_PERMIS
 from .utils import get_filtered_post_arguments
 from flask_admin import Admin
 from . import settings
-from flask.ext.babel import Babel,gettext,ngettext,lazy_gettext
 # from flask_sqlalchemy import sqlalchemy
 from .database import db_session
 from models import Templates,VPN,Probe
@@ -63,11 +62,21 @@ except ImportError:
 # assets = Environment(app)
 
 # Flask Babel
+<<<<<<< Updated upstream
 from flask_babel import Babel, gettext as _, get_translations
 app.config['BABEL_DEFAULT_LOCALE'] = 'zh_Hans_CN'
 babel = Babel(app)
 
 print (get_translations())
+=======
+from flask_babel import Babel, lazy_gettext as _
+# app.config['BABEL_DEFAULT_LOCALE'] = 'zh_Hans_CN'
+
+babel = Babel(app)
+@babel.localeselector
+def get_locale():
+  return 'zh_Hans_CN'
+>>>>>>> Stashed changes
 
 client = FlaskHTTPSaltStackClient(app.config['API_URL'],
     app.config.get('VERIFY_SSL', True))

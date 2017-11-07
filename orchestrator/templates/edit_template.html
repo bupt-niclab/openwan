@@ -22,11 +22,11 @@
 <div id="page-wrapper-3">
   <div class="row">
     <div class="col-lg-12">
-      <h1>Edit template</h1>
+      <h1>{{_("Edit template")}}</h1>
       <ol class="breadcrumb">
-        <li><a href="{{ url_for('index') }}"><i class="fa fa-dashboard"></i> Controller</a></li>
-        <li class="active"><a href="{{ url_for('templates') }}"><i class="fa fa-fa-magic"></i> Templates</a></li>
-        <li class="active"><i class="fa fa-fa-magic"></i> Edit template</li>
+        <li><a href="{{ url_for('index') }}"><i class="fa fa-dashboard"></i> {{_("Controller")}}</a></li>
+        <li class="active"><a href="{{ url_for('templates') }}"><i class="fa fa-fa-magic"></i> {{_("Templates")}}</a></li>
+        <li class="active"><i class="fa fa-fa-magic"></i> {{_("Edit template")}}</li>
       </ol>
     </div>
   </div><!-- /.row -->
@@ -70,7 +70,7 @@
       
               <div class="form-group" id="vpn_submit">
                 <div class="col-sm-offset-2 col-sm-10">
-                  <button type="submit" class="btn btn-default">Save template</button>
+                  <button type="submit" class="btn btn-default">{{_("Save template")}}</button>
                 </div>
               </div>
             </form>

@@ -1,17 +1,18 @@
-# Translations template for PROJECT.
+# Chinese (Simplified, China) translations for PROJECT.
 # Copyright (C) 2017 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2017-11-07 15:57+0800\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2017-11-07 15:11+0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: zh_Hans_CN\n"
+"Language-Team: zh_Hans_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,7 +20,7 @@ msgstr ""
 
 #: templates/add_template.html:25
 msgid "Add a new template"
-msgstr ""
+msgstr "添加新模板"
 
 #: templates/add_template.html:27 templates/control_path.html:11
 #: templates/debug.html:11 templates/edit_template.html:27
@@ -27,71 +28,71 @@ msgstr ""
 #: templates/minions_deployments.html:11 templates/run.html:29
 #: templates/templates.html:10
 msgid "Controller"
-msgstr ""
+msgstr "控制器"
 
 #: templates/add_template.html:28 templates/base_logged.html:54
 #: templates/edit_template.html:28 templates/templates.html:11
 #: templates/templates.html:23
 msgid "Templates"
-msgstr ""
+msgstr "模板"
 
 #: templates/add_template.html:29
 msgid "Add template"
-msgstr ""
+msgstr "添加模板"
 
 #: templates/add_template.html:87 templates/edit_template.html:73
 msgid "Save template"
-msgstr ""
+msgstr "保存模板"
 
 #: templates/base.html:9 templates/base_logged.html:39
 #: templates/dashboard.html:5 templates/dashboard.html:9
 msgid "Dashboard"
-msgstr ""
+msgstr "仪表盘"
 
 #: templates/base_logged.html:30
 msgid "Log Out"
-msgstr ""
+msgstr "登出"
 
 #: templates/base_logged.html:42 templates/minions.html:6
 #: templates/minions.html:18 templates/minions_deployments.html:19
 msgid "Nodes"
-msgstr ""
+msgstr "节点"
 
 #: templates/base_logged.html:44
 msgid "Nodes sync status"
-msgstr ""
+msgstr "节点同步状态"
 
 #: templates/base_logged.html:45
 msgid "Nodes deployments"
-msgstr ""
+msgstr "节点部署"
 
 #: templates/base_logged.html:46
 msgid "HealthChecks"
-msgstr ""
+msgstr "状况检查"
 
 #: templates/base_logged.html:47
 msgid "Nodes keys"
-msgstr ""
+msgstr "节点密钥"
 
 #: templates/base_logged.html:52 templates/jobs.html:17
 msgid "Jobs"
-msgstr ""
+msgstr "任务"
 
 #: templates/base_logged.html:55 templates/jobs.html:10
 msgid "Jobs history"
-msgstr ""
+msgstr "任务历史"
 
 #: templates/base_logged.html:56
 msgid "Scheduled Jobs"
-msgstr ""
+msgstr "定时任务"
 
 #: templates/base_logged.html:62
 msgid "Execute"
-msgstr ""
+msgstr "执行"
 
 #: templates/base_logged.html:64 templates/run.html:30
 msgid "Run module"
-msgstr ""
+msgstr "执行模块"
 
 #: templates/base_logged.html:65
 msgid "Inventory / Reporting"
@@ -99,55 +100,55 @@ msgstr ""
 
 #: templates/base_logged.html:70 templates/debug.html:8
 msgid "Debug"
-msgstr ""
+msgstr "调试"
 
 #: templates/base_logged.html:74
 msgid "Debug Nodes"
-msgstr ""
+msgstr "调试节点"
 
 #: templates/base_logged.html:81 templates/control_path.html:7
 msgid "Topo"
-msgstr ""
+msgstr "拓扑"
 
 #: templates/base_logged.html:85
 msgid "Traffic path"
-msgstr ""
+msgstr "流量路径"
 
 #: templates/base_logged.html:90
 msgid "Control path"
-msgstr ""
+msgstr "控制路径"
 
 #: templates/control_path.html:8 templates/control_path.html:12
 msgid "Control Path"
-msgstr ""
+msgstr "控制路径"
 
 #: templates/dashboard.html:6
 msgid "Statistics Overview"
-msgstr ""
+msgstr "统计总览"
 
 #: templates/dashboard.html:28
 msgid "Nodes are up!"
-msgstr ""
+msgstr "节点运行中"
 
 #: templates/dashboard.html:36
 msgid "Check Nodes status"
-msgstr ""
+msgstr "检查节点状态"
 
 #: templates/dashboard.html:58
 msgid "Nodes are in sync"
-msgstr ""
+msgstr "节点同步中"
 
 #: templates/dashboard.html:66
 msgid "Check Nodes sync status"
-msgstr ""
+msgstr "检查节点同步状态"
 
 #: templates/dashboard.html:169
 msgid "Recent Jobs"
-msgstr ""
+msgstr "最近任务"
 
 #: templates/dashboard.html:182
 msgid "View All Jobs"
-msgstr ""
+msgstr "查看所有任务"
 
 #: templates/debug.html:7 templates/debug.html:24
 msgid "Minion"
@@ -155,7 +156,7 @@ msgstr ""
 
 #: templates/debug.html:12 templates/debug.html:28
 msgid "Debug minion"
-msgstr ""
+msgstr "调试 minion"
 
 #: templates/debug.html:19
 msgid "Minions"
@@ -175,45 +176,45 @@ msgstr ""
 
 #: templates/edit_template.html:25 templates/edit_template.html:29
 msgid "Edit template"
-msgstr ""
+msgstr "编辑模板"
 
 #: templates/jobs.html:7
 msgid "List of executed jobs"
-msgstr ""
+msgstr "已执行任务列表"
 
 #: templates/login.html:36
 msgid "Login"
-msgstr ""
+msgstr "登录"
 
 #: templates/minions.html:7
 msgid "Status"
-msgstr ""
+msgstr "状态"
 
 #: templates/minions.html:11
 msgid "Nodes Status"
-msgstr ""
+msgstr "节点状态"
 
 #: templates/minions_deployments.html:8
 msgid "Deployments"
-msgstr ""
+msgstr "部署"
 
 #: templates/minions_deployments.html:12
 msgid "Nodes Deployments"
-msgstr ""
+msgstr "节点部署"
 
 #: templates/run.html:27
 msgid "Execute module on minions"
-msgstr ""
+msgstr "在 minion 上执行模块"
 
 #: templates/run.html:54
 msgid "Run cmd"
-msgstr ""
+msgstr "运行命令"
 
 #: templates/templates.html:8
 msgid "Jobs templates"
-msgstr ""
+msgstr "任务模板"
 
 #: templates/templates.html:24
 msgid "Add a template"
-msgstr ""
+msgstr "添加模板"
 

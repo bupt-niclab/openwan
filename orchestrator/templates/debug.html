@@ -4,29 +4,28 @@
 
 <div class="row">
     <div class="col-lg-12">
-        <h1>Minion
-            <small>Debug</small>
+        <h1>{{_("Minion")}}
+            <small>{{_("Debug")}}</small>
         </h1>
         <ol class="breadcrumb">
-            <li><a href="{{ url_for('index') }}"><i class="fa fa-dashboard"></i> Controller</a></li>
-            <li><i class="fa fa-code"></i> Debug minion</li>
-            </a>
+            <li><a href="{{ url_for('index') }}"><i class="fa fa-dashboard"></i> {{_("Controller")}}</a></li>
+            <li><i class="fa fa-code"></i> {{_("Debug minion")}}</li>
         </ol>
     </div>
 </div><!-- /.row -->
 
 <div class="row">
     <div class="col-lg-12">
-        <h2>Minions</h2>
+        <h2>{{_("Minions")}}</h2>
         <div class="table-responsive">
             <table class="table table-bordered table-hover tablesorter" id="minions">
                 <thead>
                 <tr>
-                    <th>Minion</i></th>
-                    <th>Up ?</i></th>
-                    <th>Salt version</th>
-                    <th>Roles</th>
-                    <th>Debug minion</i></th>
+                    <th>{{_("Minion")}}</th>
+                    <th>{{_("Up ?")}}</th>
+                    <th>{{_("Salt version")}}</th>
+                    <th>{{_("Roles")}}</th>
+                    <th>{{_("Debug minion")}}</th>
                 </tr>
                 </thead>
                 <tbody>

@@ -1,11 +1,12 @@
 {% extends "base_logged.html" %}
 {% block page %}
 <div class="row">
-    <div class="col-lg-12">        <h1>Dashboard
-            <small>Statistics Overview</small>
+    <div class="col-lg-12">        
+      <h1>{{_("Dashboard")}}
+            <small>{{_("Statistics Overview")}}</small>
         </h1>
         <ol class="breadcrumb">
-            <li class="active"><i class="fa fa-dashboard"></i> Dashboard</li>
+            <li class="active"><i class="fa fa-dashboard"></i> {{_("Dashboard")}}</li>
         </ol>
     </div>
 </div><!-- /.row -->
@@ -24,7 +25,7 @@
                     </div>
                     <div class="col-xs-6 text-right">
                         <div class="huge">{{ minions['up']|length }} / {{ total_minions }}</div>
-                        <div>Nodes are up!</div>
+                        <div>{{_("Nodes are up!")}}</div>
                     </div>
                 </div>
             </div>
@@ -32,7 +33,7 @@
                 <div class="panel-footer announcement-bottom">
                     <div class="row">
                         <div class="col-xs-9">
-                            Check Nodes status
+                          {{_("Check Nodes status")}}
                         </div>
                         <div class="col-xs-3 text-right">
                             <i class="fa fa-arrow-circle-right"></i>
@@ -54,7 +55,7 @@
                     </div>
                     <div class="col-xs-6 text-right">
                         <div class="huge">{{ ok_status }} / {{ total_minions }}</div>
-                        <div>Nodes are in sync</div>
+                        <div>{{_("Nodes are in sync")}}</div>
                     </div>
                 </div>
             </div>
@@ -62,7 +63,7 @@
                 <div class="panel-footer announcement-bottom">
                     <div class="row">
                         <div class="col-xs-9">
-                            Check Nodes sync status
+                          {{_("Check Nodes sync status")}}
                         </div>
                         <div class="col-xs-3 text-right">
                             <i class="fa fa-arrow-circle-right"></i>
@@ -165,7 +166,7 @@
     <div class="col-lg-12">
         <div class="panel panel-primary">
             <div class="panel-heading">
-                <h3 class="panel-title"><i class="fa fa-clock-o"></i> Recent Jobs</h3>
+                <h3 class="panel-title"><i class="fa fa-clock-o"></i> {{_("Recent Jobs")}}</h3>
             </div>
             <div class="panel-body">
                 <div class="list-group">
@@ -178,7 +179,7 @@
 
                     {% endfor %}
                     <div class="text-right">
-                        <a href="{{ url_for('jobs') }}">View All Jobs <i class="fa fa-arrow-circle-right"></i></a>
+                        <a href="{{ url_for('jobs') }}">{{_("View All Jobs")}} <i class="fa fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
             </div>

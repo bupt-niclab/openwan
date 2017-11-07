@@ -4,17 +4,17 @@
 
 <div class="row">
     <div class="col-lg-12">
-        <h1>List of executed jobs</h1>
+        <h1>{{_("List of executed jobs")}}</h1>
         <ol class="breadcrumb">
-            <li><a href="{{ url_for('index') }}"><i class="fa fa-dashboard"></i> Controller</a></li>
-            <li class="active"><i class="fa fa-history"></i> Jobs history</li>
+            <li><a href="{{ url_for('index') }}"><i class="fa fa-dashboard"></i> {{_("Controller")}}</a></li>
+            <li class="active"><i class="fa fa-history"></i> {{_("Jobs history")}}</li>
         </ol>
     </div>
 </div><!-- /.row -->
 
 <div class="row">
     <div class="col-lg-12">
-        <h2>Jobs</h2>
+        <h2>{{_("Jobs")}}</h2>
         <div class="table-responsive">
             <table class="table table-bordered table-hover" id="jobs">
                 <thead>
