@@ -64,10 +64,19 @@ except ImportError:
 # assets = Environment(app)
 
 # Flask Babel
+<<<<<<< Updated upstream
 from flask_babel import Babel, gettext as _
 app.config['BABEL_DEFAULT_LOCALE'] = 'zh_Hans_CN'
 babel = Babel(app)
 
+=======
+from flask_babel import Babel, gettext as _, get_translations
+app.config['BABEL_DEFAULT_LOCALE'] = 'zh_Hans_CN'
+babel = Babel(app)
+
+print (get_translations())
+
+>>>>>>> Stashed changes
 client = FlaskHTTPSaltStackClient(app.config['API_URL'],
                                   app.config.get('VERIFY_SSL', True))
 
