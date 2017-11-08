@@ -433,39 +433,39 @@ def edit_UTM_template(tid):
         utm_form.name.data = tmp.name
         utm_form.content_filtering.data = tmp.content_filtering
         utm_form.anti_virus.data = tmp.anti_virus
-        utm_form.antivirus_http.data = tmp.antivirus_http
-        utm_form.antivirus_smtp.data = tmp.antivirus_smtp
-        utm_form.antivirus_ftp.data = tmp.antivirus_ftp
+        # utm_form.antivirus_http.data = tmp.antivirus_http
+        # utm_form.antivirus_smtp.data = tmp.antivirus_smtp
+        # utm_form.antivirus_ftp.data = tmp.antivirus_ftp
         utm_form.anti_spam.data = tmp.anti_spam
         utm_form.antispam_default.data = tmp.antispam_default
         utm_form.antispam_custom.data = tmp.antispam_custom
         utm_form.url_filtering.data = tmp.url_filtering
         utm_form.spam_black_list_value.data = tmp.spam_black_list_value
         utm_form.spam_black_list_pattern_name.data = tmp.spam_black_list_pattern_name
-        utm_form.spam_white_list_value.data = tmp.spam_white_list_value
-        utm_form.spam_white_list_pattern_name.data = tmp.spam_white_list_pattern_name
+        # utm_form.spam_white_list_value.data = tmp.spam_white_list_value
+        # utm_form.spam_white_list_pattern_name.data = tmp.spam_white_list_pattern_name
         utm_form.spam_action.data = tmp.spam_action
-        utm_form.custom_tag_string.data = tmp.custom_tag_string
+        # utm_form.custom_tag_string.data = tmp.custom_tag_string
         utm_form.sbl_profile_name.data = tmp.sbl_profile_name
         utm_form.url_black_list_value.data = tmp.url_black_list_value
         utm_form.url_black_list_pattern_name.data = tmp.url_black_list_pattern_name
         utm_form.url_black_list_category_name.data = tmp.url_black_list_category_name
         utm_form.url_black_list_action.data = tmp.url_black_list_action
-        utm_form.url_white_list_value.data = tmp.url_white_list_value
-        utm_form.url_white_list_pattern_name.data = tmp.url_white_list_pattern_name
-        utm_form.url_white_list_category_name.data = tmp.url_white_list_category_name
-        utm_form.url_white_list_action.data = tmp.url_white_list_action
-        utm_form.fallback_setting_default.data = tmp.fallback_setting_default
-        utm_form.fallback_setting_server_connectivity.data = tmp.fallback_setting_server_connectivity
-        utm_form.fallback_setting_timeout.data = tmp.fallback_setting_timeout
-        utm_form.fallback_setting_too_many_requests.data = tmp.fallback_setting_too_many_requests
+        # utm_form.url_white_list_value.data = tmp.url_white_list_value
+        # utm_form.url_white_list_pattern_name.data = tmp.url_white_list_pattern_name
+        # utm_form.url_white_list_category_name.data = tmp.url_white_list_category_name
+        # utm_form.url_white_list_action.data = tmp.url_white_list_action
+        # utm_form.fallback_setting_default.data = tmp.fallback_setting_default
+        # utm_form.fallback_setting_server_connectivity.data = tmp.fallback_setting_server_connectivity
+        # utm_form.fallback_setting_timeout.data = tmp.fallback_setting_timeout
+        # utm_form.fallback_setting_too_many_requests.data = tmp.fallback_setting_too_many_requests
         utm_form.url_filtering_name.data = tmp.url_filtering_name
-        utm_form.file_ext_name.data = tmp.file_ext_name
-        utm_form.file_ext_val.data = tmp.file_ext_val
-        utm_form.mine_name.data = tmp.mine_name
-        utm_form.mine_val.data = tmp.mine_val
-        utm_form.ex_mine_name.data = tmp.ex_mine_name
-        utm_form.ex_mine_val.data = tmp.ex_mine_val
+        # utm_form.file_ext_name.data = tmp.file_ext_name
+        # utm_form.file_ext_val.data = tmp.file_ext_val
+        # utm_form.mine_name.data = tmp.mine_name
+        # utm_form.mine_val.data = tmp.mine_val
+        # utm_form.ex_mine_name.data = tmp.ex_mine_name
+        # utm_form.ex_mine_val.data = tmp.ex_mine_val
         utm_form.confilter_name.data = tmp.confilter_name
         utm_form.block_contype.data = tmp.block_contype
         utm_form.old_status.data = tmp.old_status
@@ -480,7 +480,10 @@ def edit_UTM_template(tid):
     if utm_form.validate_on_submit():
         db_session.delete(tmp)
         db_session.commit()
-        tmp2 = UTM(utm_form.name.data, utm.content_filtering.data)
+        tmp2 = UTM(
+            utm_form.name.data, utm.content_filtering.data
+            #todo
+        )
         db_session.add(tmp2)
         db_session.commit()
         flash('template saved successfully')
@@ -1241,12 +1244,12 @@ def UTM2dict(utms):
             utm.content_filtering,
             "anti_virus":
             utm.anti_virus,
-            "antivirus_http":
-            utm.antivirus_http,
-            "antivirus_smtp":
-            utm.antivirus_smtp,
-            "antivirus_ftp":
-            utm.antivirus_ftp,
+            # "antivirus_http":
+            # utm.antivirus_http,
+            # "antivirus_smtp":
+            # utm.antivirus_smtp,
+            # "antivirus_ftp":
+            # utm.antivirus_ftp,
             "anti_spam":
             utm.anti_spam,
             "antispam_default":
@@ -1259,14 +1262,14 @@ def UTM2dict(utms):
             utm.spam_black_list_value,
             "spam_black_list_pattern_name":
             utm.spam_black_list_pattern_name,
-            "spam_white_list_value":
-            utm.spam_white_list_value,
-            "spam_white_list_pattern_name":
-            utm.spam_white_list_pattern_name,
+            # "spam_white_list_value":
+            # utm.spam_white_list_value,
+            # "spam_white_list_pattern_name":
+            # utm.spam_white_list_pattern_name,
             "spam_action":
             utm.spam_action,
-            "custom_tag_string":
-            utm.custom_tag_string,
+            # "custom_tag_string":
+            # utm.custom_tag_string,
             "sbl_profile_name":
             utm.sbl_profile_name,
             "url_black_list_value":
@@ -1277,36 +1280,36 @@ def UTM2dict(utms):
             utm.url_black_list_category_name,
             "url_black_list_action":
             utm.url_black_list_action,
-            "url_white_list_value":
-            utm.url_white_list_value,
-            "url_white_list_pattern_name":
-            utm.url_white_list_pattern_name,
-            "url_white_list_category_name":
-            utm.url_white_list_category_name,
-            "url_white_list_action":
-            utm.url_white_list_action,
-            "fallback_setting_default":
-            utm.fallback_setting_default,
-            "fallback_setting_server_connectivity":
-            utm.fallback_setting_server_connectivity,
-            "fallback_setting_timeout":
-            utm.fallback_setting_timeout,
-            "fallback_setting_too_many_requests":
-            utm.fallback_setting_too_many_requests,
+            # "url_white_list_value":
+            # utm.url_white_list_value,
+            # "url_white_list_pattern_name":
+            # utm.url_white_list_pattern_name,
+            # "url_white_list_category_name":
+            # utm.url_white_list_category_name,
+            # "url_white_list_action":
+            # utm.url_white_list_action,
+            # "fallback_setting_default":
+            # utm.fallback_setting_default,
+            # "fallback_setting_server_connectivity":
+            # utm.fallback_setting_server_connectivity,
+            # "fallback_setting_timeout":
+            # utm.fallback_setting_timeout,
+            # "fallback_setting_too_many_requests":
+            # utm.fallback_setting_too_many_requests,
             "url_filtering_name":
             utm.url_filtering_name,
-            "file_ext_name":
-            utm.file_ext_name,
-            "file_ext_val":
-            utm.file_ext_val,
-            "mine_name":
-            utm.mine_name,
-            "mine_val":
-            utm.mine_val,
-            "ex_mine_name":
-            utm.ex_mine_name,
-            "ex_mine_val":
-            utm.ex_mine_val,
+            # "file_ext_name":
+            # utm.file_ext_name,
+            # "file_ext_val":
+            # utm.file_ext_val,
+            # "mine_name":
+            # utm.mine_name,
+            # "mine_val":
+            # utm.mine_val,
+            # "ex_mine_name":
+            # utm.ex_mine_name,
+            # "ex_mine_val":
+            # utm.ex_mine_val,
             "confilter_name":
             utm.confilter_name,
             "block_contype":
