@@ -71,6 +71,7 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/jtopo-0.4.8-min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/control_topo.js') }}"></script>
+{% assets "control_path_js" %}
+<script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
 {% endblock %}

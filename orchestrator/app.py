@@ -11,7 +11,7 @@ from os.path import join, dirname
 reload(sys)  # Reload is a hack
 sys.setdefaultencoding('UTF8')
 from flask import Flask, redirect, render_template, url_for, session, request, flash, jsonify, current_app
-from flask_assets import Environment, Bundle
+# from flask_assets import Environment, Bundle
 from .core import HTTPSaltStackClient, ExpiredToken, Unauthorized, JobNotStarted
 from .utils import login_url, parse_highstate, NotHighstateOutput, parse_argspec
 from .utils import format_arguments, Call, validate_permissions, REQUIRED_PERMISSIONS
@@ -21,7 +21,7 @@ from . import settings
 # from flask_sqlalchemy import sqlalchemy
 from .database import db_session
 from models import Templates, VPN, Probe, UTM
-from jinja2 import Environment, select_autoescape, Template
+from jinja2 import select_autoescape, Template
 # from models import db
 # from flask.ext.sqlalchemy import sqlalchemy
 
@@ -60,8 +60,48 @@ except ImportError:
         sys.exit(1)
 
 # Flask assets
-# from flask_assets import Environment, Bundle
-# assets = Environment(app)
+from flask_assets import Environment, Bundle
+from webassets.filter import get_filter
+assets = Environment(app)
+
+
+cssrewrite = get_filter('cssrewrite', replace={'../':'../vendor/font--awesome/'})
+
+bundles = {
+  'base_js': Bundle(
+    'vendor/jquery/jquery.min.js',
+    'vendor/bootstrap/js/bootstrap.min.js',
+    'vendor/metisMenu/metisMenu.min.js',
+    'js/jsontree.js',
+    'js/jquery.dataTables.min.js',
+    'js/dataTables.bootstrap.js',
+    'js/control-admin-2.js',
+    filters='jsmin',
+    output='gen/packed.js'
+    ),
+  'traffic_path_js': Bundle(
+    'js/jtopo-0.4.8-min.js',
+    'js/topo.js',
+    filters='jsmin',
+    output='gen/traffic_path.js'),
+  'control_path_js': Bundle(
+    'js/jtopo-0.4.8-min.js',
+    'js/control_topo.js',
+    filters='jsmin',
+    output='gen/control_path.js'),  
+  'base_css': Bundle(
+    'vendor/bootstrap/css/bootstrap.css',
+    'css/control-admin-2.css',
+    'vendor/font-awesome/css/font-awesome.min.css',
+    'css/jsontree.css',
+    'css/dataTables.bootstrap.css',
+    filters='cssmin, cssrewrite',
+    output='gen/packed.css'
+  )
+}
+
+assets.register(bundles)
+
 
 # Flask Babel
 from flask_babel import Babel, gettext as _
@@ -260,11 +300,12 @@ def templates():
     # master_config = client.run('config.values', client="wheel")['data']['return']
     # if not master_config.get('templates'):
     #     master_config['templates'] = {}
-    tmp = db_session.query(VPN).all()
-
+    vpn_tmp = db_session.query(VPN).all()
+    utm_tmp = db_session.query(UTM).all()
+    
     # return jsonify(errmsg = "success", data = json.dumps(tmp ,default = VPN2dict))
 
-    return render_template("templates.html", templates=tmp)
+    return render_template("templates.html", vpn_templates=vpn_tmp, utm_templates=utm_tmp)
 
 
 @app.route("/api_templates/<switchname>")

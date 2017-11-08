@@ -9,15 +9,18 @@
     <title>{{_("Dashboard")}} - Orchestrator</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.css') }}" rel="stylesheet">
+    <!-- <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.css') }}" rel="stylesheet"> -->
 
     <!-- Add custom CSS here -->
-    <link href="{{ url_for('static', filename='css/control-admin-2.css') }}" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/font-awesome/css/font-awesome.min.css') }} ">
+    <!-- <link href="{{ url_for('static', filename='css/control-admin-2.css') }}" rel="stylesheet"> -->
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='vendor/font-awesome/css/font-awesome.min.css') }} "> -->
     <!-- <link href="{{ url_for('static', filename='css/controller.css') }}" rel="stylesheet"> -->
-    <link href="{{ url_for('static', filename='css/jsontree.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', filename='css/dataTables.bootstrap.css') }}" rel="stylesheet">
+    <!-- <link href="{{ url_for('static', filename='css/jsontree.css') }}" rel="stylesheet"> -->
+    <!-- <link href="{{ url_for('static', filename='css/dataTables.bootstrap.css') }}" rel="stylesheet"> -->
 
+    {% assets "base_css" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}">
+    {% endassets %}
 
     <!-- Page Specific CSS -->
     {% if isTopo %}
@@ -31,13 +34,17 @@
     {% endblock %}
 
     <!-- JavaScript -->
-    <script src="{{ url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
+    <!-- <script src="{{ url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
     <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='vendor/metisMenu/metisMenu.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jsontree.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/dataTables.bootstrap.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/control-admin-2.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/control-admin-2.js') }}"></script> -->
+
+    {% assets "base_js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
 
 
     {% block scripts %}
