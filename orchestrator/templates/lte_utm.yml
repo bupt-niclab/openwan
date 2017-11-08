@@ -1,0 +1,36 @@
+[lte_utm]
+192.168.122.254
+
+[lte_utm:vars]
+utm_policyname = {{ name }}
+anti_virus = {{ anti_virus }}
+anti_spam = {{ anti_spam }}
+url_filtering = {{ url_filtering }}
+content_filtering = {{ content_filtering }}
+
+antispam_default={{ antispam_default }}
+antispam_custom = {{ antispam_custom }}
+spam_black_list_value = {{ spam_black_list_value }}
+spam_black_list_pattern_name = {{ spam_black_list_pattern_name }}
+spam_action = {{ spam_action }}
+sbl_profile_name ={{ sbl_profile_name }}
+
+url_black_list_value = {{ url_black_list_value }}
+url_black_list_pattern_name = {{ url_black_list_pattern_name }}
+url_black_list_category_name = {{ url_black_list_category_name }}
+url_black_list_action = {{ url_black_list_action }}
+url_filtering_name = {{ url_filtering_name }}
+
+confilter_name = {{ confilter_name }}
+block_contype = {{ block_contype }}
+
+old_policy_name = {{ old_policy_name }}
+old_src_zone = {{ old_src_zone }}
+old_dst_zone = {{ old_dst_zone }}
+old_status={{ old_status }}
+src_zone = {{ src_zone }}
+dst_zone = {{ dst_zone }}
+src_address = {{ src_address }}
+dst_address = {{ dst_address }} 
+new_policy_name = {{ new_policy_name }}
+    

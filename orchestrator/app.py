@@ -64,19 +64,10 @@ except ImportError:
 # assets = Environment(app)
 
 # Flask Babel
-<<<<<<< Updated upstream
 from flask_babel import Babel, gettext as _
 app.config['BABEL_DEFAULT_LOCALE'] = 'zh_Hans_CN'
 babel = Babel(app)
 
-=======
-from flask_babel import Babel, gettext as _, get_translations
-app.config['BABEL_DEFAULT_LOCALE'] = 'zh_Hans_CN'
-babel = Babel(app)
-
-print (get_translations())
-
->>>>>>> Stashed changes
 client = FlaskHTTPSaltStackClient(app.config['API_URL'],
                                   app.config.get('VERIFY_SSL', True))
 
@@ -552,9 +543,9 @@ phase2_perfect_forward_secrecy_keys = [('group1', 'group1'),
 #utm
 anti_virus = [('enable', 'enable'), ('noenable', 'noenable')]
 content_filtering = [('enable', 'enable'), ('noenable', 'noenable')]
-antivirus_http = [('enable', 'enable'), ('noenable', 'noenable')]
-antivirus_smtp = [('enable', 'enable'), ('noenable', 'noenable')]
-antivirus_ftp = [('enable', 'enable'), ('noenable', 'noenable')]
+# antivirus_http = [('enable', 'enable'), ('noenable', 'noenable')]
+# antivirus_smtp = [('enable', 'enable'), ('noenable', 'noenable')]
+# antivirus_ftp = [('enable', 'enable'), ('noenable', 'noenable')]
 anti_spam = [('enable', 'enable'), ('noenable', 'noenable')]
 antispam_default = [('enable', 'enable'), ('noenable', 'noenable')]
 antispam_custom = [('enable', 'enable'), ('noenable', 'noenable')]
@@ -563,17 +554,21 @@ spam_action = [('block', 'block'), ('tag-header', 'tag-header'),
                ('tag-subject', 'tag-subject')]
 url_black_list_action = [('block', 'block'), ('peimit', 'permit'),
                          ('log and permit', 'log and permit')]
-url_white_list_action = [('block', 'block'), ('peimit', 'permit'),
-                         ('log and permit', 'log and permit')]
-fallback_setting_default = [('block', 'block'), ('log and permit',
-                                                 'log and permit')]
-fallback_setting_server_connectivity = [('block', 'block'), ('log and permit',
-                                                             'log and permit')]
-fallback_setting_timeout = [('block', 'block'), ('log and permit',
-                                                 'log and permit')]
-fallback_setting_too_many_requests = [('block', 'block'), ('log and permit',
-                                                           'log and permit')]
+block_contype = [('java-applet','java-applet'),('exe','exe'),('http-cookie','http-cookie'),('zip','zip')]
+# url_white_list_action = [('block', 'block'), ('peimit', 'permit'),
+                        #  ('log and permit', 'log and permit')]
+# fallback_setting_default = [('block', 'block'), ('log and permit',
+#                                                  'log and permit')]
+# fallback_setting_server_connectivity = [('block', 'block'), ('log and permit',
+#                                                              'log and permit')]
+# fallback_setting_timeout = [('block', 'block'), ('log and permit',
+#                                                  'log and permit')]
+# fallback_setting_too_many_requests = [('block', 'block'), ('log and permit',
+                                                        #    'log and permit')]
 old_status = [('enable', 'enable'), ('noenable', 'noenable')]
+old_src_zone = [('trust', 'trust'), ('untrust', 'untrust')]
+old_dst_zone = [('trust', 'trust'), ('untrust', 'untrust')]
+
 src_zone = [('trust', 'trust'), ('untrust', 'untrust')]
 dst_zone = [('trust', 'trust'), ('untrust', 'untrust')]
 
@@ -690,12 +685,12 @@ class UTMForm(Form):
         'content_filtering', choices=content_filtering, default='enable')
     anti_virus = SelectField(
         'anti_virus', choices=anti_virus, default='enable')
-    antivirus_http = SelectField(
-        'antivirus_http', choices=antivirus_http, default='enable')
-    antivirus_smtp = SelectField(
-        'antivirus_smtp', choices=antivirus_smtp, default='enable')
-    antivirus_ftp = SelectField(
-        'antivirus_ftp', choices=antivirus_ftp, default='enable')
+    # antivirus_http = SelectField(
+    #     'antivirus_http', choices=antivirus_http, default='enable')
+    # antivirus_smtp = SelectField(
+    #     'antivirus_smtp', choices=antivirus_smtp, default='enable')
+    # antivirus_ftp = SelectField(
+    #     'antivirus_ftp', choices=antivirus_ftp, default='enable')
     anti_spam = SelectField(
         'anti_spam', choices=anti_spam, default='anti_spam')
     antispam_default = SelectField(
@@ -709,15 +704,15 @@ class UTMForm(Form):
         'url_black_list_value', validators=[DataRequired()])
     spam_black_list_pattern_name = StringField(
         'url_black_list_pattern_name', validators=[DataRequired()])
-    spam_white_list_value = StringField(
-        'url_white_list_value', validators=[DataRequired()])
-    spam_white_list_pattern_name = StringField(
-        'url_white_list_pattern_name', validators=[DataRequired()])
+    # spam_white_list_value = StringField(
+    #     'url_white_list_value', validators=[DataRequired()])
+    # spam_white_list_pattern_name = StringField(
+    #     'url_white_list_pattern_name', validators=[DataRequired()])
 
     spam_action = SelectField(
         'spam_action', choices=spam_action, default='block')
-    custom_tag_string = StringField(
-        'custom_tag_string', validators=[DataRequired()], default='***spam***')
+    # custom_tag_string = StringField(
+    #     'custom_tag_string', validators=[DataRequired()], default='***spam***')
     sbl_profile_name = StringField(
         'sbl_profile_name', validators=[DataRequired()])
 
@@ -732,42 +727,42 @@ class UTMForm(Form):
         'url_black_list_action',
         choices=url_black_list_action,
         default='block')
-    url_white_list_value = StringField(
-        'url_white_list_value', validators=[DataRequired()])
-    url_white_list_pattern_name = StringField(
-        'url_white_list_pattern_name', validators=[DataRequired()])
-    url_white_list_category_name = StringField(
-        'url_white_list_category_name', validators=[DataRequired()])
-    url_white_list_action = SelectField(
-        'url_white_list_action',
-        choices=url_white_list_action,
-        default='permit')
+    # url_white_list_value = StringField(
+    #     'url_white_list_value', validators=[DataRequired()])
+    # url_white_list_pattern_name = StringField(
+    #     'url_white_list_pattern_name', validators=[DataRequired()])
+    # url_white_list_category_name = StringField(
+    #     'url_white_list_category_name', validators=[DataRequired()])
+    # url_white_list_action = SelectField(
+    #     'url_white_list_action',
+    #     choices=url_white_list_action,
+    #     default='permit')
 
-    fallback_setting_default = SelectField(
-        'fallback_setting_default',
-        choices=fallback_setting_default,
-        default='block')
-    fallback_setting_server_connectivity = SelectField(
-        'fallback_setting_server_connectivity',
-        choices=fallback_setting_server_connectivity,
-        deafult='block')
-    fallback_setting_timeout = SelectField(
-        'fallback_setting_timeout',
-        choices=fallback_setting_timeout,
-        default='block')
-    fallback_setting_too_many_requests = SelectField(
-        'fallback_setting_too_many_requests',
-        choices=fallback_setting_too_many_requests,
-        default='block')
+    # fallback_setting_default = SelectField(
+    #     'fallback_setting_default',
+    #     choices=fallback_setting_default,
+    #     default='block')
+    # fallback_setting_server_connectivity = SelectField(
+    #     'fallback_setting_server_connectivity',
+    #     choices=fallback_setting_server_connectivity,
+    #     deafult='block')
+    # fallback_setting_timeout = SelectField(
+    #     'fallback_setting_timeout',
+    #     choices=fallback_setting_timeout,
+    #     default='block')
+    # fallback_setting_too_many_requests = SelectField(
+    #     'fallback_setting_too_many_requests',
+    #     choices=fallback_setting_too_many_requests,
+    #     default='block')
     url_filtering_name = StringField(
         'url_filtering_name', validators=[DataRequired()])
 
-    file_ext_name = StringField('file_ext_name', validators=[DataRequired()])
-    file_ext_val = StringField('file_ext_val', validators=[DataRequired()])
-    mine_name = StringField('mine_name', validators=[DataRequired()])
-    mine_val = StringField('mine_val', validators=[DataRequired()])
-    ex_mine_name = StringField('ex_mine_name', validators=[DataRequired()])
-    ex_mine_val = StringField('ex_mine_val', validators=[DataRequired()])
+    # file_ext_name = StringField('file_ext_name', validators=[DataRequired()])
+    # file_ext_val = StringField('file_ext_val', validators=[DataRequired()])
+    # mine_name = StringField('mine_name', validators=[DataRequired()])
+    # mine_val = StringField('mine_val', validators=[DataRequired()])
+    # ex_mine_name = StringField('ex_mine_name', validators=[DataRequired()])
+    # ex_mine_val = StringField('ex_mine_val', validators=[DataRequired()])
     confilter_name = StringField('confilter_name', validators=[DataRequired()])
     block_contype = StringField('block_contype', validators=[DataRequired()])
 

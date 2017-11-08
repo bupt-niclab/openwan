@@ -150,6 +150,131 @@ class VPN(Base):
 
 
 
+# class UTM(Base):
+#     __tablename__ = 'UTM'
+
+#     tid = Column(Integer, primary_key = True, autoincrement = True)
+#     name = Column(String(255), unique = True)
+#     content_filtering = Column(String(30),nullable = False)
+
+#     anti_virus = Column(String(30),nullable = False)
+#     antivirus_http = Column(String(30),nullable = False)
+#     antivirus_smtp = Column(String(30),nullable = False)
+#     antivirus_ftp = Column(String(30),nullable = False)
+#     anti_spam = Column(String(30),nullable = False)    
+#     antispam_default = Column(String(30),nullable = False)
+#     antispam_custom = Column(String(30),nullable = False)
+    
+#     # black_list_value = Column(String(300),nullable = False)
+#     spam_black_list_value = Column(String(300),nullable = False)
+#     spam_black_list_pattern_name = Column(String(30),nullable = False)
+#     spam_white_list_value = Column(String(300),nullable = False)
+#     spam_white_list_pattern_name = Column(String(30),nullable = False)
+#     spam_action = Column(String(30),nullable = False)
+#     custom_tag_string = Column(String(300),nullable = False)
+#     sbl_profile_name = Column(String(50),nullable = False)
+
+    
+
+#     url_filtering = Column(String(30),nullable = False)
+#     url_black_list_value = Column(String(300),nullable = False)
+#     url_black_list_pattern_name = Column(String(30),nullable = False)
+#     url_black_list_category_name = Column(String(50),nullable = False)
+#     url_black_list_action = Column(String(30),nullable = False)
+#     url_white_list_value = Column(String(300),nullable = False)
+#     url_white_list_pattern_name = Column(String(30),nullable = False)
+#     url_white_list_category_name = Column(String(30),nullable = False)
+#     url_white_list_action = Column(String(50),nullable = False)
+
+#     fallback_setting_default = Column(String(30),nullable = False)
+#     fallback_setting_server_connectivity = Column(String(30),nullable = False)
+#     fallback_setting_timeout = Column(String(30),nullable = False)
+#     fallback_setting_too_many_requests = Column(String(30),nullable = False)
+#     url_filtering_name = Column(String(30),nullable = False)
+
+
+#     file_ext_name = Column(String(30),nullable = False)
+#     file_ext_val = Column(String(300),nullable = False)
+#     mine_name = Column(String(30),nullable = False)
+#     mine_val = Column(String(300),nullable = False)
+#     ex_mine_name = Column(String(30),nullable = False)
+#     ex_mine_val = Column(String(300), nullable = False)
+#     confilter_name = Column(String(30),nullable = False)
+#     block_contype = Column(String(30),nullable = False)
+
+#     old_status = Column(String(30),nullable = False)
+#     old_policy_name = Column(String(30),nullable = False)
+#     old_src_zone = Column(String(30),nullable = False)
+#     old_dst_zone = Column(String(30),nullable = False)
+
+
+#     src_zone = Column(String(30),nullable = False)
+#     dst_zone = Column(String(30),nullable = False)
+#     src_address = Column(String(30),nullable = False)
+#     dst_address = Column(String(30),nullable = False)
+#     new_policy_name = Column(String(30),nullable = False)
+
+#     def __init__(self,name,content_filtering,anti_virus,antivirus_http,antivirus_smtp,
+#     antivirus_ftp,anti_spam,antispam_custom,spam_black_list_value,spam_black_list_pattern_name,
+#     spam_white_list_value,spam_white_list_pattern_name,spam_action,custom_tag_string,
+#     sbl_profile_name,antispam_default,url_filtering,url_black_list_value,url_black_list_pattern_name,
+#     url_black_list_category_name,url_black_list_action,url_white_list_value,url_white_list_pattern_name,
+#     url_white_list_category_name,url_white_list_action,fallback_setting_default,fallback_setting_server_connectivity,
+#     fallback_setting_timeout,fallback_setting_too_many_requests,url_filtering_name,file_ext_name,file_ext_val,
+#     mine_name,mine_val,ex_mine_name,ex_mine_val,confilter_name,block_contype,old_status,old_policy_name,old_src_zone,old_dst_zone,
+#     src_zone,dst_zone,src_address,dst_address,new_policy_name):
+#         self.name = name
+#         self.content_filtering = content_filtering
+#         self.anti_virus = anti_virus
+#         self.antivirus_http = antivirus_http
+#         self.antivirus_smtp = antivirus_smtp
+#         self.antivirus_ftp = antivirus_ftp
+#         self.anti_spam = anti_spam
+#         self.antispam_custom = antispam_custom
+#         self.spam_black_list_value = spam_black_list_value
+#         self.spam_black_list_pattern_name = spam_black_list_pattern_name
+#         self.spam_white_list_value = spam_white_list_value
+#         self.spam_white_list_pattern_name = spam_white_list_pattern_name
+#         self.spam_action = spam_action
+#         self.custom_tag_string = custom_tag_string
+#         self.sbl_profile_name = sbl_profile_name
+#         self.antispam_default = antispam_default
+#         self.url_filtering = url_filtering
+#         self.url_black_list_value = url_black_list_value
+#         self.url_black_list_pattern_name = url_black_list_pattern_name
+#         self.url_black_list_category_name = url_black_list_category_name
+#         self.url_black_list_action = url_black_list_action
+#         self.url_white_list_value = url_white_list_value
+#         self.url_white_list_pattern_name = url_white_list_pattern_name
+#         self.url_white_list_category_name = url_white_list_category_name
+#         self.url_white_list_action = url_white_list_action
+#         self.fallback_setting_default = fallback_setting_default
+#         self.fallback_setting_server_connectivity = fallback_setting_server_connectivity
+#         self.fallback_setting_timeout = fallback_setting_timeout
+#         self.fallback_setting_too_many_requests = fallback_setting_too_many_requests
+#         self.url_filtering_name = url_filtering_name
+#         self.file_ext_name = file_ext_name
+#         self.file_ext_val = file_ext_val
+#         self.mine_name = mine_name
+#         self.mine_val = mine_val
+#         self.ex_mine_name = ex_mine_name
+#         self.ex_mine_val = ex_mine_val
+#         self.confilter_name = confilter_name
+#         self.block_contype = block_contype
+#         self.old_status = old_status
+#         self.old_policy_name = old_policy_name
+#         self.old_src_zone = old_src_zone
+#         self.old_dst_zone = old_dst_zone
+#         self.src_zone = src_zone
+#         self.dst_zone = dst_zone
+#         self.src_address = src_address
+#         self.dst_address = dst_address
+#         self.new_policy_name = new_policy_name
+
+#     def __repr__(self):
+#         return '<name %r>' % self.name
+
+
 class UTM(Base):
     __tablename__ = 'UTM'
 
@@ -158,47 +283,23 @@ class UTM(Base):
     content_filtering = Column(String(30),nullable = False)
 
     anti_virus = Column(String(30),nullable = False)
-    antivirus_http = Column(String(30),nullable = False)
-    antivirus_smtp = Column(String(30),nullable = False)
-    antivirus_ftp = Column(String(30),nullable = False)
     anti_spam = Column(String(30),nullable = False)    
     antispam_default = Column(String(30),nullable = False)
     antispam_custom = Column(String(30),nullable = False)
     
-    # black_list_value = Column(String(300),nullable = False)
     spam_black_list_value = Column(String(300),nullable = False)
     spam_black_list_pattern_name = Column(String(30),nullable = False)
-    spam_white_list_value = Column(String(300),nullable = False)
-    spam_white_list_pattern_name = Column(String(30),nullable = False)
     spam_action = Column(String(30),nullable = False)
-    custom_tag_string = Column(String(300),nullable = False)
     sbl_profile_name = Column(String(50),nullable = False)
-
-    
 
     url_filtering = Column(String(30),nullable = False)
     url_black_list_value = Column(String(300),nullable = False)
     url_black_list_pattern_name = Column(String(30),nullable = False)
     url_black_list_category_name = Column(String(50),nullable = False)
     url_black_list_action = Column(String(30),nullable = False)
-    url_white_list_value = Column(String(300),nullable = False)
-    url_white_list_pattern_name = Column(String(30),nullable = False)
-    url_white_list_category_name = Column(String(30),nullable = False)
-    url_white_list_action = Column(String(50),nullable = False)
-
-    fallback_setting_default = Column(String(30),nullable = False)
-    fallback_setting_server_connectivity = Column(String(30),nullable = False)
-    fallback_setting_timeout = Column(String(30),nullable = False)
-    fallback_setting_too_many_requests = Column(String(30),nullable = False)
     url_filtering_name = Column(String(30),nullable = False)
 
 
-    file_ext_name = Column(String(30),nullable = False)
-    file_ext_val = Column(String(300),nullable = False)
-    mine_name = Column(String(30),nullable = False)
-    mine_val = Column(String(300),nullable = False)
-    ex_mine_name = Column(String(30),nullable = False)
-    ex_mine_val = Column(String(300), nullable = False)
     confilter_name = Column(String(30),nullable = False)
     block_contype = Column(String(30),nullable = False)
 
@@ -207,58 +308,40 @@ class UTM(Base):
     old_src_zone = Column(String(30),nullable = False)
     old_dst_zone = Column(String(30),nullable = False)
 
-
     src_zone = Column(String(30),nullable = False)
     dst_zone = Column(String(30),nullable = False)
     src_address = Column(String(30),nullable = False)
     dst_address = Column(String(30),nullable = False)
     new_policy_name = Column(String(30),nullable = False)
 
-    def __init__(self,name,content_filtering,anti_virus,antivirus_http,antivirus_smtp,
-    antivirus_ftp,anti_spam,antispam_custom,spam_black_list_value,spam_black_list_pattern_name,
-    spam_white_list_value,spam_white_list_pattern_name,spam_action,custom_tag_string,
-    sbl_profile_name,antispam_default,url_filtering,url_black_list_value,url_black_list_pattern_name,
-    url_black_list_category_name,url_black_list_action,url_white_list_value,url_white_list_pattern_name,
-    url_white_list_category_name,url_white_list_action,fallback_setting_default,fallback_setting_server_connectivity,
-    fallback_setting_timeout,fallback_setting_too_many_requests,url_filtering_name,file_ext_name,file_ext_val,
-    mine_name,mine_val,ex_mine_name,ex_mine_val,confilter_name,block_contype,old_status,old_policy_name,old_src_zone,old_dst_zone,
+    def __init__(self,name,content_filtering,anti_virus,antispam_default,
+    anti_spam,antispam_custom,spam_black_list_value,spam_black_list_pattern_name,
+    spam_action,sbl_profile_name,url_filtering,
+    url_black_list_value,url_black_list_pattern_name,
+    url_black_list_category_name,url_black_list_action,
+    url_filtering_name,
+    confilter_name,block_contype,old_status,old_policy_name,old_src_zone,old_dst_zone,
     src_zone,dst_zone,src_address,dst_address,new_policy_name):
         self.name = name
         self.content_filtering = content_filtering
         self.anti_virus = anti_virus
-        self.antivirus_http = antivirus_http
-        self.antivirus_smtp = antivirus_smtp
-        self.antivirus_ftp = antivirus_ftp
         self.anti_spam = anti_spam
+        self.antispam_default = antispam_default
         self.antispam_custom = antispam_custom
         self.spam_black_list_value = spam_black_list_value
         self.spam_black_list_pattern_name = spam_black_list_pattern_name
-        self.spam_white_list_value = spam_white_list_value
-        self.spam_white_list_pattern_name = spam_white_list_pattern_name
+
         self.spam_action = spam_action
-        self.custom_tag_string = custom_tag_string
         self.sbl_profile_name = sbl_profile_name
-        self.antispam_default = antispam_default
+        
         self.url_filtering = url_filtering
         self.url_black_list_value = url_black_list_value
         self.url_black_list_pattern_name = url_black_list_pattern_name
         self.url_black_list_category_name = url_black_list_category_name
         self.url_black_list_action = url_black_list_action
-        self.url_white_list_value = url_white_list_value
-        self.url_white_list_pattern_name = url_white_list_pattern_name
-        self.url_white_list_category_name = url_white_list_category_name
-        self.url_white_list_action = url_white_list_action
-        self.fallback_setting_default = fallback_setting_default
-        self.fallback_setting_server_connectivity = fallback_setting_server_connectivity
-        self.fallback_setting_timeout = fallback_setting_timeout
-        self.fallback_setting_too_many_requests = fallback_setting_too_many_requests
+
         self.url_filtering_name = url_filtering_name
-        self.file_ext_name = file_ext_name
-        self.file_ext_val = file_ext_val
-        self.mine_name = mine_name
-        self.mine_val = mine_val
-        self.ex_mine_name = ex_mine_name
-        self.ex_mine_val = ex_mine_val
+
         self.confilter_name = confilter_name
         self.block_contype = block_contype
         self.old_status = old_status
@@ -273,7 +356,6 @@ class UTM(Base):
 
     def __repr__(self):
         return '<name %r>' % self.name
-
 
 
 
