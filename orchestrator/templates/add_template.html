@@ -4,9 +4,9 @@
 {% macro render_field(field, label_visible=true) -%}
      <div class="form-group {% if field.errors %}has-error{% endif %} {{ kwargs.pop('class_', '') }}" id="form-group-{{ field.name }}">
         {% if field.type != 'HiddenField' and label_visible %}
-            {{ field.label(class_='col-sm-5 control-label') }}
+            {{ field.label(class_='col-sm-4 control-label') }}
         {% endif %}
-        <div class="col-sm-7 input-group">
+        <div class="col-sm-8 input-group">
           {{ field(class_='form-control', **kwargs) }}
           {% if field.errors %}
               {% for e in field.errors %}
@@ -32,30 +32,13 @@
   </div><!-- /.row -->
 
   <div class="row">
-      <div class="col-lg-3">
-        <ul class="nav nav-stacked nav-pills">
-          <li class="active">
-            <a href="#vpn" data-toggle="pill">VPN</a>
-          </li>
-          <li>
-            <a href="#probe" data-toggle="pill">探针</a>
-          </li>
-          <li>
-            <a href="#other" data-toggle="pill">其他</a>
-          </li>
-        </ul>
-      </div>
-      <div class="col-lg-9">
-        <div class="tab-content">
-          <div class="tab-pane active" id="vpn">
-            <!-- <div class="alert alert-warning" role="alert">
-              Jobs templates are saved in salt-master configuration and adding a new template will change the salt-master configuration formatting and will strip comments. See 
-              <a href="http://docs.saltstack.com/en/latest/ref/wheel/all/salt.wheel.config.html#salt.wheel.config.apply">the documentation for more details.
-              </a>
-            </div> -->
+      <div class="col-lg-12">
+          {% if is_vpn %}
+          <div id="vpn">
+            <h1>VPN</h1>
             <div class="row">
               <div class="col-lg-12">
-                <form method="POST" class="form-horizontal" role="form" action="{{ url_for('add_template') }}" id="vpn_template_form">
+                <form method="POST" class="form-horizontal" role="form" action="{{ url_for('add_template', type='vpn') }}" id="vpn_template_form">
                   {{ vpn_form.csrf_token }}
                   {{ render_field(vpn_form.name) }}
                   {{ render_field(vpn_form.LTE_cloudGW) }}
@@ -83,7 +66,7 @@
                   </div>
           
                   <div class="form-group" id="vpn_submit">
-                    <div class="col-sm-offset-2 col-sm-10">
+                    <div class="col-sm-offset-4 col-sm-10">
                       <button type="submit" class="btn btn-default">{{_("Save template")}}</button>
                     </div>
                   </div>
@@ -101,135 +84,152 @@
               </div> -->
             </div>
           </div>
-          <div class="tab-pane" id="probe">
-            <!-- <div class="alert alert-warning" role="alert">
-              Jobs templates are saved in salt-master configuration and adding a new template will change the salt-master configuration formatting and will strip comments. See 
-              <a href="http://docs.saltstack.com/en/latest/ref/wheel/all/salt.wheel.config.html#salt.wheel.config.apply">the documentation for more details.
-              </a>
-            </div> -->
+          {% endif %}
+          {% if is_utm %}          
+          <div id="utm">
+            <h1>UTM</h1>              
             <div class="row">
               <div class="col-lg-12">
+                  <form method="POST" class="form-horizontal" role="form" action="{{ url_for('add_template', type='utm') }}" id="utm_template_form">
+                    {{ utm_form.csrf_token }}
+                    {{ render_field(utm_form.name)}}
+                    <br/>
+                    {{ render_field(utm_form.anti_virus)}}
+                    <br/>                    
+                    {{ render_field(utm_form.anti_spam)}}
+                    {{ render_field(utm_form.antispam_default)}}
+                    {{ render_field(utm_form.antispam_custom)}}
+                    {{ render_field(utm_form.spam_black_list_value)}}
+                    {{ render_field(utm_form.spam_black_list_pattern_name)}}
+                    {{ render_field(utm_form.spam_action)}}
+                    {{ render_field(utm_form.sbl_profile_name)}}
+                    <br/>                    
+                    {{ render_field(utm_form.url_filtering)}}
+                    {{ render_field(utm_form.url_black_list_value)}}
+                    {{ render_field(utm_form.url_black_list_pattern_name)}}
+                    {{ render_field(utm_form.url_black_list_category_name)}}
+                    {{ render_field(utm_form.url_black_list_action)}}
+                    {{ render_field(utm_form.url_filtering_name)}}
+                    <br/>                    
+                    {{ render_field(utm_form.content_filtering)}}
+                    {{ render_field(utm_form.confilter_name)}}
+                    {{ render_field(utm_form.block_contype)}}
+                    {{ render_field(utm_form.old_status)}}
+                    {{ render_field(utm_form.old_policy_name)}}
+                    {{ render_field(utm_form.old_src_zone)}}
+                    {{ render_field(utm_form.old_dst_zone)}}
+                    {{ render_field(utm_form.src_zone)}}
+                    {{ render_field(utm_form.dst_zone)}}
+                    {{ render_field(utm_form.src_address)}}
+                    {{ render_field(utm_form.dst_address)}}
+                    {{ render_field(utm_form.new_policy_name)}}
+                    
+                    
+                    <div class="panel panel-default" id="utm_optional_panel" style="display: none">
+                      <div class="panel-heading">
+                        <h3 class="panel-title">{{hiding_control('hide_control', True)|safe }} Optional arguments</h3>
+                      </div>
+                      <div class="panel-body" id="utm_optional_arguments" style="display: none">
+                      </div>
+                    </div>
+            
+                    <div class="form-group" id="utm_submit">
+                      <div class="col-sm-offset-4 col-sm-10">
+                        <button type="submit" class="btn btn-default">{{_("Save template")}}</button>
+                      </div>
+                    </div>
+                  </form>
               </div>
-              <!-- <div class="col-lg-12">
-                <div class="panel panel-default">
-                  <div class="panel-heading">
-                    <h3 class="panel-title">Functions docs</h3>
-                  </div>
-                  <div class="panel-body">
-                    <pre id="doc-placeholder"></pre>
-                  </div>
-                </div>
-              </div> -->
             </div>
           </div>
-          <div class="tab-pane" id="other">其他</div>
-        </div> 
+          {% endif %}
+          {% if id_idp %}          
+          <div id="idp">IDP</div>
+          {% endif %}
       </div>
     </div>
 {% endblock %}
 
 {% block scripts %}
-<script type="text/javascript">
+<script>
+$(function(){
+  var anti_virus = $('#anti_virus');
 
-// function template(field_name, default_value, required) {
-//   return '<div class="form-group run-arg" id="form-group-fun">' +
-//   '<label class="col-sm-2 control-label" for="' + field_name + '">' + field_name + '</label><div class="col-sm-10 input-group">' +
-//   (required ? '<div class="input-group-addon">*</div>' : '') +
-//   '<input class="form-control" id="' + field_name + '" name="' + field_name + '" type="text" ' +
-//   (default_value ? 'placeholder="' + default_value + '" ' : '') +
-//   (required ? 'required="required" ' : '') +
-//   '></div></div>';
-// }
+  var anti_spam = $('#anti_virus');
+  var antispam_default = $('#antispam_default');
+  var antispam_custom = $('#antispam_custom');
+  var spam_black_list_value = $('#spam_black_list_value');
+  var spam_black_list_pattern_name = $('#spam_black_list_pattern_name');
+  var spam_action = $('#spam_action');
+  var sbl_profile_name = $('#sbl_profile_name');
 
-// function append_input_field_before(field_id, field_name, default_value, required) {
-//   $(field_id).before(template(field_name, default_value, required));
-// }
+  var url_filtering = $('#url_filtering');
+  var url_black_list_value = $('#url_black_list_value');
+  var url_black_list_pattern_name = $('#url_black_list_pattern_name');
+  var url_black_list_category_name = $('#url_black_list_category_name');
+  var url_black_list_action = $('#url_black_list_action');
+  var url_filtering_name = $('#url_filtering_name');
 
-// function insert_input_field(field_id, field_name, default_value, required) {
-//   $(field_id).append(template(field_name, default_value, required));
-// }
+  var content_filtering = $('#content_filtering');
+  var confilter_name = $('#confilter_name');
+  var block_contype = $('#block_contype');
+  var old_status = $('#old_status');
+  var old_policy_name = $('#old_policy_name');
+  var old_src_zone = $('#old_src_zone');
+  var old_dst_zone = $('#old_dst_zone');
+  var src_zone = $('#src_zone');
+  var dst_zone = $('#dst_zone');
+  var src_address = $('#src_address');
+  var dst_address = $('#dst_address');
+  var new_policy_name = $('#new_policy_name');
+  
+  anti_spam.change(function(){
+    var val = $(this).val();    
+    if (val === 'enable') {
+      show_anti_spam(true);
+    } else {
+      show_anti_spam(false);      
+    }
+  });
 
+  antispam_default.change(function(){
+    var val = $(this).val();
+    if (val === 'enable') {
+      antispam_custom.val('noenable');
+    } else {
+      antispam_custom.val('enable');      
+    }
+  });
 
-// $(function() {
-//   var timer;
-//   var delay = 300; // 0.3 seconds delay after last input
+  antispam_custom.change(function(){
+    var val = $(this).val();
+    if (val === 'enable') {
+      antispam_default.val('noenable');
+      show_antispam_custom(true);
+    } else {
+      antispam_default.val('enable');
+      show_antispam_custom(false);          
+    }
+  });
 
-//   $("div.panel-heading i.hide_control").click(function(event) {
-//     $(this).parents("div.panel").first().find("div.panel-body").toggle();
-//     $(this).parent().find("i.fa").toggle();
-//   });
+  url_filtering.change(function(){
+    var val = $(this).val();
+    if (val === 'enable') {
+      show_url_filtering(true);
+    } else {
+      show_url_filtering(false);      
+    }
+  });
 
+  content_filtering.change(function(){
+    var val = $(this).val();
+    if (val === 'enable') {
+      show_content_filtering(true);
+    } else {
+      show_content_filtering(false);      
+    }
+  });
 
-//   $('#fun').on('input', function() {
-//     window.clearTimeout(timer);
-//     timer = window.setTimeout(function(){
-
-//       // Clear old inputs
-//       $("#template_form").find('.run-arg').remove();
-//       // Hide optional panel and arguments
-//       $("#optional_panel").hide();
-//       $("#optional_arguments").hide();
-//       // Hiding control reset
-//       $(".control_on_hidden").show();
-//       $(".control_on_showed").hide();
-//       // Clear docs
-//       $("#doc-placeholder").text('');
-
-//       var exact_fun = $('#fun').val()
-
-//       var data = {
-//         'expr_form': $('#expr_form').val(),
-//         'tgt': $('#tgt').val(),
-//         'fun': exact_fun
-//       };
-//       $.ajax({
-//         url: "{{ url_for('doc_search') }}",
-//         type: "post",
-//         contentType: "application/json",
-//         data: JSON.stringify(data),
-//         success: function (data, status) {
-
-//           // Update doc and update form
-
-
-//           // New doc content
-//           var new_text = '';
-
-//           // Iterate on data
-//           for (var function_name in data) {
-//             function_doc = data[function_name].doc;
-//             new_text += function_name + function_doc + '\n';
-
-//             // Only show forms if it's the right function
-//             if (function_name == exact_fun) {
-//               // Required args
-//               data[function_name].spec.required_args.map(function(e) {
-//                 append_input_field_before("#optional_panel", e, "Enter input", true);
-//               });
-
-//               // Optionnal args
-//               default_args = data[function_name].spec.default_args;
-//               if(default_args == undefined){
-//                 $("#optional_panel").hide();
-//               } else {
-//                 $("#optional_panel").show();
-//                 $.map(default_args, function(value, key) {
-//                   insert_input_field("#optional_arguments", key, value);
-//                 });
-//               }
-//             }
-//           }
-
-//           // Set new doc pre
-//           $("#doc-placeholder").text(new_text);
-//         },
-//         error: function (xhr, desc, err) {
-//           console.log(xhr);
-//           console.log("Desc: " + desc + "\nErr:" + err);
-//         }
-//       });
-//     }, delay);
-//   })
-// });
+});
 </script>
 {% endblock %}

@@ -64,44 +64,47 @@ from flask_assets import Environment, Bundle
 from webassets.filter import get_filter
 assets = Environment(app)
 
-
-cssrewrite = get_filter('cssrewrite', replace={'../':'../vendor/font--awesome/'})
+cssrewrite = get_filter(
+    'cssrewrite', replace={
+        '../': '../vendor/font--awesome/'
+    })
 
 bundles = {
-  'base_js': Bundle(
-    'vendor/jquery/jquery.min.js',
-    'vendor/bootstrap/js/bootstrap.min.js',
-    'vendor/metisMenu/metisMenu.min.js',
-    'js/jsontree.js',
-    'js/jquery.dataTables.min.js',
-    'js/dataTables.bootstrap.js',
-    'js/control-admin-2.js',
-    filters='jsmin',
-    output='gen/packed.js'
-    ),
-  'traffic_path_js': Bundle(
-    'js/jtopo-0.4.8-min.js',
-    'js/topo.js',
-    filters='jsmin',
-    output='gen/traffic_path.js'),
-  'control_path_js': Bundle(
-    'js/jtopo-0.4.8-min.js',
-    'js/control_topo.js',
-    filters='jsmin',
-    output='gen/control_path.js'),  
-  'base_css': Bundle(
-    'vendor/bootstrap/css/bootstrap.css',
-    'css/control-admin-2.css',
-    'vendor/font-awesome/css/font-awesome.min.css',
-    'css/jsontree.css',
-    'css/dataTables.bootstrap.css',
-    filters='cssmin, cssrewrite',
-    output='gen/packed.css'
-  )
+    'base_js':
+    Bundle(
+        'vendor/jquery/jquery.min.js',
+        'vendor/bootstrap/js/bootstrap.min.js',
+        'vendor/metisMenu/metisMenu.min.js',
+        'js/jsontree.js',
+        'js/jquery.dataTables.min.js',
+        'js/dataTables.bootstrap.js',
+        'js/control-admin-2.js',
+        filters='jsmin',
+        output='gen/packed.js'),
+    'traffic_path_js':
+    Bundle(
+        'js/jtopo-0.4.8-min.js',
+        'js/topo.js',
+        filters='jsmin',
+        output='gen/traffic_path.js'),
+    'control_path_js':
+    Bundle(
+        'js/jtopo-0.4.8-min.js',
+        'js/control_topo.js',
+        filters='jsmin',
+        output='gen/control_path.js'),
+    'base_css':
+    Bundle(
+        'vendor/bootstrap/css/bootstrap.css',
+        'css/control-admin-2.css',
+        'vendor/font-awesome/css/font-awesome.min.css',
+        'css/jsontree.css',
+        'css/dataTables.bootstrap.css',
+        filters='cssmin, cssrewrite',
+        output='gen/packed.css')
 }
 
 assets.register(bundles)
-
 
 # Flask Babel
 from flask_babel import Babel, gettext as _
@@ -112,7 +115,7 @@ client = FlaskHTTPSaltStackClient(app.config['API_URL'],
                                   app.config.get('VERIFY_SSL', True))
 
 from flask_wtf import FlaskForm as Form
-from wtforms import StringField, PasswordField, TextAreaField
+from wtforms import StringField, PasswordField, TextAreaField, SelectField
 from wtforms.validators import DataRequired
 
 
@@ -302,10 +305,11 @@ def templates():
     #     master_config['templates'] = {}
     vpn_tmp = db_session.query(VPN).all()
     utm_tmp = db_session.query(UTM).all()
-    
+
     # return jsonify(errmsg = "success", data = json.dumps(tmp ,default = VPN2dict))
 
-    return render_template("templates.html", vpn_templates=vpn_tmp, utm_templates=utm_tmp)
+    return render_template(
+        "templates.html", vpn_templates=vpn_tmp, utm_templates=utm_tmp)
 
 
 @app.route("/api_templates/<switchname>")
@@ -347,11 +351,12 @@ def run_template(template):
 @app.route("/templates/new", methods=['GET', 'POST'])
 # @login_required
 def add_template():
-    # form = NewTemplateForm()
     vpn_form = VPNForm()
     utm_form = UTMForm()
-    # probe_form = ProbeForm()
+    print('post 1')    
     if vpn_form.validate_on_submit():
+        print('post 2')    
+        
         # ((?:(?:25[0-5]|2[0-4]\d|(?:1\d{2}|[1-9]?\d))\.){3}(?:25[0-5]|2[0-4]\d|(?:1\d{2}|[1-9]?\d)))/24
         tmp = VPN(vpn_form.name.data, vpn_form.LTE_cloudGW.data,
                   vpn_form.LTE_external_interface.data,
@@ -380,30 +385,18 @@ def add_template():
         db_session.commit()
         flash('template saved successfully')
         return redirect(url_for('templates'))
-    # if probe_form.validate_on_submit():
-    #   return jsonify(errmsg="success")
-    #     master_config = client.run('config.values', client="wheel")['data']['return']
 
-    #     BLACKLIST_ARGS = ('csrf_token', 'tgt', 'fun', 'expr_form', 'name', 'description','owner')
-    #     args = get_filtered_post_arguments(BLACKLIST_ARGS)
-
-    #     templates = master_config.get('templates', {})
-    #     #print templates
-    #     templates[form.name.data.strip()] = {
-    #         'description': form.description.data.strip(),
-    #         'fun': form.fun.data.strip(),
-    #         'tgt': form.tgt.data.strip(),
-    #         'expr_form': form.expr_form.data.strip(),
-    #         'args': args}
-
-    #     client.run('config.apply', client="wheel", key="templates", value=templates)
-
-    #     master_config = client.run('config.values', client="wheel")
-
-    #     flash('Template {0} has been successfully saved'.format(form.name.data.strip()))
-
-    #     return redirect(url_for('templates'))
-    return render_template("add_template.html", vpn_form=vpn_form)
+    tmp_type = request.args['type']
+    print(tmp_type)
+    if tmp_type == 'vpn':
+        return render_template(
+            "add_template.html", is_vpn=True, vpn_form=vpn_form)
+    if tmp_type == 'utm':
+        return render_template(
+            "add_template.html", is_utm=True, utm_form=utm_form)
+    if tmp_type == 'idp':
+        return render_template(
+            "add_template.html", is_vpn=True, vpn_form=vpn_form)
 
 
 @app.route("/template/edit/VPN/<tid>", methods=['GET', 'POST'])
@@ -521,10 +514,9 @@ def edit_UTM_template(tid):
     if utm_form.validate_on_submit():
         db_session.delete(tmp)
         db_session.commit()
-        tmp2 = UTM(
-            utm_form.name.data, utm.content_filtering.data
-            #todo
-        )
+        tmp2 = UTM(utm_form.name.data, utm.content_filtering.data
+                   #todo
+                   )
         db_session.add(tmp2)
         db_session.commit()
         flash('template saved successfully')
@@ -538,10 +530,6 @@ def edit_UTM_template(tid):
 def deployments():
     return ""
 
-
-from flask_wtf import FlaskForm as Form
-from wtforms import StringField, SelectField
-from wtforms.validators import DataRequired
 
 matchers = [('glob', 'Glob'), ('pcre', 'Perl regular expression'), ('list',
                                                                     'List'),
@@ -598,9 +586,10 @@ spam_action = [('block', 'block'), ('tag-header', 'tag-header'),
                ('tag-subject', 'tag-subject')]
 url_black_list_action = [('block', 'block'), ('peimit', 'permit'),
                          ('log and permit', 'log and permit')]
-block_contype = [('java-applet','java-applet'),('exe','exe'),('http-cookie','http-cookie'),('zip','zip')]
+block_contype = [('java-applet', 'java-applet'), ('exe', 'exe'),
+                 ('http-cookie', 'http-cookie'), ('zip', 'zip')]
 # url_white_list_action = [('block', 'block'), ('peimit', 'permit'),
-                        #  ('log and permit', 'log and permit')]
+#  ('log and permit', 'log and permit')]
 # fallback_setting_default = [('block', 'block'), ('log and permit',
 #                                                  'log and permit')]
 # fallback_setting_server_connectivity = [('block', 'block'), ('log and permit',
@@ -608,7 +597,7 @@ block_contype = [('java-applet','java-applet'),('exe','exe'),('http-cookie','htt
 # fallback_setting_timeout = [('block', 'block'), ('log and permit',
 #                                                  'log and permit')]
 # fallback_setting_too_many_requests = [('block', 'block'), ('log and permit',
-                                                        #    'log and permit')]
+#    'log and permit')]
 old_status = [('enable', 'enable'), ('noenable', 'noenable')]
 old_src_zone = [('trust', 'trust'), ('untrust', 'untrust')]
 old_dst_zone = [('trust', 'trust'), ('untrust', 'untrust')]
@@ -725,8 +714,6 @@ def validate_network_segment(form, field):
     # if form.validators.IPAddress(ipv4=True):
 class UTMForm(Form):
     name = StringField('name', validators=[DataRequired()])  #必填
-    content_filtering = SelectField(
-        'content_filtering', choices=content_filtering, default='enable')
     anti_virus = SelectField(
         'anti_virus', choices=anti_virus, default='enable')
     # antivirus_http = SelectField(
@@ -741,9 +728,6 @@ class UTMForm(Form):
         'antispam_custom', choices=antispam_custom, default='noenable')
     antispam_custom = SelectField(
         'antispam_custom', choices=antispam_custom, default='enable')
-
-    url_filtering = SelectField(
-        'url_filtering', choices=url_filtering, default='enable')
     spam_black_list_value = StringField(
         'url_black_list_value', validators=[DataRequired()])
     spam_black_list_pattern_name = StringField(
@@ -760,7 +744,8 @@ class UTMForm(Form):
     sbl_profile_name = StringField(
         'sbl_profile_name', validators=[DataRequired()])
 
-    # url_filtering = SelectField('url_filtering', choices= url_filtering, default = 'enable')
+    url_filtering = SelectField(
+        'url_filtering', choices=url_filtering, default='enable')
     url_black_list_value = StringField(
         'url_black_list_value', validators=[DataRequired()])
     url_black_list_pattern_name = StringField(
@@ -807,6 +792,8 @@ class UTMForm(Form):
     # mine_val = StringField('mine_val', validators=[DataRequired()])
     # ex_mine_name = StringField('ex_mine_name', validators=[DataRequired()])
     # ex_mine_val = StringField('ex_mine_val', validators=[DataRequired()])
+    content_filtering = SelectField(
+        'content_filtering', choices=content_filtering, default='enable')
     confilter_name = StringField('confilter_name', validators=[DataRequired()])
     block_contype = StringField('block_contype', validators=[DataRequired()])
 
@@ -1279,48 +1266,33 @@ def UTM2dict(utms):
     result = []
     for utm in utms:
         single = {
-            "name":
-            utm.name,
-            "content_filtering":
-            utm.content_filtering,
-            "anti_virus":
-            utm.anti_virus,
+            "name": utm.name,
+            "content_filtering": utm.content_filtering,
+            "anti_virus": utm.anti_virus,
             # "antivirus_http":
             # utm.antivirus_http,
             # "antivirus_smtp":
             # utm.antivirus_smtp,
             # "antivirus_ftp":
             # utm.antivirus_ftp,
-            "anti_spam":
-            utm.anti_spam,
-            "antispam_default":
-            utm.antispam_default,
-            "antispam_custom":
-            utm.antispam_custom,
-            "url_filtering":
-            utm.url_filtering,
-            "spam_black_list_value":
-            utm.spam_black_list_value,
-            "spam_black_list_pattern_name":
-            utm.spam_black_list_pattern_name,
+            "anti_spam": utm.anti_spam,
+            "antispam_default": utm.antispam_default,
+            "antispam_custom": utm.antispam_custom,
+            "url_filtering": utm.url_filtering,
+            "spam_black_list_value": utm.spam_black_list_value,
+            "spam_black_list_pattern_name": utm.spam_black_list_pattern_name,
             # "spam_white_list_value":
             # utm.spam_white_list_value,
             # "spam_white_list_pattern_name":
             # utm.spam_white_list_pattern_name,
-            "spam_action":
-            utm.spam_action,
+            "spam_action": utm.spam_action,
             # "custom_tag_string":
             # utm.custom_tag_string,
-            "sbl_profile_name":
-            utm.sbl_profile_name,
-            "url_black_list_value":
-            utm.url_black_list_value,
-            "url_black_list_pattern_name":
-            utm.url_black_list_pattern_name,
-            "url_black_list_category_name":
-            utm.url_black_list_category_name,
-            "url_black_list_action":
-            utm.url_black_list_action,
+            "sbl_profile_name": utm.sbl_profile_name,
+            "url_black_list_value": utm.url_black_list_value,
+            "url_black_list_pattern_name": utm.url_black_list_pattern_name,
+            "url_black_list_category_name": utm.url_black_list_category_name,
+            "url_black_list_action": utm.url_black_list_action,
             # "url_white_list_value":
             # utm.url_white_list_value,
             # "url_white_list_pattern_name":
@@ -1337,8 +1309,7 @@ def UTM2dict(utms):
             # utm.fallback_setting_timeout,
             # "fallback_setting_too_many_requests":
             # utm.fallback_setting_too_many_requests,
-            "url_filtering_name":
-            utm.url_filtering_name,
+            "url_filtering_name": utm.url_filtering_name,
             # "file_ext_name":
             # utm.file_ext_name,
             # "file_ext_val":
@@ -1351,28 +1322,17 @@ def UTM2dict(utms):
             # utm.ex_mine_name,
             # "ex_mine_val":
             # utm.ex_mine_val,
-            "confilter_name":
-            utm.confilter_name,
-            "block_contype":
-            utm.block_contype,
-            "old_status":
-            utm.old_status,
-            "old_policy_name":
-            utm.old_policy_name,
-            "old_src_zone":
-            utm.old_src_zone,
-            "old_dst_zone":
-            utm.old_dst_zone,
-            "src_zone":
-            utm.src_zone,
-            "dst_zone":
-            utm.dst_zone,
-            "src_address":
-            utm.src_address,
-            "dst_address":
-            utm.dst_address,
-            "new_policy_name":
-            utm.new_policy_name
+            "confilter_name": utm.confilter_name,
+            "block_contype": utm.block_contype,
+            "old_status": utm.old_status,
+            "old_policy_name": utm.old_policy_name,
+            "old_src_zone": utm.old_src_zone,
+            "old_dst_zone": utm.old_dst_zone,
+            "src_zone": utm.src_zone,
+            "dst_zone": utm.dst_zone,
+            "src_address": utm.src_address,
+            "dst_address": utm.dst_address,
+            "new_policy_name": utm.new_policy_name
         }
         result.append(single)
     return result

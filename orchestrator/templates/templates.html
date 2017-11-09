@@ -38,7 +38,7 @@
     <div class="row tab-pane active" id="vpn">
       <div class="col-lg-12">
         <h2>VPN {{_("Templates")}}
-          <a href="{{ url_for('add_template') }}">
+          <a href="{{ url_for('add_template', type='vpn') }}">
             <button type="button" class="btn btn-info">{{_("Add a template")}}</button>
           </a>
         </h2>
@@ -46,8 +46,9 @@
           <table class="table table-bordered table-hover tablesorter">
             <thead>
               <tr>
+                <th>#</th>                  
                 <th>name</th>
-                <th>LTE_cloudGW</th>
+                <!-- <th>LTE_cloudGW</th>
                 <th>LTE_external_interface</th>
                 <th>LTE_local_identity</th>
                 <th>LTE_remote_identity</th>
@@ -61,15 +62,16 @@
                 <th>phase1_dead_peer_detection_threshold</th>
                 <th>phase2_authentication_algorithm</th>
                 <th>phase2_encryption_algorithm</th>
-                <th>phase2_perfect_forward_secrecy_keys</th>
+                <th>phase2_perfect_forward_secrecy_keys</th> -->
                 <th>操作</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 {% for template in vpn_templates %}
+                <td>{{vpn_templates.index(template)}}</td>                
                 <td>{{ template.name }}</td>
-                <td>{{ template.LTE_cloudGW }}</td>
+                <!-- <td>{{ template.LTE_cloudGW }}</td>
                 <td>{{ template.LTE_external_interface }}</td>
                 <td>{{ template.LTE_local_identity }}</td>
                 <td>{{ template.LTE_remote_identity }}</td>
@@ -83,7 +85,7 @@
                 <td>{{ template.phase1_dead_peer_detection_threshold }}</td>
                 <td>{{ template.phase2_authentication_algorithm }}</td>
                 <td>{{ template.phase2_encryption_algorithm }}</td>
-                <td>{{ template.phase2_perfect_forward_secrecy_keys }}</td>
+                <td>{{ template.phase2_perfect_forward_secrecy_keys }}</td> -->
     
                 <td>
                   <a href="{{url_for('edit_VPN_template', tid=template.tid)}}">修改</a>
@@ -101,7 +103,7 @@
     <div class="row tab-pane" id="utm" >
       <div class="col-lg-12">
         <h2>UTM {{_("Templates")}}
-          <a href="{{ url_for('add_template') }}">
+          <a href="{{ url_for('add_template', type='utm') }}">
             <button type="button" class="btn btn-info">{{_("Add a template")}}</button>
           </a>
         </h2>
@@ -109,8 +111,9 @@
           <table class="table table-bordered table-hover tablesorter">
             <thead>
               <tr>
+                <th>#</th>
                 <th>name</th>
-                <th>content_filtering</th>
+                <!-- <th>content_filtering</th>
                 <th>anti_virus</th>
                 <th>antivirus_http</th>
                 <th>antivirus_smtp</th>
@@ -156,15 +159,16 @@
                 <th>dst_zone</th>
                 <th>src_address</th>
                 <th>dst_address</th>
-                <th>new_policy_name</th>
+                <th>new_policy_name</th> -->
                 <th>操作</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 {% for template in utm_templates %}
+                <td>{{utm_templates.index(template)}}</td>                                
                 <td>{{ template.name }}</td>
-                <td>{{ template.LTE_cloudGW }}</td>
+                <!-- <td>{{ template.LTE_cloudGW }}</td>
                 <td>{{ template.LTE_external_interface }}</td>
                 <td>{{ template.LTE_local_identity }}</td>
                 <td>{{ template.LTE_remote_identity }}</td>
@@ -178,7 +182,7 @@
                 <td>{{ template.phase1_dead_peer_detection_threshold }}</td>
                 <td>{{ template.phase2_authentication_algorithm }}</td>
                 <td>{{ template.phase2_encryption_algorithm }}</td>
-                <td>{{ template.phase2_perfect_forward_secrecy_keys }}</td>
+                <td>{{ template.phase2_perfect_forward_secrecy_keys }}</td> -->
     
                 <td>
                   <a href="{{url_for('edit_VPN_template', tid=template.tid)}}">修改</a>
@@ -196,7 +200,7 @@
     <div class="row tab-pane" id="idp">
       <div class="col-lg-12">
         <h2>IDP {{_("Templates")}}
-          <a href="{{ url_for('add_template') }}">
+          <a href="{{ url_for('add_template', type='idp') }}">
             <button type="button" class="btn btn-info">{{_("Add a template")}}</button>
           </a>
         </h2>
