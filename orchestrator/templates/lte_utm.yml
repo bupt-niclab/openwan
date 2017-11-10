@@ -1,5 +1,5 @@
 [lte_utm]
-192.168.122.254
+
 
 [lte_utm:vars]
 utm_policyname = {{ name }}

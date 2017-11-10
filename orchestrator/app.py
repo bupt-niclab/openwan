@@ -1752,3 +1752,53 @@ def jinja_access_test(tid):
     d["PFS_keys"] = PFS_keys
 
     return render_template('lte_access.yml', **d)
+
+@app.route('/apply_utm_template', methods = ['POST'])
+@login_required
+def applyUTMtemplate_1():
+    global LASTAPPLY_UTM
+    tid = request.json['tid']
+    node_ip = request.json['ip']
+    node_name = request.json['node_name']
+    output = open('lte_utm.yml','w')
+    cont = []
+    for line in jinja_utm(tid):
+        cont.append(line)
+        output.write(line)
+    output.close()
+
+    LASTAPPLY_UTM = tid
+    tmp = db_session.query(UTM).filter_by(tid = tid).first()
+
+    lines = []
+    output = open('lte_utm.yml','r')
+    flag = 0
+    for line in output.readlines():
+        if flag == 1:
+            line = line + node_ip
+            flag = flag + 1
+            lines.append(line)
+            continue
+        flag = flag + 1
+        lines.append(line)
+    output.close()
+    s = ''.join(lines)
+    f = open('lte_utm.yml','w')
+    f.write(s)
+    f.close()
+    ff = subprocess.check_output(
+        "cp lte_utm.yml /srv/salt/base/lte_utm.yml", shell=True)
+    str_utm = "salt " + node_name + " cp.get_file salt://lte_utm.yml /etc/ansible/lte_utm.yml"
+    cp_access = subprocess.check_output(str_utm, shell=True)
+    run_utm = "salt "+node_name+" cmd.run 'ansible-playbook -i lte_utm.yml utm-config.yml' cwd='/etc/ansible'"
+    run_yml_utm = subprocess.check_output(
+        run_utm, shell=True, stderr=subprocess.STDOUT)
+
+    strerrmsg = run_yml_utm
+
+    if "failed=0" in strerrmsg:
+        return jsonify(errmsg="success", status=0)
+    elif "failed=1" in strerrmsg:
+        return jsonify(errmsg=strerrmsg, status=-1)
+    else:
+        return jsonify(errmsg=strerrmsg, status=1)
