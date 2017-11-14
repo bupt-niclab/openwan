@@ -365,7 +365,7 @@ def add_template():
     utm_url_filtering_name = "surfprofile_" + utm_num
     utm_confilter_name = "confilter_profile_" + utm_num
     utm_new_policy_name = "Client_Outbound_" + utm_num
-    utm_old_policy_name = None
+    utm_old_policy_name = ""
 
     
 
@@ -650,7 +650,7 @@ block_contype = [('java-applet', 'java-applet'), ('exe', 'exe'),
 old_status = [('enable', 'enable'), ('noenable', 'noenable')]
 # old_src_zone = [('trust', 'trust'), ('untrust', 'untrust')]
 # old_dst_zone = [('trust', 'trust'), ('untrust', 'untrust')]
-old_policy_name = []
+old_policy_name = []#[('Client-Outbound-2','Client-Outbound-2,untrust,trust'),('Client-Outbound-1','Client-Outbound-1,untrust,trust'),('Client-Outbound-3','Client-Outbound-3,untrust,trust')]
 src_zone = [('trust', 'trust'), ('untrust', 'untrust')]
 dst_zone = [('trust', 'trust'), ('untrust', 'untrust')]
 #idp
