@@ -116,7 +116,7 @@ client = FlaskHTTPSaltStackClient(app.config['API_URL'],
 
 from flask_wtf import FlaskForm as Form
 from wtforms import StringField, PasswordField, TextAreaField, SelectField, SelectMultipleField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, ValidationError
 
 
 class LoginForm(Form):
@@ -801,8 +801,32 @@ def validate_network_segment(form, field):
         raise ValidationError(
             "please input correct format like '10.0.0.1/24-10.1.0.0/24'")
 
+def validate_by_antispam_custom(form, field):
+  if form.antispam_custom.data == 'enable':
+    if field.data == '':
+      raise ValidationError("选择 antispam_custom 时，该选项为必填字段")
 
-    # if form.validators.IPAddress(ipv4=True):
+def validate_by_url_filtering(form, field):
+  if form.url_filtering.data == 'enable':
+    if field.data == '':
+      raise ValidationError("选择 url_filtering 时，该选项为必填字段")
+
+def validate_by_content_filtering(form, field):
+  if form.content_filtering.data == 'enable':
+    if field.data == '':
+      raise ValidationError("选择 content_filtering 时，该选项为必填字段")
+
+def validate_by_old_status(form, field):
+  if form.old_status.data == 'enable':
+    if field.data == '':
+      raise ValidationError("选择 old_status 时，该选项为必填字段")
+
+def validate_new_status(form, field):
+  if form.old_status.data == 'noenable':
+    if field.data == '':
+      raise ValidationError("选择新建 policy 时，该选项为必填字段")
+
+
 class UTMForm(Form):
     name = StringField('name', validators=[DataRequired()])  #必填
     anti_virus = SelectField(
@@ -814,9 +838,9 @@ class UTMForm(Form):
     antispam_custom = SelectField(
         'antispam_custom', choices=antispam_custom, default='enable')
     spam_black_list_value = StringField(
-        'spam_black_list_value', validators=[DataRequired()])
+        'spam_black_list_value', validators=[validate_by_antispam_custom])
     spam_black_list_pattern_name = StringField(
-        'spam_black_list_pattern_name', validators=[DataRequired()])
+        'spam_black_list_pattern_name', validators=[validate_by_antispam_custom])
     spam_action = SelectField(
         'spam_action', choices=spam_action, default='block')
     sbl_profile_name = StringField(
@@ -825,39 +849,38 @@ class UTMForm(Form):
     url_filtering = SelectField(
         'url_filtering', choices=url_filtering, default='enable')
     url_black_list_value = StringField(
-        'url_black_list_value', validators=[DataRequired()])
+        'url_black_list_value', validators=[validate_by_url_filtering])
     url_black_list_pattern_name = StringField(
-        'url_black_list_pattern_name', validators=[DataRequired()])
+        'url_black_list_pattern_name', validators=[validate_by_url_filtering])
     url_black_list_category_name = StringField(
-        'url_black_list_category_name', validators=[DataRequired()])
+        'url_black_list_category_name', validators=[validate_by_url_filtering])
     url_black_list_action = SelectField(
         'url_black_list_action',
         choices=url_black_list_action,
         default='block')
-    
     url_filtering_name = StringField(
         'url_filtering_name')
+
     content_filtering = SelectField(
         'content_filtering', choices=content_filtering, default='enable')
     confilter_name = StringField('confilter_name')
-    block_contype = SelectMultipleField('block_contype', choices=block_contype, validators=[DataRequired()])
+    block_contype = SelectMultipleField('block_contype', choices=block_contype, validators=[validate_by_content_filtering])
 
     old_status = SelectField(
         'old_status', choices=old_status, default='enable')
     old_policy_name = StringField(
-        'old_policy_name', validators=[DataRequired()])
-    old_src_zone = StringField('old_src_zone', validators=[DataRequired()])
-    old_dst_zone = StringField('old_dst_zone', validators=[DataRequired()])
+        'old_policy_name', validators=[validate_by_old_status])
+    old_src_zone = StringField('old_src_zone', validators=[validate_by_old_status])
+    old_dst_zone = StringField('old_dst_zone', validators=[validate_by_old_status])
 
     src_zone = SelectField('src_zone', choices=dst_zone, default='trust')
     dst_zone = SelectField('dst_zone', choices=dst_zone, default='untrust')
     src_address = StringField(
-        'src_address', validators=[DataRequired()], default='any')
+        'src_address', validators=[validate_new_status], default='any')
     dst_address = StringField(
-        'dst_address', validators=[DataRequired()], default='any')
+        'dst_address', validators=[validate_new_status], default='any')
     new_policy_name = StringField(
-        'new_policy_name', validators=[DataRequired()])
-
+        'new_policy_name', validators=[validate_new_status])
 
 class NewTemplateForm(RunForm):
     name = StringField('name', validators=[DataRequired()])

@@ -138,6 +138,8 @@
 {% block scripts %}
 <script>
 $(function(){
+
+  /* UTM */
   var anti_virus = $('#anti_virus');
 
   var anti_spam = $('#anti_virus');
@@ -151,7 +153,6 @@ $(function(){
   var form_spam_black_list_pattern_name = $('#form-group-spam_black_list_pattern_name');
   var spam_action = $('#spam_action');
   var form_spam_action = $('#form-group-spam_action');
-  // var sbl_profile_name = $('#sbl_profile_name');
 
   var url_filtering = $('#url_filtering');
   var url_black_list_value = $('#url_black_list_value');
@@ -162,10 +163,8 @@ $(function(){
   var form_url_black_list_category_name = $('#form-group-url_black_list_category_name');  
   var url_black_list_action = $('#url_black_list_action');
   var form_url_black_list_action = $('#form-group-url_black_list_action'); 
-  // var url_filtering_name = $('#url_filtering_name');
 
   var content_filtering = $('#content_filtering');
-  // var confilter_name = $('#confilter_name');
   var block_contype = $('#block_contype');
   var form_block_contype = $('#form-group-block_contype');
 
@@ -188,62 +187,33 @@ $(function(){
   var form_new_policy_name = $('#form-group-new_policy_name');  
   
   anti_spam.change(function(){
-    var val = $(this).val();    
-    if (val === 'enable') {
-      show_anti_spam(true);
-    } else {
-      show_anti_spam(false);      
-    }
+    var val = $(this).val();  
+    anti_spam_control(val);  
   });
 
   antispam_default.change(function(){
     var val = $(this).val();
-    if (val === 'enable') {
-      antispam_custom.val('noenable');
-      show_antispam_custom(false);                
-    } else {
-      antispam_custom.val('enable');   
-      show_antispam_custom(true);         
-    }
+    antispam_default_control(val);
   });
 
   antispam_custom.change(function(){
     var val = $(this).val();
-    
-    if (val === 'enable') {
-      antispam_default.val('noenable');
-      show_antispam_custom(true);
-    } else {
-      antispam_default.val('enable');
-      show_antispam_custom(false);          
-    }
+    antispam_custom_control(val);
   });
 
   url_filtering.change(function(){
     var val = $(this).val();
-    if (val === 'enable') {
-      show_url_filtering(true);
-    } else {
-      show_url_filtering(false);      
-    }
+    url_filtering_control(val);    
   });
 
   content_filtering.change(function(){
     var val = $(this).val();
-    if (val === 'enable') {
-      show_content_filtering(true);
-    } else {
-      show_content_filtering(false);      
-    }
+    content_filtering_control(val);
   });
 
   old_status.change(function(){
     var val = $(this).val();
-    if (val === 'enable') {
-      show_old_policy(true);
-    } else {
-      show_old_policy(false);
-    }    
+    old_status_control(val);
   });
 
 
@@ -308,7 +278,67 @@ $(function(){
       form_new_policy_name.show();
     }
   }
-  // show_old_policy(true);
+
+  function anti_spam_control(val) {
+    if (val === 'enable') {
+      show_anti_spam(true);
+    } else {
+      show_anti_spam(false);      
+    }
+  }
+  function antispam_default_control(val) {
+    if (val === 'enable') {
+      antispam_custom.val('noenable');
+      show_antispam_custom(false);      
+    } else {
+      antispam_custom.val('enable');   
+      show_antispam_custom(true); 
+    }
+  }
+  function antispam_custom_control(val) {
+    if (val === 'enable') {
+      antispam_default.val('noenable');
+      show_antispam_custom(true);      
+    } else {
+      antispam_default.val('enable');   
+      show_antispam_custom(false); 
+    }
+  }
+  function url_filtering_control(val) {
+    if (val === 'enable') {
+      show_url_filtering(true);
+    } else {
+      show_url_filtering(false);      
+    }
+  }
+  function content_filtering_control(val) {
+    if (val === 'enable') {
+      show_content_filtering(true);
+    } else {
+      show_content_filtering(false);      
+    }
+  }
+  function old_status_control(val) {
+    if (val === 'enable') {
+      show_old_policy(true);
+    } else {
+      show_old_policy(false);
+    } 
+  }
+
+
+  function initUTM() {    
+    anti_spam_control(anti_spam.val());
+    antispam_default_control(antispam_default.val());
+    antispam_custom_control(antispam_custom.val());
+    url_filtering_control(url_filtering.val());
+    content_filtering_control(content_filtering.val());
+    old_status_control(old_status.val());
+  }
+
+  initUTM();
+
+  /* IDP */
 });
 </script>
 {% endblock %}
