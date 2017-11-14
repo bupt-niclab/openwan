@@ -356,7 +356,9 @@ def add_template():
     #获取utm数据库数据的条目数量
     utm_num = db_session.query(UTM).count() 
     utm_num = utm_num + 1
+    print("utm num is ",utm_num)
     utm_name = "Basic_UTM_" + str(utm_num) 
+    print("utm name should be ",utm_name)
     utm_spam_black_list_pattern_name = "url_black_" + str(utm_num) 
     utm_sbl_profile_name = "antispam_sblpro_" + str(utm_num) 
     utm_url_black_list_pattern_name = "url_black_" + str(utm_num)  + str(utm_num) 
@@ -417,6 +419,17 @@ def add_template():
         return redirect(url_for('templates'))
     if utm_form.validate_on_submit():
         print('post 3')    
+        utm_form.name.data = utm_name
+        utm_form.spam_black_list_pattern_name.data = utm_spam_black_list_pattern_name
+        utm_form.sbl_profile_name.data = utm_sbl_profile_name
+        utm_form.url_black_list_pattern_name.data = utm_url_black_list_pattern_name
+        utm_form.url_black_list_category_name.data = utm_url_black_list_category_name
+        utm_form.url_filtering_name.data = utm_url_filtering_name
+        utm_form.confilter_name.data = utm_confilter_name
+        utm_form.new_policy_name.data = utm_new_policy_name
+        utm_form.old_policy_name.data = utm_old_policy_name.split(',')[0]
+        utm_form.old_dst_zone.data = utm_old_policy_name.split(',')[1]
+        utm_form.old_src_zone.data = utm_old_policy_name.split(',')[2]
         tmp = UTM(utm_form.anti_virus.data,
                   utm_form.content_filtering.data,
                   utm_form.anti_virus.data,
@@ -430,26 +443,40 @@ def add_template():
                   utm_form.url_black_list_value.data,
                   utm_form.url_black_list_action.data,
                   utm_form.old_status.data,
-                  utm_form.old_policy_name.data,
-                  utm_form.old_src_zone.data,
-                  utm_form.old_dst_zone.data,
+                #   utm_form.old_policy_name.data,
+                #   utm_form.old_src_zone.data,
+                #   utm_form.old_dst_zone.data,
                   utm_form.src_zone.data,
                   utm_form.dst_zone.data,
                   utm_form.src_address.data,
                   utm_form.dst_address.data,
+
+                  utm_form.name.data,
+                  utm_form.spam_black_list_pattern_name.data,
+                  utm_form.sbl_profile_name.data,
+                  utm_form.url_black_list_pattern_name.data,
+                  utm_form.url_black_list_category_name.data,
+                  utm_form.url_filtering_name.data,
+                  utm_form.confilter_name.data,
+                  utm_form.confilter_name.data,
+                  utm_form.old_policy_name.data,
+                  utm_form.old_dst_zone.data,
+                  utm_form.old_src_zone.data,
+
         )
-        tmp.name = utm_name
-        print("tmp.name is ",tmp.name)
-        tmp.spam_black_list_pattern_name = utm_spam_black_list_pattern_name
-        tmp.sbl_profile_name = utm_sbl_profile_name
-        tmp.url_black_list_pattern_name = utm_url_black_list_pattern_name
-        tmp.url_black_list_category_name = utm_url_black_list_category_name
-        tmp.url_filtering_name = utm_url_filtering_name
-        tmp.confilter_name = utm_confilter_name
-        tmp.new_policy_name = utm_new_policy_name
-        tmp.old_policy_name = utm_old_policy_name.strip(',')[0]
-        tmp.old_dst_zone = utm_old_policy_name.strip(',')[1]
-        tmp.old_src_zone = utm_old_policy_name.strip(',')[2]
+        # tmp.name = utm_name
+        print("utm name is ",utm_form.name.data)
+        print("utm_form.old_src_zone.data is ",utm_form.old_src_zone.data)
+        # tmp.spam_black_list_pattern_name = utm_spam_black_list_pattern_name
+        # tmp.sbl_profile_name = utm_sbl_profile_name
+        # tmp.url_black_list_pattern_name = utm_url_black_list_pattern_name
+        # tmp.url_black_list_category_name = utm_url_black_list_category_name
+        # tmp.url_filtering_name = utm_url_filtering_name
+        # tmp.confilter_name = utm_confilter_name
+        # tmp.new_policy_name = utm_new_policy_name
+        # tmp.old_policy_name = utm_old_policy_name.strip(',')[0]
+        # tmp.old_dst_zone = utm_old_policy_name.strip(',')[1]
+        # tmp.old_src_zone = utm_old_policy_name.strip(',')[2]
         db_session.add(tmp)
         db_session.commit()
         flash('template saved successfully')
@@ -562,9 +589,9 @@ def edit_UTM_template(tid):
             'url_black_list_action':utm_form.url_black_list_action.data,
             'block_contype':utm_form.block_contype.data,
             'old_status':utm_form.old_status.data,
-            'old_policy_name':utm_form.old_policy_name.data.strip().strip(':')[0],
-            'old_src_zone':utm_form.old_policy_name.data.strip().strip(':')[2],
-            'old_dst_zone':utm_form.old_policy_name.data.strip().strip(':')[1],
+            'old_policy_name':utm_form.old_policy_name.data.strip().split(':')[0],
+            'old_src_zone':utm_form.old_policy_name.data.strip().split(':')[2],
+            'old_dst_zone':utm_form.old_policy_name.data.strip().split(':')[1],
             'src_zone':utm_form.src_zone.data,
             'dst_zone':utm_form.dst_zone.data,
             'src_address':utm_form.src_address.data,
@@ -793,7 +820,7 @@ class UTMForm(Form):
     spam_action = SelectField(
         'spam_action', choices=spam_action, default='block')
     sbl_profile_name = StringField(
-        'sbl_profile_name', validators=[DataRequired()])
+        'sbl_profile_name')
 
     url_filtering = SelectField(
         'url_filtering', choices=url_filtering, default='enable')
@@ -809,10 +836,10 @@ class UTMForm(Form):
         default='block')
     
     url_filtering_name = StringField(
-        'url_filtering_name', validators=[DataRequired()])
+        'url_filtering_name')
     content_filtering = SelectField(
         'content_filtering', choices=content_filtering, default='enable')
-    confilter_name = StringField('confilter_name', validators=[DataRequired()])
+    confilter_name = StringField('confilter_name')
     block_contype = SelectMultipleField('block_contype', choices=block_contype, validators=[DataRequired()])
 
     old_status = SelectField(
