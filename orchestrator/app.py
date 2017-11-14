@@ -498,27 +498,45 @@ def edit_VPN_template(tid):
         # probe_form = ProbeForm()
 
     if vpn_form.validate_on_submit():
-        db_session.delete(tmp)
+        tmp2 = db_session.query(VPN).filter_by(tid = tid).update({
+            VPN.name : vpn_form.name.data,
+            VPN.LTE_cloudGW : vpn_form.LTE_cloudGW.data,
+            VPN.LTE_external_interface : vpn_form.LTE_external_interface.data,
+            VPN.LTE_local_identity : vpn_form.LTE_local_identity.data,
+            VPN.LTE_remote_identity : vpn_form.LTE_remote_identity.data,
+            VPN.cloud_external_interface : vpn_form.cloud_external_interface.data,
+            VPN.cloud_local_address : vpn_form.cloud_local_address.data,
+            VPN.phase1_dh_group : vpn_form.phase1_dh_group.data,
+            VPN.phase1_authentication_algorithm : vpn_form.phase1_authentication_algorithm.data,
+            VPN.phase1_encryption_algorithm : vpn_form.phase1_encryption_algorithm.data,
+            VPN.phase1_pre_shared_key : vpn_form.phase1_pre_shared_key.data,
+            VPN.phase1_dead_peer_detection_nterval : vpn_form.phase1_dead_peer_detection_nterval.data,
+            VPN.phase1_dead_peer_detection_threshold : vpn_form.phase1_dead_peer_detection_threshold.data,
+            VPN.phase2_authentication_algorithm : vpn_form.phase2_authentication_algorithm.data,
+            VPN.phase2_encryption_algorithm : vpn_form.phase2_encryption_algorithm.data,
+            VPN.phase2_perfect_forward_secrecy_keys : vpn_form.phase2_perfect_forward_secrecy_keys
+        })
+        # db_session.delete(tmp)
         db_session.commit()
         print(vpn_form.name.data)
-        tmp2 = VPN(
-            vpn_form.name.data, vpn_form.LTE_cloudGW.data,
-            vpn_form.LTE_external_interface.data,
-            vpn_form.LTE_local_identity.data, vpn_form.LTE_local_identity.data,
-            vpn_form.cloud_external_interface.data,
-            vpn_form.cloud_local_address.data, vpn_form.phase1_dh_group.data,
-            vpn_form.phase1_authentication_algorithm.data,
-            vpn_form.phase1_encryption_algorithm.data,
-            vpn_form.phase1_pre_shared_key.data,
-            vpn_form.phase1_dead_peer_detection_nterval.data,
-            vpn_form.phase1_dead_peer_detection_threshold.data,
-            vpn_form.phase2_authentication_algorithm.data,
-            vpn_form.phase2_encryption_algorithm.data,
-            vpn_form.phase2_perfect_forward_secrecy_keys.data)
-        print(tmp2)
+        # tmp2 = VPN(
+        #     vpn_form.name.data, vpn_form.LTE_cloudGW.data,
+        #     vpn_form.LTE_external_interface.data,
+        #     vpn_form.LTE_local_identity.data, vpn_form.LTE_local_identity.data,
+        #     vpn_form.cloud_external_interface.data,
+        #     vpn_form.cloud_local_address.data, vpn_form.phase1_dh_group.data,
+        #     vpn_form.phase1_authentication_algorithm.data,
+        #     vpn_form.phase1_encryption_algorithm.data,
+        #     vpn_form.phase1_pre_shared_key.data,
+        #     vpn_form.phase1_dead_peer_detection_nterval.data,
+        #     vpn_form.phase1_dead_peer_detection_threshold.data,
+        #     vpn_form.phase2_authentication_algorithm.data,
+        #     vpn_form.phase2_encryption_algorithm.data,
+        #     vpn_form.phase2_perfect_forward_secrecy_keys.data)
+        # print(tmp2)
 
-        db_session.add(tmp2)
-        db_session.commit()
+        # db_session.add(tmp2)
+        # db_session.commit()
 
         flash('template saved successfully')
         return redirect(url_for('templates'))
