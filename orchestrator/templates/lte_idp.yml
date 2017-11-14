@@ -1,0 +1,29 @@
+[lte_idp]
+192.168.122.254
+
+[lte_idp:vars]
+idp_policy_name="base-policy"
+idp_rule_name="R1"
+rule_src_zone="trust"
+rule_dst_zone="untrust" 
+rule_action="drop-connection"
+idprule_sev="critical"
+
+predefine_idp = "noenable"
+
+custom_idp = "enable"
+cus_attack_name="sig1"
+cus_attack_severity="critical"
+cus_attack_action="drop"
+cus_attack_direction="client-to-server"
+
+old_status="noenable"
+old_policy_name = "p2"
+old_src_zone = "trust"
+old_dst_zone = "untrust"
+
+src_zone = "trust"
+dst_zone = "untrust"
+src_address = "any"
+dst_address = "any" 
+new_policy_name = "Client-Outbound-2"

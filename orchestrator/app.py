@@ -353,10 +353,32 @@ def run_template(template):
 def add_template():
     vpn_form = VPNForm()
     utm_form = UTMForm()
-    print('post 1')    
+    print('post 1')  
+    #获取utm数据库数据的条目数量
+    utm_num = db_session.query(UTM).count() 
+    utm_num = utm_num + 1
+    utm_name = "Basic_UTM_" + utm_num 
+    utm_spam_black_list_pattern_name = "url_black_" + utm_num
+    utm_sbl_profile_name = "antispam_sblpro_" + utm_num
+    utm_url_black_list_pattern_name = "utl_black_" + utm_num + utm_num
+    utm_url_black_list_category_name = "utl_category_black_" + utm_num
+    utm_url_filtering_name = "surfprofile_" + utm_num
+    utm_confilter_name = "confilter_profile_" + utm_num
+    
+
+    # 获取旧的policy
+    ff = subprocess("salt '*' test.ping",shell = True)
+    f = subprocess("salt junos.rpc 'get-firewall-policies'",shell = True)
+    for line in f:
+        if 'policy_name' in line:
+            d = dict()
+            str_name = line.strip().strip(':')
+            d[str_name] = str_name
+            old_policy_name.append(d)
+    
     if vpn_form.validate_on_submit():
         print('post 2')    
-        
+                
         # ((?:(?:25[0-5]|2[0-4]\d|(?:1\d{2}|[1-9]?\d))\.){3}(?:25[0-5]|2[0-4]\d|(?:1\d{2}|[1-9]?\d)))/24
         tmp = VPN(vpn_form.name.data, vpn_form.LTE_cloudGW.data,
                   vpn_form.LTE_external_interface.data,
@@ -379,7 +401,31 @@ def add_template():
         flash('template saved successfully')
         return redirect(url_for('templates'))
     if utm_form.validate_on_submit():
-        tmp = UTM(utm_form.name.data, utm_form.confilter_name.data)
+        
+        # name = "policy"
+        tmp = UTM(utm_form.anti_virus.data,
+        utm_form.content_filtering.data,
+        utm_form.anti_virus.data,
+        utm_form.anti_spam.data,
+        utm_form.antispam_default.data,
+        utm_form.antispam_custom.data,
+        utm_form.spam_black_list_value.data,
+        utm_form.spam_black_list_pattern_name.data,
+        utm_form.spam_action.data,
+        utm_form.url_filtering.data,
+        utm_form.url_black_list_value.data,
+        utm_form.url_black_list_action.data,
+        utm_form.block_contype.data,
+        utm_form.old_status.data,
+        utm_form.old_src_zone.data,
+        utm_form.old_dst_zone.data,
+        utm_form.src_zone.data,
+        utm_form.dst_zone.data,
+        utm_form.src_address.data,
+        utm_form.dst_address.data,
+
+
+        )
 
         db_session.add(tmp)
         db_session.commit()
@@ -464,46 +510,26 @@ def edit_UTM_template(tid):
     tmp = db_session.query(UTM).filter_by(tid=tid).first()
     utm_form = UTMForm()
     if request.method == 'GET':
-        utm_form.name.data = tmp.name
+        # utm_form.name.data = tmp.name
         utm_form.content_filtering.data = tmp.content_filtering
         utm_form.anti_virus.data = tmp.anti_virus
-        # utm_form.antivirus_http.data = tmp.antivirus_http
-        # utm_form.antivirus_smtp.data = tmp.antivirus_smtp
-        # utm_form.antivirus_ftp.data = tmp.antivirus_ftp
         utm_form.anti_spam.data = tmp.anti_spam
         utm_form.antispam_default.data = tmp.antispam_default
         utm_form.antispam_custom.data = tmp.antispam_custom
         utm_form.url_filtering.data = tmp.url_filtering
         utm_form.spam_black_list_value.data = tmp.spam_black_list_value
-        utm_form.spam_black_list_pattern_name.data = tmp.spam_black_list_pattern_name
-        # utm_form.spam_white_list_value.data = tmp.spam_white_list_value
-        # utm_form.spam_white_list_pattern_name.data = tmp.spam_white_list_pattern_name
+        # utm_form.spam_black_list_pattern_name.data = tmp.spam_black_list_pattern_name
         utm_form.spam_action.data = tmp.spam_action
-        # utm_form.custom_tag_string.data = tmp.custom_tag_string
-        utm_form.sbl_profile_name.data = tmp.sbl_profile_name
+        # utm_form.sbl_profile_name.data = tmp.sbl_profile_name
         utm_form.url_black_list_value.data = tmp.url_black_list_value
-        utm_form.url_black_list_pattern_name.data = tmp.url_black_list_pattern_name
-        utm_form.url_black_list_category_name.data = tmp.url_black_list_category_name
+        # utm_form.url_black_list_pattern_name.data = tmp.url_black_list_pattern_name
+        # utm_form.url_black_list_category_name.data = tmp.url_black_list_category_name
         utm_form.url_black_list_action.data = tmp.url_black_list_action
-        # utm_form.url_white_list_value.data = tmp.url_white_list_value
-        # utm_form.url_white_list_pattern_name.data = tmp.url_white_list_pattern_name
-        # utm_form.url_white_list_category_name.data = tmp.url_white_list_category_name
-        # utm_form.url_white_list_action.data = tmp.url_white_list_action
-        # utm_form.fallback_setting_default.data = tmp.fallback_setting_default
-        # utm_form.fallback_setting_server_connectivity.data = tmp.fallback_setting_server_connectivity
-        # utm_form.fallback_setting_timeout.data = tmp.fallback_setting_timeout
-        # utm_form.fallback_setting_too_many_requests.data = tmp.fallback_setting_too_many_requests
-        utm_form.url_filtering_name.data = tmp.url_filtering_name
-        # utm_form.file_ext_name.data = tmp.file_ext_name
-        # utm_form.file_ext_val.data = tmp.file_ext_val
-        # utm_form.mine_name.data = tmp.mine_name
-        # utm_form.mine_val.data = tmp.mine_val
-        # utm_form.ex_mine_name.data = tmp.ex_mine_name
-        # utm_form.ex_mine_val.data = tmp.ex_mine_val
-        utm_form.confilter_name.data = tmp.confilter_name
+        # utm_form.url_filtering_name.data = tmp.url_filtering_name
+        # utm_form.confilter_name.data = tmp.confilter_name
         utm_form.block_contype.data = tmp.block_contype
         utm_form.old_status.data = tmp.old_status
-        utm_form.old_policy_name.data = tmp.old_policy_name
+        # utm_form.old_policy_name.data = tmp.old_policy_name
         utm_form.old_src_zone.data = tmp.old_src_zone
         utm_form.old_dst_zone.data = tmp.old_dst_zone
         utm_form.src_zone.data = tmp.src_zone
@@ -601,10 +627,22 @@ block_contype = [('java-applet', 'java-applet'), ('exe', 'exe'),
 old_status = [('enable', 'enable'), ('noenable', 'noenable')]
 old_src_zone = [('trust', 'trust'), ('untrust', 'untrust')]
 old_dst_zone = [('trust', 'trust'), ('untrust', 'untrust')]
-
+old_policy_name = []
 src_zone = [('trust', 'trust'), ('untrust', 'untrust')]
 dst_zone = [('trust', 'trust'), ('untrust', 'untrust')]
-
+#idp
+rule_src_zone = [('trust', 'trust'), ('untrust', 'untrust')]
+rule_dst_zone = [('trust', 'trust'), ('untrust', 'untrust')]
+idprule_action = [('no-action','no-action'),
+    ('ignore-connection','ignore-connection'),('drop-packet','drop-packet'),
+    ('drop-connection','drop-connection'),('close-client','close-client'),
+    ('close-server','close-server'),('close-client-and-server','close-client-and-server')]
+idprule_sev = [('critical','critical'),('info','info'),('major','major'),('minor','minor'),('warning','warning')]
+predefine_idp = [('enable', 'enable'), ('noenable', 'noenable')]
+custom_idp = [('enable', 'enable'), ('noenable', 'noenable')]
+cus_attack_serverity = [('critical','critical'),('info','info'),('major','major'),('minor','minor'),('warning','warning')]
+cus_attack_action = [('close','close'),('close-client','close-client'),('close-server','close-server'),('drop','drop'),('drop-packet','drop-packet'),('ignore','ignore'),('none','none')]
+cus_attack_direction = [('any','any'),('client-to-server','client-to-server'),('server-to-client','server-to-client')]
 
 class RunForm(Form):
     expr_form = SelectField('matcher', choices=matchers)
@@ -713,88 +751,42 @@ def validate_network_segment(form, field):
 
     # if form.validators.IPAddress(ipv4=True):
 class UTMForm(Form):
-    name = StringField('name', validators=[DataRequired()])  #必填
+    # name = StringField('name', validators=[DataRequired()])  #必填
     anti_virus = SelectField(
         'anti_virus', choices=anti_virus, default='enable')
-    # antivirus_http = SelectField(
-    #     'antivirus_http', choices=antivirus_http, default='enable')
-    # antivirus_smtp = SelectField(
-    #     'antivirus_smtp', choices=antivirus_smtp, default='enable')
-    # antivirus_ftp = SelectField(
-    #     'antivirus_ftp', choices=antivirus_ftp, default='enable')
     anti_spam = SelectField(
         'anti_spam', choices=anti_spam, default='anti_spam')
     antispam_default = SelectField(
-        'antispam_custom', choices=antispam_custom, default='noenable')
+        'antispam_default', choices=antispam_default, default='noenable')
     antispam_custom = SelectField(
         'antispam_custom', choices=antispam_custom, default='enable')
     spam_black_list_value = StringField(
         'url_black_list_value', validators=[DataRequired()])
-    spam_black_list_pattern_name = StringField(
-        'url_black_list_pattern_name', validators=[DataRequired()])
-    # spam_white_list_value = StringField(
-    #     'url_white_list_value', validators=[DataRequired()])
-    # spam_white_list_pattern_name = StringField(
-    #     'url_white_list_pattern_name', validators=[DataRequired()])
-
+    # spam_black_list_pattern_name = StringField(
+    #     'url_black_list_pattern_name', validators=[DataRequired()])
     spam_action = SelectField(
         'spam_action', choices=spam_action, default='block')
-    # custom_tag_string = StringField(
-    #     'custom_tag_string', validators=[DataRequired()], default='***spam***')
-    sbl_profile_name = StringField(
-        'sbl_profile_name', validators=[DataRequired()])
+    # sbl_profile_name = StringField(
+    #     'sbl_profile_name', validators=[DataRequired()])
 
     url_filtering = SelectField(
         'url_filtering', choices=url_filtering, default='enable')
     url_black_list_value = StringField(
         'url_black_list_value', validators=[DataRequired()])
-    url_black_list_pattern_name = StringField(
-        'url_black_list_pattern_name', validators=[DataRequired()])
-    url_black_list_category_name = StringField(
-        'url_black_list_category_name', validators=[DataRequired()])
+    # url_black_list_pattern_name = StringField(
+    #     'url_black_list_pattern_name', validators=[DataRequired()])
+    # url_black_list_category_name = StringField(
+    #     'url_black_list_category_name', validators=[DataRequired()])
     url_black_list_action = SelectField(
         'url_black_list_action',
         choices=url_black_list_action,
         default='block')
-    # url_white_list_value = StringField(
-    #     'url_white_list_value', validators=[DataRequired()])
-    # url_white_list_pattern_name = StringField(
-    #     'url_white_list_pattern_name', validators=[DataRequired()])
-    # url_white_list_category_name = StringField(
-    #     'url_white_list_category_name', validators=[DataRequired()])
-    # url_white_list_action = SelectField(
-    #     'url_white_list_action',
-    #     choices=url_white_list_action,
-    #     default='permit')
-
-    # fallback_setting_default = SelectField(
-    #     'fallback_setting_default',
-    #     choices=fallback_setting_default,
-    #     default='block')
-    # fallback_setting_server_connectivity = SelectField(
-    #     'fallback_setting_server_connectivity',
-    #     choices=fallback_setting_server_connectivity,
-    #     deafult='block')
-    # fallback_setting_timeout = SelectField(
-    #     'fallback_setting_timeout',
-    #     choices=fallback_setting_timeout,
-    #     default='block')
-    # fallback_setting_too_many_requests = SelectField(
-    #     'fallback_setting_too_many_requests',
-    #     choices=fallback_setting_too_many_requests,
-    #     default='block')
-    url_filtering_name = StringField(
-        'url_filtering_name', validators=[DataRequired()])
-
-    # file_ext_name = StringField('file_ext_name', validators=[DataRequired()])
-    # file_ext_val = StringField('file_ext_val', validators=[DataRequired()])
-    # mine_name = StringField('mine_name', validators=[DataRequired()])
-    # mine_val = StringField('mine_val', validators=[DataRequired()])
-    # ex_mine_name = StringField('ex_mine_name', validators=[DataRequired()])
-    # ex_mine_val = StringField('ex_mine_val', validators=[DataRequired()])
+    
+    # url_filtering_name = StringField(
+    #     'url_filtering_name', validators=[DataRequired()])
     content_filtering = SelectField(
         'content_filtering', choices=content_filtering, default='enable')
-    confilter_name = StringField('confilter_name', validators=[DataRequired()])
+    # confilter_name = StringField('confilter_name', validators=[DataRequired()])
     block_contype = StringField('block_contype', validators=[DataRequired()])
 
     old_status = SelectField(
@@ -810,8 +802,8 @@ class UTMForm(Form):
         'src_address', validators=[DataRequired()], default='any')
     dst_address = StringField(
         'dst_address', validators=[DataRequired()], default='any')
-    new_policy_name = StringField(
-        'new_policy_name', validators=[DataRequired()])
+    # new_policy_name = StringField(
+    #     'new_policy_name', validators=[DataRequired()])
 
 
 class NewTemplateForm(RunForm):
@@ -1169,6 +1161,17 @@ def del_UTM_tempalte():
     db_session.commit()
     return jsonify(errmsg="success", data='0')
 
+@app.route('/templates/IDP/delete', methods=['POST'])
+@login_required
+def del_IDP_tempalte():
+    IDP_name = request.json['name']
+    tmp = db_session.query(IDP).filter_by(name=IDP_name).first()
+    if tmp.name == None:
+        return jsonify(errmsg="No such tempalte", data='2')
+    db_session.delete(tmp)
+    db_session.commit()
+    return jsonify(errmsg="success", data='0')
+
 
 @app.route('/templates/VPN/modify', methods=['POST'])
 @login_required
@@ -1243,11 +1246,24 @@ def query_UTM_tempalte():
     tmp = db_session.query(UTM).filter_by(name=UTM_name).first()
     return jsonify(errmsg="success", data=json.dumps(tmp, default=UTM2dict))
 
+@app.route('/templates/IDP/query', methods=['POST'])
+@login_required
+def query_IDP_tempalte():
+    UTM_name = request.json['name']
+    tmp = db_session.query(IDP).filter_by(name=IDP_name).first()
+    return jsonify(errmsg="success", data=json.dumps(tmp, default=UTM2dict))
+
 
 @app.route('/templates/UTM/all', methods=['GET'])
 @login_required
-def query_allUTM_tempalte():
+def query_all_UTM_tempalte():
     tmp = db_session.query(UTM).all()
+    return jsonify(errmsg="success", data=json.dumps(tmp, default=UTM2dict))
+
+@app.route('/templates/IDP/all', methods=['GET'])
+@login_required
+def query_all_IDP_tempalte():
+    tmp = db_session.query(IDP).all()
     return jsonify(errmsg="success", data=json.dumps(tmp, default=UTM2dict))
 
 
@@ -1269,59 +1285,19 @@ def UTM2dict(utms):
             "name": utm.name,
             "content_filtering": utm.content_filtering,
             "anti_virus": utm.anti_virus,
-            # "antivirus_http":
-            # utm.antivirus_http,
-            # "antivirus_smtp":
-            # utm.antivirus_smtp,
-            # "antivirus_ftp":
-            # utm.antivirus_ftp,
             "anti_spam": utm.anti_spam,
             "antispam_default": utm.antispam_default,
             "antispam_custom": utm.antispam_custom,
             "url_filtering": utm.url_filtering,
             "spam_black_list_value": utm.spam_black_list_value,
             "spam_black_list_pattern_name": utm.spam_black_list_pattern_name,
-            # "spam_white_list_value":
-            # utm.spam_white_list_value,
-            # "spam_white_list_pattern_name":
-            # utm.spam_white_list_pattern_name,
             "spam_action": utm.spam_action,
-            # "custom_tag_string":
-            # utm.custom_tag_string,
             "sbl_profile_name": utm.sbl_profile_name,
             "url_black_list_value": utm.url_black_list_value,
             "url_black_list_pattern_name": utm.url_black_list_pattern_name,
             "url_black_list_category_name": utm.url_black_list_category_name,
             "url_black_list_action": utm.url_black_list_action,
-            # "url_white_list_value":
-            # utm.url_white_list_value,
-            # "url_white_list_pattern_name":
-            # utm.url_white_list_pattern_name,
-            # "url_white_list_category_name":
-            # utm.url_white_list_category_name,
-            # "url_white_list_action":
-            # utm.url_white_list_action,
-            # "fallback_setting_default":
-            # utm.fallback_setting_default,
-            # "fallback_setting_server_connectivity":
-            # utm.fallback_setting_server_connectivity,
-            # "fallback_setting_timeout":
-            # utm.fallback_setting_timeout,
-            # "fallback_setting_too_many_requests":
-            # utm.fallback_setting_too_many_requests,
             "url_filtering_name": utm.url_filtering_name,
-            # "file_ext_name":
-            # utm.file_ext_name,
-            # "file_ext_val":
-            # utm.file_ext_val,
-            # "mine_name":
-            # utm.mine_name,
-            # "mine_val":
-            # utm.mine_val,
-            # "ex_mine_name":
-            # utm.ex_mine_name,
-            # "ex_mine_val":
-            # utm.ex_mine_val,
             "confilter_name": utm.confilter_name,
             "block_contype": utm.block_contype,
             "old_status": utm.old_status,

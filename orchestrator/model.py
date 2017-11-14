@@ -294,3 +294,58 @@ class UTM(db.Model):
     def __repr__(self):
         return '<name %r>' % self.name
 
+class IDP(db.Model):
+    __tablename__ = 'IDP'
+    
+    tid = db.Column(db.Integer, primary_key = True, autoincrement = True)
+    name = db.Column(db.String(255), unique = True)
+    rule_src_zone = db.Column(db.String(30), nullable = False)
+    rule_dst_zone = db.Column(db.String(30), nullable = False)
+    idprule_action = db.Column(db.String(30),nullable = False)
+    idprule_sev = db.Column(db.String(30), nullable = False)
+    predefine_idp = db.Column(db.String(30), nullable = False)
+    custom_idp = db.Column(db.String(30), nullable = False)
+    cus_attack_name = db.Column(db.String(300), nullable = False)
+    cus_attack_serverity = db.Column(db.String(30), nullable = False)
+    cus_attack_action = db.Column(db.String(30), nullable = False)
+    cus_attack_direction = db.Column(db.String(30), nullable = False)
+
+    old_status = db.Column(db.String(30),nullable = False)
+    old_policy_name = db.Column(db.String(30),nullable = False)
+    old_src_zone = db.Column(db.String(30),nullable = False)
+    old_dst_zone = db.Column(db.String(30),nullable = False)
+
+    src_zone = db.Column(db.String(30),nullable = False)
+    dst_zone = db.Column(db.String(30),nullable = False)
+    src_address = db.Column(db.String(30),nullable = False)
+    dst_address = db.Column(db.String(30),nullable = False)
+    new_policy_name = db.Column(db.String(30),nullable = False)
+
+    def __init__(self, tid, name, rule_src_zone, rule_dst_zone, 
+    idprule_action, idprule_sev, predefine_idp, custom_idp,
+    cus_attack_name, cus_attack_serverity, cus_attack_action, cus_attack_direction,
+    old_status, old_policy_name, old_src_zone, old_dst_zone,
+    src_zone, dst_zone, src_address, dst_address, new_policy_name):
+        self.name = name
+        self.rule_src_zone = rule_src_zone
+        self.rule_dst_zone = rule_dst_zone
+        self.idprule_action = idprule_action
+        self.idprule_sev = idprule_sev
+        self.predefine_idp = predefine_idp
+        self.custom_idp = custom_idp
+        self.cus_attack_name = cus_attack_name
+        self.cus_attack_serverity = cus_attack_serverity
+        self.cus_attack_action = cus_attack_action
+        self.cus_attack_direction = cus_attack_direction
+        self.old_status = old_status
+        self.old_policy_name = old_policy_name
+        self.old_src_zone = old_src_zone
+        self.old_dst_zone = old_dst_zone
+        self.src_zone = src_zone
+        self.dst_zone = dst_zone
+        self.src_address = src_address
+        self.dst_address = dst_address
+        self.new_policy_name = new_policy_name
+
+    def __repr__(self):
+        return '<name %r>' % self.name
