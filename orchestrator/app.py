@@ -353,46 +353,46 @@ def run_template(template):
 def add_template():
     vpn_form = VPNForm()
     utm_form = UTMForm()
-    print('post 1')  
     #获取utm数据库数据的条目数量
     utm_num = db_session.query(UTM).count() 
     utm_num = utm_num + 1
-    utm_name = "Basic_UTM_" + utm_num 
-    utm_spam_black_list_pattern_name = "url_black_" + utm_num
-    utm_sbl_profile_name = "antispam_sblpro_" + utm_num
-    utm_url_black_list_pattern_name = "utl_black_" + utm_num + utm_num
-    utm_url_black_list_category_name = "utl_category_black_" + utm_num
-    utm_url_filtering_name = "surfprofile_" + utm_num
-    utm_confilter_name = "confilter_profile_" + utm_num
-    utm_new_policy_name = "Client_Outbound_" + utm_num
-    utm_old_policy_name = ""
+    utm_name = "Basic_UTM_" + str(utm_num) 
+    utm_spam_black_list_pattern_name = "url_black_" + str(utm_num) 
+    utm_sbl_profile_name = "antispam_sblpro_" + str(utm_num) 
+    utm_url_black_list_pattern_name = "url_black_" + str(utm_num)  + str(utm_num) 
+    utm_url_black_list_category_name = "url_category_black_" + str(utm_num) 
+    utm_url_filtering_name = "surfprofile_" + str(utm_num) 
+    utm_confilter_name = "confilter_profile_" + str(utm_num) 
+    utm_new_policy_name = "Client_Outbound_" + str(utm_num) 
+    utm_old_policy_name = "Client-Outbound-3,untrust,trust"
+    print('post 1')  
 
     
 
-    # 获取旧的policy
-    ff = subprocess("salt '*' test.ping",shell = True)
-    f = subprocess("salt LTE-node2-agent junos.rpc 'get-firewall-policies'",shell = True)
+    # # 获取旧的policy
+    # ff = subprocess("salt '*' test.ping",shell = True)
+    # f = subprocess("salt LTE-node2-agent junos.rpc 'get-firewall-policies'",shell = True)
     
-    for line in f:
-        if 'policy_name' in line:
-            d = dict()
-            str_name = line.strip().strip(':')
-            print(str_name)
-            str_command = "salt LTE-node2-agent junos.rpc 'get-firewall-policies' policy-name="+ str_name 
-            command = subprocess(str_command,shell = True)
-            for l in command:
-                if 'destination-zone-name' in l:
-                    str_name = str_name +","+ l.strip().strip(':')
-                    print(str_name)
-                if 'source-zone-name' in l:
-                    str_name = str_name + ","+ l.strip().strip(':')
-                    print(str_name)
-            d[str_name] = str_name
-            utm_old_policy_name = str_name
-            old_policy_name.append(d)
+    # for line in f:
+    #     if 'policy_name' in line:
+    #         d = dict()
+    #         str_name = line.strip().strip(':')
+    #         print(str_name)
+    #         str_command = "salt LTE-node2-agent junos.rpc 'get-firewall-policies' policy-name="+ str_name 
+    #         command = subprocess(str_command,shell = True)
+    #         for l in command:
+    #             if 'destination-zone-name' in l:
+    #                 str_name = str_name +","+ l.strip().strip(':')
+    #                 print(str_name)
+    #             if 'source-zone-name' in l:
+    #                 str_name = str_name + ","+ l.strip().strip(':')
+    #                 print(str_name)
+    #         d[str_name] = str_name
+    #         utm_old_policy_name = str_name
+    #         old_policy_name.append(d)
     
     if vpn_form.validate_on_submit():
-        print('post 2')    
+        print('post 2') 
                 
         # ((?:(?:25[0-5]|2[0-4]\d|(?:1\d{2}|[1-9]?\d))\.){3}(?:25[0-5]|2[0-4]\d|(?:1\d{2}|[1-9]?\d)))/24
         tmp = VPN(vpn_form.name.data, vpn_form.LTE_cloudGW.data,
@@ -416,7 +416,7 @@ def add_template():
         flash('template saved successfully')
         return redirect(url_for('templates'))
     if utm_form.validate_on_submit():
-        
+        print('post 3')    
         tmp = UTM(utm_form.anti_virus.data,
         utm_form.content_filtering.data,
         utm_form.anti_virus.data,
@@ -440,6 +440,7 @@ def add_template():
         utm_form.dst_address.data
         )
         tmp.name = utm_name
+        print("tmp.name is ",tmp.name)
         tmp.spam_black_list_pattern_name = utm_spam_black_list_pattern_name
         tmp.sbl_profile_name = utm_sbl_profile_name
         tmp.url_black_list_pattern_name = utm_url_black_list_pattern_name
@@ -650,7 +651,7 @@ block_contype = [('java-applet', 'java-applet'), ('exe', 'exe'),
 old_status = [('enable', 'enable'), ('noenable', 'noenable')]
 # old_src_zone = [('trust', 'trust'), ('untrust', 'untrust')]
 # old_dst_zone = [('trust', 'trust'), ('untrust', 'untrust')]
-old_policy_name = []#[('Client-Outbound-2','Client-Outbound-2,untrust,trust'),('Client-Outbound-1','Client-Outbound-1,untrust,trust'),('Client-Outbound-3','Client-Outbound-3,untrust,trust')]
+old_policy_name = [('Client-Outbound-2','Client-Outbound-2,untrust,trust'),('Client-Outbound-1','Client-Outbound-1,untrust,trust'),('Client-Outbound-3','Client-Outbound-3,untrust,trust')]
 src_zone = [('trust', 'trust'), ('untrust', 'untrust')]
 dst_zone = [('trust', 'trust'), ('untrust', 'untrust')]
 #idp

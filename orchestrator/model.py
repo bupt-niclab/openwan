@@ -224,21 +224,21 @@ class UTM(db.Model):
     antispam_default = db.Column(db.String(30),nullable = False)
     antispam_custom = db.Column(db.String(30),nullable = False)
     
-    spam_black_list_value = db.Column(db.String(300),nullable = False)
-    spam_black_list_pattern_name = db.Column(db.String(30),nullable = False)
-    spam_action = db.Column(db.String(30),nullable = False)
-    sbl_profile_name = db.Column(db.String(50),nullable = False)
+    spam_black_list_value = db.Column(db.String(300),nullable = True)
+    spam_black_list_pattern_name = db.Column(db.String(30),nullable = True)
+    spam_action = db.Column(db.String(30),nullable = True)
+    sbl_profile_name = db.Column(db.String(50),nullable = True)
 
     url_filtering = db.Column(db.String(30),nullable = False)
-    url_black_list_value = db.Column(db.String(300),nullable = False)
-    url_black_list_pattern_name = db.Column(db.String(30),nullable = False)
-    url_black_list_category_name = db.Column(db.String(50),nullable = False)
-    url_black_list_action = db.Column(db.String(30),nullable = False)
-    url_filtering_name = db.Column(db.String(30),nullable = False)
+    url_black_list_value = db.Column(db.String(300),nullable = True)
+    url_black_list_pattern_name = db.Column(db.String(30),nullable = True)
+    url_black_list_category_name = db.Column(db.String(50),nullable = True)
+    url_black_list_action = db.Column(db.String(30),nullable = True)
+    url_filtering_name = db.Column(db.String(30),nullable = True)
 
 
-    confilter_name = db.Column(db.String(30),nullable = False)
-    block_contype = db.Column(db.String(30),nullable = False)
+    confilter_name = db.Column(db.String(30),nullable = True)
+    block_contype = db.Column(db.String(30),nullable = True)
 
     old_status = db.Column(db.String(30),nullable = False)
     old_policy_name = db.Column(db.String(30),nullable = False)
