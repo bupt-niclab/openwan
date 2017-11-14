@@ -364,16 +364,31 @@ def add_template():
     utm_url_black_list_category_name = "utl_category_black_" + utm_num
     utm_url_filtering_name = "surfprofile_" + utm_num
     utm_confilter_name = "confilter_profile_" + utm_num
+    utm_new_policy_name = "Client_Outbound_" + utm_num
+    utm_old_policy_name = None
+
     
 
     # 获取旧的policy
     ff = subprocess("salt '*' test.ping",shell = True)
-    f = subprocess("salt junos.rpc 'get-firewall-policies'",shell = True)
+    f = subprocess("salt LTE-node2-agent junos.rpc 'get-firewall-policies'",shell = True)
+    
     for line in f:
         if 'policy_name' in line:
             d = dict()
             str_name = line.strip().strip(':')
+            print(str_name)
+            str_command = "salt LTE-node2-agent junos.rpc 'get-firewall-policies' policy-name="+ str_name 
+            command = subprocess(str_command,shell = True)
+            for l in command:
+                if 'destination-zone-name' in l:
+                    str_name = str_name +","+ l.strip().strip(':')
+                    print(str_name)
+                if 'source-zone-name' in l:
+                    str_name = str_name + ","+ l.strip().strip(':')
+                    print(str_name)
             d[str_name] = str_name
+            utm_old_policy_name = str_name
             old_policy_name.append(d)
     
     if vpn_form.validate_on_submit():
@@ -402,7 +417,6 @@ def add_template():
         return redirect(url_for('templates'))
     if utm_form.validate_on_submit():
         
-        # name = "policy"
         tmp = UTM(utm_form.anti_virus.data,
         utm_form.content_filtering.data,
         utm_form.anti_virus.data,
@@ -410,23 +424,32 @@ def add_template():
         utm_form.antispam_default.data,
         utm_form.antispam_custom.data,
         utm_form.spam_black_list_value.data,
-        utm_form.spam_black_list_pattern_name.data,
+        # utm_form.spam_black_list_pattern_name.data,
         utm_form.spam_action.data,
         utm_form.url_filtering.data,
         utm_form.url_black_list_value.data,
         utm_form.url_black_list_action.data,
         utm_form.block_contype.data,
         utm_form.old_status.data,
+        utm_form.old_policy_name.data,
         utm_form.old_src_zone.data,
         utm_form.old_dst_zone.data,
         utm_form.src_zone.data,
         utm_form.dst_zone.data,
         utm_form.src_address.data,
-        utm_form.dst_address.data,
-
-
+        utm_form.dst_address.data
         )
-
+        tmp.name = utm_name
+        tmp.spam_black_list_pattern_name = utm_spam_black_list_pattern_name
+        tmp.sbl_profile_name = utm_sbl_profile_name
+        tmp.url_black_list_pattern_name = utm_url_black_list_pattern_name
+        tmp.url_black_list_category_name = utm_url_black_list_category_name
+        tmp.url_filtering_name = utm_url_filtering_name
+        tmp.confilter_name = utm_confilter_name
+        tmp.new_policy_name = utm_new_policy_name
+        tmp.old_policy_name = utm_old_policy_name.strip(',')[0]
+        tmp.old_dst_zone = utm_old_policy_name.strip(',')[1]
+        tmp.old_src_zone = utm_old_policy_name.strip(',')[2]
         db_session.add(tmp)
         db_session.commit()
         flash('template saved successfully')
@@ -529,7 +552,7 @@ def edit_UTM_template(tid):
         # utm_form.confilter_name.data = tmp.confilter_name
         utm_form.block_contype.data = tmp.block_contype
         utm_form.old_status.data = tmp.old_status
-        # utm_form.old_policy_name.data = tmp.old_policy_name
+        utm_form.old_policy_name.data = tmp.old_policy_name
         utm_form.old_src_zone.data = tmp.old_src_zone
         utm_form.old_dst_zone.data = tmp.old_dst_zone
         utm_form.src_zone.data = tmp.src_zone
@@ -625,8 +648,8 @@ block_contype = [('java-applet', 'java-applet'), ('exe', 'exe'),
 # fallback_setting_too_many_requests = [('block', 'block'), ('log and permit',
 #    'log and permit')]
 old_status = [('enable', 'enable'), ('noenable', 'noenable')]
-old_src_zone = [('trust', 'trust'), ('untrust', 'untrust')]
-old_dst_zone = [('trust', 'trust'), ('untrust', 'untrust')]
+# old_src_zone = [('trust', 'trust'), ('untrust', 'untrust')]
+# old_dst_zone = [('trust', 'trust'), ('untrust', 'untrust')]
 old_policy_name = []
 src_zone = [('trust', 'trust'), ('untrust', 'untrust')]
 dst_zone = [('trust', 'trust'), ('untrust', 'untrust')]
@@ -751,7 +774,7 @@ def validate_network_segment(form, field):
 
     # if form.validators.IPAddress(ipv4=True):
 class UTMForm(Form):
-    # name = StringField('name', validators=[DataRequired()])  #必填
+    name = StringField('name', validators=[DataRequired()])  #必填
     anti_virus = SelectField(
         'anti_virus', choices=anti_virus, default='enable')
     anti_spam = SelectField(
@@ -762,31 +785,31 @@ class UTMForm(Form):
         'antispam_custom', choices=antispam_custom, default='enable')
     spam_black_list_value = StringField(
         'url_black_list_value', validators=[DataRequired()])
-    # spam_black_list_pattern_name = StringField(
-    #     'url_black_list_pattern_name', validators=[DataRequired()])
+    spam_black_list_pattern_name = StringField(
+        'url_black_list_pattern_name', validators=[DataRequired()])
     spam_action = SelectField(
         'spam_action', choices=spam_action, default='block')
-    # sbl_profile_name = StringField(
-    #     'sbl_profile_name', validators=[DataRequired()])
+    sbl_profile_name = StringField(
+        'sbl_profile_name', validators=[DataRequired()])
 
     url_filtering = SelectField(
         'url_filtering', choices=url_filtering, default='enable')
     url_black_list_value = StringField(
         'url_black_list_value', validators=[DataRequired()])
-    # url_black_list_pattern_name = StringField(
-    #     'url_black_list_pattern_name', validators=[DataRequired()])
-    # url_black_list_category_name = StringField(
-    #     'url_black_list_category_name', validators=[DataRequired()])
+    url_black_list_pattern_name = StringField(
+        'url_black_list_pattern_name', validators=[DataRequired()])
+    url_black_list_category_name = StringField(
+        'url_black_list_category_name', validators=[DataRequired()])
     url_black_list_action = SelectField(
         'url_black_list_action',
         choices=url_black_list_action,
         default='block')
     
-    # url_filtering_name = StringField(
-    #     'url_filtering_name', validators=[DataRequired()])
+    url_filtering_name = StringField(
+        'url_filtering_name', validators=[DataRequired()])
     content_filtering = SelectField(
         'content_filtering', choices=content_filtering, default='enable')
-    # confilter_name = StringField('confilter_name', validators=[DataRequired()])
+    confilter_name = StringField('confilter_name', validators=[DataRequired()])
     block_contype = StringField('block_contype', validators=[DataRequired()])
 
     old_status = SelectField(
@@ -802,8 +825,8 @@ class UTMForm(Form):
         'src_address', validators=[DataRequired()], default='any')
     dst_address = StringField(
         'dst_address', validators=[DataRequired()], default='any')
-    # new_policy_name = StringField(
-    #     'new_policy_name', validators=[DataRequired()])
+    new_policy_name = StringField(
+        'new_policy_name', validators=[DataRequired()])
 
 
 class NewTemplateForm(RunForm):
