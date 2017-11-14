@@ -115,7 +115,7 @@ client = FlaskHTTPSaltStackClient(app.config['API_URL'],
                                   app.config.get('VERIFY_SSL', True))
 
 from flask_wtf import FlaskForm as Form
-from wtforms import StringField, PasswordField, TextAreaField, SelectField
+from wtforms import StringField, PasswordField, TextAreaField, SelectField, SelectMultipleField
 from wtforms.validators import DataRequired
 
 
@@ -810,7 +810,7 @@ class UTMForm(Form):
     content_filtering = SelectField(
         'content_filtering', choices=content_filtering, default='enable')
     confilter_name = StringField('confilter_name', validators=[DataRequired()])
-    block_contype = StringField('block_contype', validators=[DataRequired()])
+    block_contype = SelectMultipleField('block_contype', choices=block_contype, validators=[DataRequired()])
 
     old_status = SelectField(
         'old_status', choices=old_status, default='enable')

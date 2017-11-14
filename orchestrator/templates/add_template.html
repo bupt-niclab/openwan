@@ -102,17 +102,14 @@
                     {{ render_field(utm_form.spam_black_list_value)}}
                     {{ render_field(utm_form.spam_black_list_pattern_name)}}
                     {{ render_field(utm_form.spam_action)}}
-                    {{ render_field(utm_form.sbl_profile_name)}}
                     <br/>                    
                     {{ render_field(utm_form.url_filtering)}}
                     {{ render_field(utm_form.url_black_list_value)}}
                     {{ render_field(utm_form.url_black_list_pattern_name)}}
                     {{ render_field(utm_form.url_black_list_category_name)}}
                     {{ render_field(utm_form.url_black_list_action)}}
-                    {{ render_field(utm_form.url_filtering_name)}}
                     <br/>                    
                     {{ render_field(utm_form.content_filtering)}}
-                    {{ render_field(utm_form.confilter_name)}}
                     {{ render_field(utm_form.block_contype)}}
                     {{ render_field(utm_form.old_status)}}
                     {{ render_field(utm_form.old_policy_name)}}
@@ -157,31 +154,50 @@ $(function(){
 
   var anti_spam = $('#anti_virus');
   var antispam_default = $('#antispam_default');
+  var form_antispam_default = $('#form-group-antispam_default');
   var antispam_custom = $('#antispam_custom');
+  var form_antispam_custom = $('#form-group-antispam_custom');  
   var spam_black_list_value = $('#spam_black_list_value');
+  var form_spam_black_list_value = $('#form-group-spam_black_list_value');
   var spam_black_list_pattern_name = $('#spam_black_list_pattern_name');
+  var form_spam_black_list_pattern_name = $('#form-group-spam_black_list_pattern_name');
   var spam_action = $('#spam_action');
-  var sbl_profile_name = $('#sbl_profile_name');
+  var form_spam_action = $('#form-group-spam_action');
+  // var sbl_profile_name = $('#sbl_profile_name');
 
   var url_filtering = $('#url_filtering');
   var url_black_list_value = $('#url_black_list_value');
+  var form_url_black_list_value = $('#form-group-url_black_list_value');  
   var url_black_list_pattern_name = $('#url_black_list_pattern_name');
+  var form_url_black_list_pattern_name = $('#form-group-url_black_list_pattern_name');  
   var url_black_list_category_name = $('#url_black_list_category_name');
+  var form_url_black_list_category_name = $('#form-group-url_black_list_category_name');  
   var url_black_list_action = $('#url_black_list_action');
-  var url_filtering_name = $('#url_filtering_name');
+  var form_url_black_list_action = $('#form-group-url_black_list_action'); 
+  // var url_filtering_name = $('#url_filtering_name');
 
   var content_filtering = $('#content_filtering');
-  var confilter_name = $('#confilter_name');
+  // var confilter_name = $('#confilter_name');
   var block_contype = $('#block_contype');
+  var form_block_contype = $('#form-group-block_contype');
+
   var old_status = $('#old_status');
   var old_policy_name = $('#old_policy_name');
+  var form_old_policy_name = $('#form-group-old_policy_name');  
   var old_src_zone = $('#old_src_zone');
+  var form_old_src_zone = $('#form-group-old_src_zone');  
   var old_dst_zone = $('#old_dst_zone');
+  var form_old_dst_zone = $('#form-group-old_dst_zone');  
   var src_zone = $('#src_zone');
+  var form_src_zone = $('#form-group-src_zone');  
   var dst_zone = $('#dst_zone');
+  var form_dst_zone = $('#form-group-dst_zone');  
   var src_address = $('#src_address');
+  var form_src_address = $('#form-group-src_address');  
   var dst_address = $('#dst_address');
+  var form_dst_address = $('#form-group-dst_address');  
   var new_policy_name = $('#new_policy_name');
+  var form_new_policy_name = $('#form-group-new_policy_name');  
   
   anti_spam.change(function(){
     var val = $(this).val();    
@@ -196,13 +212,17 @@ $(function(){
     var val = $(this).val();
     if (val === 'enable') {
       antispam_custom.val('noenable');
+      show_antispam_custom(false);                
     } else {
-      antispam_custom.val('enable');      
+      antispam_custom.val('enable');   
+      show_antispam_custom(true);         
     }
   });
 
   antispam_custom.change(function(){
     var val = $(this).val();
+    console.log('changed');
+    
     if (val === 'enable') {
       antispam_default.val('noenable');
       show_antispam_custom(true);
@@ -229,6 +249,81 @@ $(function(){
       show_content_filtering(false);      
     }
   });
+
+  old_status.change(function(){
+    var val = $(this).val();
+    if (val === 'enable') {
+      show_old_policy(true);
+    } else {
+      show_old_policy(false);
+    }    
+  });
+
+
+  function show_anti_spam(flag) {
+    if (flag) {
+      form_antispam_default.show();
+      form_antispam_custom.show();
+    } else {
+      form_antispam_default.hide();
+      form_antispam_custom.hide();
+    }
+  }
+  function show_antispam_custom(flag) {
+    if (flag) {
+      form_spam_action.show();
+      form_spam_black_list_pattern_name.show();
+      form_spam_black_list_value.show();
+    } else {
+      form_spam_action.hide();
+      form_spam_black_list_pattern_name.hide();
+      form_spam_black_list_value.hide();
+    }
+  }
+  function show_url_filtering(flag) {
+    if (flag) {
+      form_url_black_list_value.show();
+      form_url_black_list_pattern_name.show();
+      form_url_black_list_category_name.show();
+      form_url_black_list_action.show();
+    } else {
+      form_url_black_list_value.hide();
+      form_url_black_list_pattern_name.hide();
+      form_url_black_list_category_name.hide();
+      form_url_black_list_action.hide();
+    }
+  }
+  function show_content_filtering(flag) {
+    if (flag) {
+      form_block_contype.show();
+    } else {
+      form_block_contype.hide();
+    }
+  }
+  function show_old_policy(flag) {
+    if (flag) {
+      form_old_policy_name.show();
+      form_old_src_zone.show();
+      form_old_dst_zone.show();
+      form_src_zone.hide();
+      form_dst_zone.hide();
+      form_src_address.hide();
+      form_dst_address.hide();
+      form_new_policy_name.hide();
+    } else {
+      form_old_policy_name.hide();
+      form_old_src_zone.hide();
+      form_old_dst_zone.hide();
+      form_src_zone.show();
+      form_dst_zone.show();
+      form_src_address.show();
+      form_dst_address.show();
+      form_new_policy_name.show();
+    }
+  }
+
+  show_old_policy(true);
+  
 
 });
 </script>

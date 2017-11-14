@@ -45,6 +45,7 @@ venv/
 # custom
 mobile-topo/
 .vscode/
+template.sqlite
 
 # flask-assets
 .webassets-cache/
