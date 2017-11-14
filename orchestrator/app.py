@@ -436,7 +436,7 @@ def add_template():
                   utm_form.src_zone.data,
                   utm_form.dst_zone.data,
                   utm_form.src_address.data,
-                  utm_form.dst_address.data
+                  utm_form.dst_address.data,
         )
         tmp.name = utm_name
         print("tmp.name is ",tmp.name)
@@ -571,11 +571,6 @@ def edit_UTM_template(tid):
             'dst_address':utm_form.dst_address.data,
         })
         db_session.commit()
-        # tmp2 = UTM(utm_form.name.data, utm.content_filtering.data
-        #            #todo
-        #            )
-        # db_session.add(tmp2)
-        # db_session.commit()
         flash('template saved successfully')
         return redirect(url_for('templates'))
 
@@ -798,7 +793,7 @@ class UTMForm(Form):
     spam_action = SelectField(
         'spam_action', choices=spam_action, default='block')
     sbl_profile_name = StringField(
-        'sbl_profile_name')
+        'sbl_profile_name', validators=[DataRequired()])
 
     url_filtering = SelectField(
         'url_filtering', choices=url_filtering, default='enable')
@@ -814,10 +809,10 @@ class UTMForm(Form):
         default='block')
     
     url_filtering_name = StringField(
-        'url_filtering_name')
+        'url_filtering_name', validators=[DataRequired()])
     content_filtering = SelectField(
         'content_filtering', choices=content_filtering, default='enable')
-    confilter_name = StringField('confilter_name')
+    confilter_name = StringField('confilter_name', validators=[DataRequired()])
     block_contype = SelectMultipleField('block_contype', choices=block_contype, validators=[DataRequired()])
 
     old_status = SelectField(
