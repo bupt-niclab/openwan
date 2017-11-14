@@ -418,26 +418,25 @@ def add_template():
     if utm_form.validate_on_submit():
         print('post 3')    
         tmp = UTM(utm_form.anti_virus.data,
-        utm_form.content_filtering.data,
-        utm_form.anti_virus.data,
-        utm_form.anti_spam.data,
-        utm_form.antispam_default.data,
-        utm_form.antispam_custom.data,
-        utm_form.spam_black_list_value.data,
-        # utm_form.spam_black_list_pattern_name.data,
-        utm_form.spam_action.data,
-        utm_form.url_filtering.data,
-        utm_form.url_black_list_value.data,
-        utm_form.url_black_list_action.data,
-        utm_form.block_contype.data,
-        utm_form.old_status.data,
-        utm_form.old_policy_name.data,
-        utm_form.old_src_zone.data,
-        utm_form.old_dst_zone.data,
-        utm_form.src_zone.data,
-        utm_form.dst_zone.data,
-        utm_form.src_address.data,
-        utm_form.dst_address.data
+                  utm_form.content_filtering.data,
+                  utm_form.anti_virus.data,
+                  utm_form.anti_spam.data,
+                  utm_form.antispam_default.data,
+                  utm_form.antispam_custom.data,
+                  utm_form.spam_black_list_value.data,
+                  # utm_form.spam_black_list_pattern_name.data,
+                  utm_form.spam_action.data,
+                  utm_form.url_filtering.data,
+                  utm_form.url_black_list_value.data,
+                  utm_form.url_black_list_action.data,
+                  utm_form.old_status.data,
+                  utm_form.old_policy_name.data,
+                  utm_form.old_src_zone.data,
+                  utm_form.old_dst_zone.data,
+                  utm_form.src_zone.data,
+                  utm_form.dst_zone.data,
+                  utm_form.src_address.data,
+                  utm_form.dst_address.data
         )
         tmp.name = utm_name
         print("tmp.name is ",tmp.name)
@@ -478,13 +477,10 @@ def edit_VPN_template(tid):
         vpn_form.name.data = tmp.name
         vpn_form.LTE_cloudGW.data = tmp.LTE_cloudGW
         vpn_form.LTE_external_interface.data = tmp.LTE_external_interface
-        # vpn_form.LTE_internal_interface.data = tmp.LTE_internal_interface
         vpn_form.LTE_local_identity.data = tmp.LTE_local_identity
         vpn_form.LTE_remote_identity.data = tmp.LTE_remote_identity
         vpn_form.cloud_external_interface.data = tmp.cloud_external_interface
-        # vpn_form.cloud_internal_interface.data = tmp.cloud_internal_interface
         vpn_form.cloud_local_address.data = tmp.cloud_local_address
-        # vpn_form.network_segment.data = tmp.network_segment
         vpn_form.phase1_dh_group.data = tmp.phase1_dh_group
         vpn_form.phase1_authentication_algorithm.data = tmp.phase1_authentication_algorithm
         vpn_form.phase1_encryption_algorithm.data = tmp.phase1_encryption_algorithm
@@ -494,50 +490,28 @@ def edit_VPN_template(tid):
         vpn_form.phase2_authentication_algorithm.data = tmp.phase2_authentication_algorithm
         vpn_form.phase2_encryption_algorithm.data = tmp.phase2_encryption_algorithm
         vpn_form.phase2_perfect_forward_secrecy_keys.data = tmp.phase2_perfect_forward_secrecy_keys
-        # vpn_form.ipsec_protocol.data = tmp.ipsec_protocol
-        # probe_form = ProbeForm()
 
     if vpn_form.validate_on_submit():
-        tmp2 = db_session.query(VPN).filter_by(tid = tid).update({
-            VPN.name : vpn_form.name.data,
-            VPN.LTE_cloudGW : vpn_form.LTE_cloudGW.data,
-            VPN.LTE_external_interface : vpn_form.LTE_external_interface.data,
-            VPN.LTE_local_identity : vpn_form.LTE_local_identity.data,
-            VPN.LTE_remote_identity : vpn_form.LTE_remote_identity.data,
-            VPN.cloud_external_interface : vpn_form.cloud_external_interface.data,
-            VPN.cloud_local_address : vpn_form.cloud_local_address.data,
-            VPN.phase1_dh_group : vpn_form.phase1_dh_group.data,
-            VPN.phase1_authentication_algorithm : vpn_form.phase1_authentication_algorithm.data,
-            VPN.phase1_encryption_algorithm : vpn_form.phase1_encryption_algorithm.data,
-            VPN.phase1_pre_shared_key : vpn_form.phase1_pre_shared_key.data,
-            VPN.phase1_dead_peer_detection_nterval : vpn_form.phase1_dead_peer_detection_nterval.data,
-            VPN.phase1_dead_peer_detection_threshold : vpn_form.phase1_dead_peer_detection_threshold.data,
-            VPN.phase2_authentication_algorithm : vpn_form.phase2_authentication_algorithm.data,
-            VPN.phase2_encryption_algorithm : vpn_form.phase2_encryption_algorithm.data,
-            VPN.phase2_perfect_forward_secrecy_keys : vpn_form.phase2_perfect_forward_secrecy_keys
+        tmp2 = db_session.query(VPN).filter(VPN.tid == tid).update({
+            'name' : vpn_form.name.data,
+            'LTE_cloudGW' : vpn_form.LTE_cloudGW.data,
+            'LTE_external_interface' : vpn_form.LTE_external_interface.data,
+            'LTE_local_identity' : vpn_form.LTE_local_identity.data,
+            'LTE_remote_identity' : vpn_form.LTE_remote_identity.data,
+            'cloud_external_interface' : vpn_form.cloud_external_interface.data,
+            'cloud_local_address' : vpn_form.cloud_local_address.data,
+            'phase1_dh_group' : vpn_form.phase1_dh_group.data,
+            'phase1_authentication_algorithm' : vpn_form.phase1_authentication_algorithm.data,
+            'phase1_encryption_algorithm' : vpn_form.phase1_encryption_algorithm.data,
+            'phase1_pre_shared_key' : vpn_form.phase1_pre_shared_key.data,
+            'phase1_dead_peer_detection_nterval' : vpn_form.phase1_dead_peer_detection_nterval.data,
+            'phase1_dead_peer_detection_threshold' : vpn_form.phase1_dead_peer_detection_threshold.data,
+            'phase2_authentication_algorithm' : vpn_form.phase2_authentication_algorithm.data,
+            'phase2_encryption_algorithm' : vpn_form.phase2_encryption_algorithm.data,
+            'phase2_perfect_forward_secrecy_keys' : vpn_form.phase2_perfect_forward_secrecy_keys.data,
         })
-        # db_session.delete(tmp)
         db_session.commit()
         print(vpn_form.name.data)
-        # tmp2 = VPN(
-        #     vpn_form.name.data, vpn_form.LTE_cloudGW.data,
-        #     vpn_form.LTE_external_interface.data,
-        #     vpn_form.LTE_local_identity.data, vpn_form.LTE_local_identity.data,
-        #     vpn_form.cloud_external_interface.data,
-        #     vpn_form.cloud_local_address.data, vpn_form.phase1_dh_group.data,
-        #     vpn_form.phase1_authentication_algorithm.data,
-        #     vpn_form.phase1_encryption_algorithm.data,
-        #     vpn_form.phase1_pre_shared_key.data,
-        #     vpn_form.phase1_dead_peer_detection_nterval.data,
-        #     vpn_form.phase1_dead_peer_detection_threshold.data,
-        #     vpn_form.phase2_authentication_algorithm.data,
-        #     vpn_form.phase2_encryption_algorithm.data,
-        #     vpn_form.phase2_perfect_forward_secrecy_keys.data)
-        # print(tmp2)
-
-        # db_session.add(tmp2)
-        # db_session.commit()
-
         flash('template saved successfully')
         return redirect(url_for('templates'))
 
@@ -552,7 +526,6 @@ def edit_UTM_template(tid):
     tmp = db_session.query(UTM).filter_by(tid=tid).first()
     utm_form = UTMForm()
     if request.method == 'GET':
-        # utm_form.name.data = tmp.name
         utm_form.content_filtering.data = tmp.content_filtering
         utm_form.anti_virus.data = tmp.anti_virus
         utm_form.anti_spam.data = tmp.anti_spam
@@ -560,15 +533,9 @@ def edit_UTM_template(tid):
         utm_form.antispam_custom.data = tmp.antispam_custom
         utm_form.url_filtering.data = tmp.url_filtering
         utm_form.spam_black_list_value.data = tmp.spam_black_list_value
-        # utm_form.spam_black_list_pattern_name.data = tmp.spam_black_list_pattern_name
         utm_form.spam_action.data = tmp.spam_action
-        # utm_form.sbl_profile_name.data = tmp.sbl_profile_name
         utm_form.url_black_list_value.data = tmp.url_black_list_value
-        # utm_form.url_black_list_pattern_name.data = tmp.url_black_list_pattern_name
-        # utm_form.url_black_list_category_name.data = tmp.url_black_list_category_name
         utm_form.url_black_list_action.data = tmp.url_black_list_action
-        # utm_form.url_filtering_name.data = tmp.url_filtering_name
-        # utm_form.confilter_name.data = tmp.confilter_name
         utm_form.block_contype.data = tmp.block_contype
         utm_form.old_status.data = tmp.old_status
         utm_form.old_policy_name.data = tmp.old_policy_name
@@ -579,14 +546,36 @@ def edit_UTM_template(tid):
         utm_form.src_address.data = tmp.src_address
         utm_form.dst_address.data = tmp.dst_address
         utm_form.new_policy_name.data = tmp.new_policy_name
+
     if utm_form.validate_on_submit():
-        db_session.delete(tmp)
+        # db_session.delete(tmp)
+        tmp2 = db_session.query(UTM).filter(UTM.tid == tid).update({
+            'anti_virus':utm_form.anti_virus.data,
+            'anti_spam':utm_form.anti_spam.data,
+            'url_filtering':utm_form.url_filtering.data,
+            'content_filtering':utm_form.content_filtering.data,
+            'antispam_default':utm_form.antispam_default.data,
+            'antispam_custom':utm_form.antispam_custom.data,
+            'spam_black_list_value':utm_form.spam_black_list_value.data,
+            'spam_action':utm_form.spam_action.data,
+            'url_black_list_value':utm_form.url_black_list_value.data,
+            'url_black_list_action':utm_form.url_black_list_action.data,
+            'block_contype':utm_form.block_contype.data,
+            'old_status':utm_form.old_status.data,
+            'old_policy_name':utm_form.old_policy_name.data.strip().strip(':')[0],
+            'old_src_zone':utm_form.old_policy_name.data.strip().strip(':')[2],
+            'old_dst_zone':utm_form.old_policy_name.data.strip().strip(':')[1],
+            'src_zone':utm_form.src_zone.data,
+            'dst_zone':utm_form.dst_zone.data,
+            'src_address':utm_form.src_address.data,
+            'dst_address':utm_form.dst_address.data,
+        })
         db_session.commit()
-        tmp2 = UTM(utm_form.name.data, utm.content_filtering.data
-                   #todo
-                   )
-        db_session.add(tmp2)
-        db_session.commit()
+        # tmp2 = UTM(utm_form.name.data, utm.content_filtering.data
+        #            #todo
+        #            )
+        # db_session.add(tmp2)
+        # db_session.commit()
         flash('template saved successfully')
         return redirect(url_for('templates'))
 
