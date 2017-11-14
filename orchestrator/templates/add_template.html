@@ -120,8 +120,6 @@
                     {{ render_field(utm_form.src_address)}}
                     {{ render_field(utm_form.dst_address)}}
                     {{ render_field(utm_form.new_policy_name)}}
-                    
-                    
                     <div class="panel panel-default" id="utm_optional_panel" style="display: none">
                       <div class="panel-heading">
                         <h3 class="panel-title">{{hiding_control('hide_control', True)|safe }} Optional arguments</h3>
@@ -140,7 +138,7 @@
             </div>
           </div>
           {% endif %}
-          {% if id_idp %}          
+          {% if is_idp %}          
           <div id="idp">IDP</div>
           {% endif %}
       </div>
@@ -221,7 +219,6 @@ $(function(){
 
   antispam_custom.change(function(){
     var val = $(this).val();
-    console.log('changed');
     
     if (val === 'enable') {
       antispam_default.val('noenable');

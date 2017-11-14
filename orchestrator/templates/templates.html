@@ -208,45 +208,16 @@
           <table class="table table-bordered table-hover tablesorter">
             <thead>
               <tr>
+                <th># </th>
                 <th>name</th>
-                <th>LTE_cloudGW</th>
-                <th>LTE_external_interface</th>
-                <th>LTE_local_identity</th>
-                <th>LTE_remote_identity</th>
-                <th>cloud_external_interface</th>
-                <th>cloud_local_address</th>
-                <th>phase1_dh_group</th>
-                <th>phase1_authentication_algorithm</th>
-                <th>phase1_encryption_algorithm</th>
-                <th>phase1_pre_shared_key</th>
-                <th>phase1_dead_peer_detection_nterval</th>
-                <th>phase1_dead_peer_detection_threshold</th>
-                <th>phase2_authentication_algorithm</th>
-                <th>phase2_encryption_algorithm</th>
-                <th>phase2_perfect_forward_secrecy_keys</th>
                 <th>操作</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 {% for template in vpn_templates %}
+                <td>{{vpn_templates.index(template)}}</td>                
                 <td>{{ template.name }}</td>
-                <td>{{ template.LTE_cloudGW }}</td>
-                <td>{{ template.LTE_external_interface }}</td>
-                <td>{{ template.LTE_local_identity }}</td>
-                <td>{{ template.LTE_remote_identity }}</td>
-                <td>{{ template.cloud_external_interface }}</td>
-                <td>{{ template.cloud_local_address }}</td>
-                <td>{{ template.phase1_dh_group }}</td>
-                <td>{{ template.phase1_authentication_algorithm }}</td>
-                <td>{{ template.phase1_encryption_algorithm }}</td>
-                <td>{{ template.phase1_pre_shared_key }}</td>
-                <td>{{ template.phase1_dead_peer_detection_nterval }}</td>
-                <td>{{ template.phase1_dead_peer_detection_threshold }}</td>
-                <td>{{ template.phase2_authentication_algorithm }}</td>
-                <td>{{ template.phase2_encryption_algorithm }}</td>
-                <td>{{ template.phase2_perfect_forward_secrecy_keys }}</td>
-    
                 <td>
                   <a href="{{url_for('edit_VPN_template', tid=template.tid)}}">修改</a>
                   <a href="#" onclick="delTemplate('{{template.name}}', '{{template.network_segment}}')">删除</a>

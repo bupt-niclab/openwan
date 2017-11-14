@@ -543,7 +543,7 @@ def edit_VPN_template(tid):
 
     # if probe_form.validate_on_submit():
     #   return jsonify(errmsg="success")
-    return render_template("edit_template.html", vpn_form=vpn_form, tid=tid)
+    return render_template("edit_template.html", vpn_form=vpn_form, tid=tid, is_vpn=True)
 
 
 @app.route("/template/edit/UTM/<tid>", methods=['GET', 'POST'])
@@ -590,7 +590,7 @@ def edit_UTM_template(tid):
         flash('template saved successfully')
         return redirect(url_for('templates'))
 
-    return None
+    return render_template("edit_template.html", utm_form=utm_form, tid=tid, is_utm=True)
 
 
 @app.route("/deployments")
