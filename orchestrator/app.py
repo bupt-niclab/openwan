@@ -803,13 +803,13 @@ class UTMForm(Form):
     antispam_custom = SelectField(
         'antispam_custom', choices=antispam_custom, default='enable')
     spam_black_list_value = StringField(
-        'url_black_list_value', validators=[DataRequired()])
+        'spam_black_list_value', validators=[DataRequired()])
     spam_black_list_pattern_name = StringField(
-        'url_black_list_pattern_name', validators=[DataRequired()])
+        'spam_black_list_pattern_name', validators=[DataRequired()])
     spam_action = SelectField(
         'spam_action', choices=spam_action, default='block')
     sbl_profile_name = StringField(
-        'sbl_profile_name', validators=[DataRequired()])
+        'sbl_profile_name')
 
     url_filtering = SelectField(
         'url_filtering', choices=url_filtering, default='enable')
@@ -825,10 +825,10 @@ class UTMForm(Form):
         default='block')
     
     url_filtering_name = StringField(
-        'url_filtering_name', validators=[DataRequired()])
+        'url_filtering_name')
     content_filtering = SelectField(
         'content_filtering', choices=content_filtering, default='enable')
-    confilter_name = StringField('confilter_name', validators=[DataRequired()])
+    confilter_name = StringField('confilter_name')
     block_contype = SelectMultipleField('block_contype', choices=block_contype, validators=[DataRequired()])
 
     old_status = SelectField(
