@@ -1946,6 +1946,18 @@ IDP_tem = [
     {'tid':2,'name':'idp_2','applied':False},
     {'tid':3,'name':'idp_3','applied':False}
 ]
+@app.route('/api_templates/<switchname>')
+@login_required
+def api_templates(switchname):
+    global LASTAPPLY_TID
+    for t in VPN_tem:
+        print(t['applied'])
+        if t['tid'] == LASTAPPLY_TID:
+            t['applied'] = True
+        else:
+            t['applied'] = False
+        
+    return jsonify(errmsg = "success",data=VPN_tem)
 @app.route('/api_templates/VPN/<switchname>')
 @login_required
 def api_templates_vpn(switchname):
@@ -2048,10 +2060,10 @@ def getControlPathInfo():
 
 
 nodesinfo_basic = [
-    {'name':'LTE-node-2','ip':'125.34.194.7','input_pps':'35','output_pps':'27'},
-    {'name':'hgw-1','ip':'125.34.194.8','input_pps':'23','output_pps':'45'},
-    {'name':'LTE-node-3','ip':'223.104.254.115','input_pps':'13','output_pps':'14'},
-    {'name':'ngfw-1','ip':'112.35.30.69','input_pps':'21','output_pps':'19'}
+    {'name':"LTE-node-2",'ip':"125.34.194.7",'input_pps':35,'output_pps':27},
+    {'name':"hgw-1",'ip':"125.34.194.8",'input_pps':23,'output_pps':45},
+    {'name':"LTE-node-3",'ip':"223.104.254.115",'input_pps':13,'output_pps':14},
+    {'name':"ngfw-1",'ip':"112.35.30.69",'input_pps':21,'output_pps':19}
     
 ]
 @app.route('/traffic_path_nodes', methods=['GET'])
