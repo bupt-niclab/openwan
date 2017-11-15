@@ -1860,3 +1860,46 @@ def applyUTMtemplate_1():
         return jsonify(errmsg=strerrmsg, status=-1)
     else:
         return jsonify(errmsg=strerrmsg, status=1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@app.route('/get_control_path_nodes',methods = ['GET'])
+@login_required
+def getControlPathInfo():
+    nodesinfo = [
+        ()
+    ]
