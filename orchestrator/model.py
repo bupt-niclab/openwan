@@ -299,16 +299,17 @@ class IDP(db.Model):
     
     tid = db.Column(db.Integer, primary_key = True, autoincrement = True)
     name = db.Column(db.String(255), unique = True)
+    idp_rule_name = db.Column(db.String(300), nullable = True)
     rule_src_zone = db.Column(db.String(30), nullable = False)
     rule_dst_zone = db.Column(db.String(30), nullable = False)
     idprule_action = db.Column(db.String(30),nullable = False)
     idprule_sev = db.Column(db.String(30), nullable = False)
     predefine_idp = db.Column(db.String(30), nullable = False)
     custom_idp = db.Column(db.String(30), nullable = False)
-    cus_attack_name = db.Column(db.String(300), nullable = False)
-    cus_attack_serverity = db.Column(db.String(30), nullable = False)
-    cus_attack_action = db.Column(db.String(30), nullable = False)
-    cus_attack_direction = db.Column(db.String(30), nullable = False)
+    cus_attack_name = db.Column(db.String(300), nullable = True)
+    cus_attack_serverity = db.Column(db.String(30), nullable = True)
+    cus_attack_action = db.Column(db.String(30), nullable = True)
+    cus_attack_direction = db.Column(db.String(30), nullable = True)
 
     old_status = db.Column(db.String(30),nullable = False)
     old_policy_name = db.Column(db.String(30),nullable = False)
@@ -321,12 +322,13 @@ class IDP(db.Model):
     dst_address = db.Column(db.String(30),nullable = False)
     new_policy_name = db.Column(db.String(30),nullable = False)
 
-    def __init__(self, tid, name, rule_src_zone, rule_dst_zone, 
+    def __init__(self, tid, name,idp_rule_name, rule_src_zone, rule_dst_zone, 
     idprule_action, idprule_sev, predefine_idp, custom_idp,
     cus_attack_name, cus_attack_serverity, cus_attack_action, cus_attack_direction,
     old_status, old_policy_name, old_src_zone, old_dst_zone,
     src_zone, dst_zone, src_address, dst_address, new_policy_name):
         self.name = name
+        self.idp_rule_name = idp_rule_name
         self.rule_src_zone = rule_src_zone
         self.rule_dst_zone = rule_dst_zone
         self.idprule_action = idprule_action

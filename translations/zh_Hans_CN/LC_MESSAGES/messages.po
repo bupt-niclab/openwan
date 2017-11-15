@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-11-07 15:57+0800\n"
+"POT-Creation-Date: 2017-11-15 17:12+0800\n"
 "PO-Revision-Date: 2017-11-07 15:11+0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_Hans_CN\n"
@@ -22,8 +22,8 @@ msgstr ""
 msgid "Add a new template"
 msgstr "添加新模板"
 
-#: templates/add_template.html:27 templates/control_path.html:11
-#: templates/debug.html:11 templates/edit_template.html:27
+#: templates/add_template.html:27 templates/debug.html:11
+#: templates/edit_template.html:27 templates/health_checks.html:11
 #: templates/jobs.html:9 templates/minions.html:10
 #: templates/minions_deployments.html:11 templates/run.html:29
 #: templates/templates.html:10
@@ -31,8 +31,9 @@ msgid "Controller"
 msgstr "控制器"
 
 #: templates/add_template.html:28 templates/base_logged.html:54
-#: templates/edit_template.html:28 templates/templates.html:11
-#: templates/templates.html:23
+#: templates/edit_template.html:28 templates/templates.html:13
+#: templates/templates.html:40 templates/templates.html:105
+#: templates/templates.html:202
 msgid "Templates"
 msgstr "模板"
 
@@ -40,21 +41,23 @@ msgstr "模板"
 msgid "Add template"
 msgstr "添加模板"
 
-#: templates/add_template.html:87 templates/edit_template.html:73
+#: templates/add_template.html:70 templates/add_template.html:133
+#: templates/edit_template.html:70 templates/edit_template.html:123
 msgid "Save template"
 msgstr "保存模板"
-
-#: templates/base.html:9 templates/base_logged.html:39
-#: templates/dashboard.html:5 templates/dashboard.html:9
-msgid "Dashboard"
-msgstr "仪表盘"
 
 #: templates/base_logged.html:30
 msgid "Log Out"
 msgstr "登出"
 
-#: templates/base_logged.html:42 templates/minions.html:6
-#: templates/minions.html:18 templates/minions_deployments.html:19
+#: templates/base_logged.html:39 templates/dashboard.html:5
+#: templates/dashboard.html:9
+msgid "Dashboard"
+msgstr "仪表盘"
+
+#: templates/base_logged.html:42 templates/health_checks.html:7
+#: templates/minions.html:6 templates/minions.html:18
+#: templates/minions_deployments.html:19
 msgid "Nodes"
 msgstr "节点"
 
@@ -66,7 +69,8 @@ msgstr "节点同步状态"
 msgid "Nodes deployments"
 msgstr "节点部署"
 
-#: templates/base_logged.html:46
+#: templates/base_logged.html:46 templates/health_checks.html:8
+#: templates/health_checks.html:12
 msgid "HealthChecks"
 msgstr "状况检查"
 
@@ -106,7 +110,7 @@ msgstr "调试"
 msgid "Debug Nodes"
 msgstr "调试节点"
 
-#: templates/base_logged.html:81 templates/control_path.html:7
+#: templates/base_logged.html:81
 msgid "Topo"
 msgstr "拓扑"
 
@@ -116,10 +120,6 @@ msgstr "流量路径"
 
 #: templates/base_logged.html:90
 msgid "Control path"
-msgstr "控制路径"
-
-#: templates/control_path.html:8 templates/control_path.html:12
-msgid "Control Path"
 msgstr "控制路径"
 
 #: templates/dashboard.html:6
@@ -172,7 +172,7 @@ msgstr ""
 
 #: templates/debug.html:27
 msgid "Roles"
-msgstr ""
+msgstr "角色"
 
 #: templates/edit_template.html:25 templates/edit_template.html:29
 msgid "Edit template"
@@ -210,11 +210,15 @@ msgstr "在 minion 上执行模块"
 msgid "Run cmd"
 msgstr "运行命令"
 
-#: templates/templates.html:8
+#: templates/templates.html:6
 msgid "Jobs templates"
 msgstr "任务模板"
 
-#: templates/templates.html:24
+#: templates/templates.html:42 templates/templates.html:107
+#: templates/templates.html:204
 msgid "Add a template"
 msgstr "添加模板"
+
+#~ msgid "Control Path"
+#~ msgstr "控制路径"
 

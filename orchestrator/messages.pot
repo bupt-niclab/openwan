@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-11-07 15:57+0800\n"
+"POT-Creation-Date: 2017-11-15 17:12+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,8 +21,8 @@ msgstr ""
 msgid "Add a new template"
 msgstr ""
 
-#: templates/add_template.html:27 templates/control_path.html:11
-#: templates/debug.html:11 templates/edit_template.html:27
+#: templates/add_template.html:27 templates/debug.html:11
+#: templates/edit_template.html:27 templates/health_checks.html:11
 #: templates/jobs.html:9 templates/minions.html:10
 #: templates/minions_deployments.html:11 templates/run.html:29
 #: templates/templates.html:10
@@ -30,8 +30,9 @@ msgid "Controller"
 msgstr ""
 
 #: templates/add_template.html:28 templates/base_logged.html:54
-#: templates/edit_template.html:28 templates/templates.html:11
-#: templates/templates.html:23
+#: templates/edit_template.html:28 templates/templates.html:13
+#: templates/templates.html:40 templates/templates.html:105
+#: templates/templates.html:202
 msgid "Templates"
 msgstr ""
 
@@ -39,21 +40,23 @@ msgstr ""
 msgid "Add template"
 msgstr ""
 
-#: templates/add_template.html:87 templates/edit_template.html:73
+#: templates/add_template.html:70 templates/add_template.html:133
+#: templates/edit_template.html:70 templates/edit_template.html:123
 msgid "Save template"
-msgstr ""
-
-#: templates/base.html:9 templates/base_logged.html:39
-#: templates/dashboard.html:5 templates/dashboard.html:9
-msgid "Dashboard"
 msgstr ""
 
 #: templates/base_logged.html:30
 msgid "Log Out"
 msgstr ""
 
-#: templates/base_logged.html:42 templates/minions.html:6
-#: templates/minions.html:18 templates/minions_deployments.html:19
+#: templates/base_logged.html:39 templates/dashboard.html:5
+#: templates/dashboard.html:9
+msgid "Dashboard"
+msgstr ""
+
+#: templates/base_logged.html:42 templates/health_checks.html:7
+#: templates/minions.html:6 templates/minions.html:18
+#: templates/minions_deployments.html:19
 msgid "Nodes"
 msgstr ""
 
@@ -65,7 +68,8 @@ msgstr ""
 msgid "Nodes deployments"
 msgstr ""
 
-#: templates/base_logged.html:46
+#: templates/base_logged.html:46 templates/health_checks.html:8
+#: templates/health_checks.html:12
 msgid "HealthChecks"
 msgstr ""
 
@@ -105,7 +109,7 @@ msgstr ""
 msgid "Debug Nodes"
 msgstr ""
 
-#: templates/base_logged.html:81 templates/control_path.html:7
+#: templates/base_logged.html:81
 msgid "Topo"
 msgstr ""
 
@@ -115,10 +119,6 @@ msgstr ""
 
 #: templates/base_logged.html:90
 msgid "Control path"
-msgstr ""
-
-#: templates/control_path.html:8 templates/control_path.html:12
-msgid "Control Path"
 msgstr ""
 
 #: templates/dashboard.html:6
@@ -209,11 +209,12 @@ msgstr ""
 msgid "Run cmd"
 msgstr ""
 
-#: templates/templates.html:8
+#: templates/templates.html:6
 msgid "Jobs templates"
 msgstr ""
 
-#: templates/templates.html:24
+#: templates/templates.html:42 templates/templates.html:107
+#: templates/templates.html:204
 msgid "Add a template"
 msgstr ""
 
