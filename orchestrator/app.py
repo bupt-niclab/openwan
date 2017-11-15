@@ -26,7 +26,9 @@ from jinja2 import select_autoescape, Template
 # from flask.ext.sqlalchemy import sqlalchemy
 
 # global lastapply_tid = False
-LASTAPPLY_TID = False
+LASTAPPLY_TID = ""
+LASTAPPLY_UTM = ""
+LASTAPPLY_IDP = ""
 
 # Init app
 
@@ -1493,53 +1495,53 @@ def applyVPNtemplate():
     return jsonify(errmsg="success", data=json.dumps(nodesinfo))
 
 
-@app.route('/control_path_nodes', methods=['GET'])
-# @login_required
-def getControlPathinfo():
-    nodesinfo = []
-    #按行将获取到的配置信息写入xml文件中
-    output = open('interface.txt', 'w')
-    ff = subprocess.check_output("salt '*' test.ping", shell=True)
-    # print(ff)
-    # infoget = os.popen("salt 'cpe*' junos.rpc 'get-interface-information' '/home/user/interface.xml' interface_name='ge-0/0/0.0' terse=True")
-    # for line in os.popen("salt 'cpe*' junos.rpc 'get-interface-information' interface_name='ge-0/0/0.0' terse=True"):
-    for line in ff:
-        output.write(line)
-    output.close()
-    #按行读取保存好了的xml文件
-    flag = 0
-    node_name = None
-    node_state = None
-    read_file = open('interface.txt', 'r')
-    d = dict()
-    for line in read_file.readlines():
-        d1 = dict()
-        if flag % 2 == 0:
-            d['node_name'] = line.strip().strip(':')
-            # print(type(d['node_name']))
-            str_node = "salt '" + d['node_name'] + "' grains.item os --output=json"
-            node_name = d['node_name']
-            fff = subprocess.check_output(str_node, shell=True)
-            node_info = json.loads(fff)
-            # print("node info type is ",node_info[node_name],d['node_name'])
-            # print("node info type is ",node_info[node_name]['os'])
-            node_type = node_info[node_name]['os']
-            print("node type is ", node_type)
-            if node_type != "proxy":
-                d['node_type'] = "non-agent"
-            else:
-                d['node_type'] = "agent"
-        if flag % 2 == 1:
-            if line.strip() == "True":
-                d['node_state'] = "up"
-            else:
-                d['node_state'] = "down"
-            d1 = d.copy()
-            nodesinfo.append(d1)
-            print(nodesinfo)
-        flag = flag + 1
-        # print(nodesinfo)
-    return jsonify(errmsg="success", data=json.dumps(nodesinfo))
+# @app.route('/control_path_nodes', methods=['GET'])
+# # @login_required
+# def getControlPathinfo():
+#     nodesinfo = []
+#     #按行将获取到的配置信息写入xml文件中
+#     output = open('interface.txt', 'w')
+#     ff = subprocess.check_output("salt '*' test.ping", shell=True)
+#     # print(ff)
+#     # infoget = os.popen("salt 'cpe*' junos.rpc 'get-interface-information' '/home/user/interface.xml' interface_name='ge-0/0/0.0' terse=True")
+#     # for line in os.popen("salt 'cpe*' junos.rpc 'get-interface-information' interface_name='ge-0/0/0.0' terse=True"):
+#     for line in ff:
+#         output.write(line)
+#     output.close()
+#     #按行读取保存好了的xml文件
+#     flag = 0
+#     node_name = None
+#     node_state = None
+#     read_file = open('interface.txt', 'r')
+#     d = dict()
+#     for line in read_file.readlines():
+#         d1 = dict()
+#         if flag % 2 == 0:
+#             d['node_name'] = line.strip().strip(':')
+#             # print(type(d['node_name']))
+#             str_node = "salt '" + d['node_name'] + "' grains.item os --output=json"
+#             node_name = d['node_name']
+#             fff = subprocess.check_output(str_node, shell=True)
+#             node_info = json.loads(fff)
+#             # print("node info type is ",node_info[node_name],d['node_name'])
+#             # print("node info type is ",node_info[node_name]['os'])
+#             node_type = node_info[node_name]['os']
+#             print("node type is ", node_type)
+#             if node_type != "proxy":
+#                 d['node_type'] = "non-agent"
+#             else:
+#                 d['node_type'] = "agent"
+#         if flag % 2 == 1:
+#             if line.strip() == "True":
+#                 d['node_state'] = "up"
+#             else:
+#                 d['node_state'] = "down"
+#             d1 = d.copy()
+#             nodesinfo.append(d1)
+#             print(nodesinfo)
+#         flag = flag + 1
+#         # print(nodesinfo)
+#     return jsonify(errmsg="success", data=json.dumps(nodesinfo))
 
 
 @app.route('/traffic_path_nodes', methods=['GET'])
@@ -1650,85 +1652,85 @@ def getTrafficPathinfo():
     return jsonify(errmsg="success", data=json.dumps(nodesinfo_basic))
 
 
-@app.route('/apply_vpn_template', methods=['POST'])
-# @login_required
-def applyVPNtemplate_1():
-    global LASTAPPLY_TID
-    tid = request.json['tid']
-    dest_ip = request.json['ip']
-    node_name = request.json['node_name']
-    output = open('lte_centor.yml', 'w')
-    cont = []
-    for line in jinja_centor_test(tid):
-        cont.append(line)
-        output.write(line)
-    output.close()
-    # print("cont is ",cont)
-    output = open('lte_access.yml', 'w')
-    cont = []
-    for line in jinja_access_test(tid):
-        cont.append(line)
-        output.write(line)
-    output.close()
-    node_name = str(node_name)
-    LASTAPPLY_TID = tid
-    # device_name = request.json['device_name']
-    device_name1 = "Agent-2"
-    device_name2 = "cpe1"
-    tmp = db_session.query(VPN).filter_by(tid=tid).first()
-    #拿到对应的模板
-    lines = []
-    output = open('lte_access.yml', 'r')
-    flag = 0
-    for line in output.readlines():
-        if flag == 1:
-            line = line + dest_ip
-            flag = flag + 1
-            lines.append(line)
-            continue
-        if flag == 7:
-            line = line.strip("\n") + "'" + node_name + "'" + "\n"
-            flag = flag + 1
-            lines.append(line)
-            continue
-        flag = flag + 1
-        lines.append(line)
-    output.close()
-    print("lines is", lines)
-    s = ''.join(lines)
-    f = open('lte_access.yml', 'w')
-    f.write(s)
-    f.close()
-    ff = subprocess.check_output(
-        "cp lte_centor.yml /srv/salt/base/lte_centor.yml", shell=True)
-    f = subprocess.check_output(
-        "cp lte_access.yml /srv/salt/base/lte_access.yml", shell=True)
-    str_access = "salt " + node_name + " cp.get_file salt://lte_access.yml /etc/ansible/lte_access.yml"
-    cp_access = subprocess.check_output(str_access, shell=True)
-    str_centor = "salt " + node_name + " cp.get_file salt://lte_centor.yml /etc/ansible/lte_centor.yml"
-    cp_centor = subprocess.check_output(str_centor, shell=True)
+# @app.route('/apply_vpn_template', methods=['POST'])
+# # @login_required
+# def applyVPNtemplate_1():
+#     global LASTAPPLY_TID
+#     tid = request.json['tid']
+#     dest_ip = request.json['ip']
+#     node_name = request.json['node_name']
+#     output = open('lte_centor.yml', 'w')
+#     cont = []
+#     for line in jinja_centor_test(tid):
+#         cont.append(line)
+#         output.write(line)
+#     output.close()
+#     # print("cont is ",cont)
+#     output = open('lte_access.yml', 'w')
+#     cont = []
+#     for line in jinja_access_test(tid):
+#         cont.append(line)
+#         output.write(line)
+#     output.close()
+#     node_name = str(node_name)
+#     LASTAPPLY_TID = tid
+#     # device_name = request.json['device_name']
+#     device_name1 = "Agent-2"
+#     device_name2 = "cpe1"
+#     tmp = db_session.query(VPN).filter_by(tid=tid).first()
+#     #拿到对应的模板
+#     lines = []
+#     output = open('lte_access.yml', 'r')
+#     flag = 0
+#     for line in output.readlines():
+#         if flag == 1:
+#             line = line + dest_ip
+#             flag = flag + 1
+#             lines.append(line)
+#             continue
+#         if flag == 7:
+#             line = line.strip("\n") + "'" + node_name + "'" + "\n"
+#             flag = flag + 1
+#             lines.append(line)
+#             continue
+#         flag = flag + 1
+#         lines.append(line)
+#     output.close()
+#     print("lines is", lines)
+#     s = ''.join(lines)
+#     f = open('lte_access.yml', 'w')
+#     f.write(s)
+#     f.close()
+#     ff = subprocess.check_output(
+#         "cp lte_centor.yml /srv/salt/base/lte_centor.yml", shell=True)
+#     f = subprocess.check_output(
+#         "cp lte_access.yml /srv/salt/base/lte_access.yml", shell=True)
+#     str_access = "salt " + node_name + " cp.get_file salt://lte_access.yml /etc/ansible/lte_access.yml"
+#     cp_access = subprocess.check_output(str_access, shell=True)
+#     str_centor = "salt " + node_name + " cp.get_file salt://lte_centor.yml /etc/ansible/lte_centor.yml"
+#     cp_centor = subprocess.check_output(str_centor, shell=True)
 
-    run_access = "salt " + node_name + " cmd.run 'ansible-playbook -i lte_access.yml customize_lte_access_vpn.yml' cwd='/etc/ansible'"
-    run_yml_access = subprocess.check_output(
-        run_access, shell=True, stderr=subprocess.STDOUT)
-    run_centor = "salt " + node_name + " cmd.run 'ansible-playbook -i lte_centor.yml customize_lte_centor_vpn.yml' cwd='/etc/ansible'"
-    run_yml_centor = subprocess.check_output(
-        run_centor, shell=True, stderr=subprocess.STDOUT)
+#     run_access = "salt " + node_name + " cmd.run 'ansible-playbook -i lte_access.yml customize_lte_access_vpn.yml' cwd='/etc/ansible'"
+#     run_yml_access = subprocess.check_output(
+#         run_access, shell=True, stderr=subprocess.STDOUT)
+#     run_centor = "salt " + node_name + " cmd.run 'ansible-playbook -i lte_centor.yml customize_lte_centor_vpn.yml' cwd='/etc/ansible'"
+#     run_yml_centor = subprocess.check_output(
+#         run_centor, shell=True, stderr=subprocess.STDOUT)
 
-    # print(tmp.network_segment)
+#     # print(tmp.network_segment)
 
-    #调用命令行下发配置
+#     #调用命令行下发配置
 
-    strerrmsg = run_yml_centor + run_yml_access
+#     strerrmsg = run_yml_centor + run_yml_access
 
-    if "failed=0" in strerrmsg:
-        return jsonify(errmsg="success", status=0)
-    elif "failed=1" in strerrmsg:
-        return jsonify(errmsg=strerrmsg, status=-1)
-    else:
-        return jsonify(errmsg=strerrmsg, status=1)
+#     if "failed=0" in strerrmsg:
+#         return jsonify(errmsg="success", status=0)
+#     elif "failed=1" in strerrmsg:
+#         return jsonify(errmsg=strerrmsg, status=-1)
+#     else:
+#         return jsonify(errmsg=strerrmsg, status=1)
 
-    # return jsonify(errmsg = "success")
+#     # return jsonify(errmsg = "success")
 
 
 @app.teardown_request
@@ -1839,95 +1841,167 @@ def jinja_access_test(tid):
 
     return render_template('lte_access.yml', **d)
 
-@app.route('/apply_utm_template', methods = ['POST'])
+# @app.route('/apply_utm_template', methods = ['POST'])
+# @login_required
+# def applyUTMtemplate_1():
+#     global LASTAPPLY_UTM
+#     tid = request.json['tid']
+#     node_ip = request.json['ip']
+#     node_name = request.json['node_name']
+#     output = open('lte_utm.yml','w')
+#     cont = []
+#     for line in jinja_utm(tid):
+#         cont.append(line)
+#         output.write(line)
+#     output.close()
+
+#     LASTAPPLY_UTM = tid
+#     tmp = db_session.query(UTM).filter_by(tid = tid).first()
+
+#     lines = []
+#     output = open('lte_utm.yml','r')
+#     flag = 0
+#     for line in output.readlines():
+#         if flag == 1:
+#             line = line + node_ip
+#             flag = flag + 1
+#             lines.append(line)
+#             continue
+#         flag = flag + 1
+#         lines.append(line)
+#     output.close()
+#     s = ''.join(lines)
+#     f = open('lte_utm.yml','w')
+#     f.write(s)
+#     f.close()
+#     ff = subprocess.check_output(
+#         "cp lte_utm.yml /srv/salt/base/lte_utm.yml", shell=True)
+#     str_utm = "salt " + node_name + " cp.get_file salt://lte_utm.yml /etc/ansible/lte_utm.yml"
+#     cp_access = subprocess.check_output(str_utm, shell=True)
+#     run_utm = "salt "+node_name+" cmd.run 'ansible-playbook -i lte_utm.yml utm-config.yml' cwd='/etc/ansible'"
+#     run_yml_utm = subprocess.check_output(
+#         run_utm, shell=True, stderr=subprocess.STDOUT)
+
+#     strerrmsg = run_yml_utm
+
+#     if "failed=0" in strerrmsg:
+#         return jsonify(errmsg="success", status=0)
+#     elif "failed=1" in strerrmsg:
+#         return jsonify(errmsg=strerrmsg, status=-1)
+#     else:
+#         return jsonify(errmsg=strerrmsg, status=1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+nodesinfo = [
+        {'node_name':'cpe1','node_type':'agent','node_state':'up','vpn':'down','utm':'down','idp':'down'},
+        {'node_name':'cpeCloud','node_type':'agent','node_state':'up','vpn':'down','utm':'down','idp':'down'},
+        {'node_name':'LTE-node2-agent','node_type':'agent','node_state':'up','vpn':'down','utm':'down','idp':'down'},
+        {'node_name':'Agent-1','node_type':'non-agent','node_state':'up','vpn':'down','utm':'down','idp':'down'},
+        {'node_name':'Agent-2','node_type':'non-agent','node_state':'up','vpn':'down','utm':'down','idp':'down'},
+        {'node_name':'LTE-node-2','node_type':'non-agent','node_state':'up','vpn':'down','utm':'down','idp':'down'}
+    ]
+VPN_tem = [
+    {'id':'1','name':'vpn_1'},
+    {'id':'2','name':'vpn_2'},
+    {'id':'3','name':'vpn_3'}
+]
+
+UTM_tem = [
+    {'id':'1','name':'utm_1'},
+    {'id':'2','name':'utm_2'},
+    {'id':'3','name':'utm_3'}
+]
+
+IDP_tem = [
+    {'id':'1','name':'idp_1'},
+    {'id':'2','name':'idp_2'},
+    {'id':'3','name':'idp_3'}
+]
+
+@app.route('/apply_vpn_template',methods=['POST'])
 @login_required
-def applyUTMtemplate_1():
+def applyVPNtemplate_2():
+    global LASTAPPLY_TID
+    tid = request.json['tid']
+    dest_ip = request.json['ip']
+    node_name = request.json['node_name']
+    LASTAPPLY_TID = tid
+    for node in nodesinfo:
+        if node['node_name'] == node_name:
+            node['vpn'] = 'up'
+
+    return jsonify(errmsg = "success")
+
+@app.route('/apply_utm_tempalte',methods=['POST'])
+@login_required
+def applyUTMtemplate_2():
+    global LASTAPPLY_TID
+    tid = request.json['tid']
+    dest_ip = request.json['ip']
+    node_name = request.json['node_name']
+    LASTAPPLY_TID = tid
+    for node in nodesinfo:
+        if node['node_name'] == node_name:
+            node['utm'] = 'up'
+
+    return jsonify(errmsg = "success")
+
+@app.route('/apply_idp_template',methods=['POST'])
+@login_required
+def applyUTMtemplate_2():
     global LASTAPPLY_UTM
     tid = request.json['tid']
-    node_ip = request.json['ip']
+    dest_ip = request.json['ip']
     node_name = request.json['node_name']
-    output = open('lte_utm.yml','w')
-    cont = []
-    for line in jinja_utm(tid):
-        cont.append(line)
-        output.write(line)
-    output.close()
+    LASTAPPLY_IDP = tid
+    for node in nodesinfo:
+        if node['node_name'] == node_name:
+            node['idp'] = 'up'
 
-    LASTAPPLY_UTM = tid
-    tmp = db_session.query(UTM).filter_by(tid = tid).first()
-
-    lines = []
-    output = open('lte_utm.yml','r')
-    flag = 0
-    for line in output.readlines():
-        if flag == 1:
-            line = line + node_ip
-            flag = flag + 1
-            lines.append(line)
-            continue
-        flag = flag + 1
-        lines.append(line)
-    output.close()
-    s = ''.join(lines)
-    f = open('lte_utm.yml','w')
-    f.write(s)
-    f.close()
-    ff = subprocess.check_output(
-        "cp lte_utm.yml /srv/salt/base/lte_utm.yml", shell=True)
-    str_utm = "salt " + node_name + " cp.get_file salt://lte_utm.yml /etc/ansible/lte_utm.yml"
-    cp_access = subprocess.check_output(str_utm, shell=True)
-    run_utm = "salt "+node_name+" cmd.run 'ansible-playbook -i lte_utm.yml utm-config.yml' cwd='/etc/ansible'"
-    run_yml_utm = subprocess.check_output(
-        run_utm, shell=True, stderr=subprocess.STDOUT)
-
-    strerrmsg = run_yml_utm
-
-    if "failed=0" in strerrmsg:
-        return jsonify(errmsg="success", status=0)
-    elif "failed=1" in strerrmsg:
-        return jsonify(errmsg=strerrmsg, status=-1)
-    else:
-        return jsonify(errmsg=strerrmsg, status=1)
+    return jsonify(errmsg = "success")
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-@app.route('/get_control_path_nodes',methods = ['GET'])
+@app.route('/control_path_nodes',methods = ['GET'])
 @login_required
 def getControlPathInfo():
+<<<<<<< Updated upstream
     nodesinfo = [
         ()
     ]
+=======
+    
+    return jsonify(errmsg="success", data=json.dumps(nodesinfo))
+
+>>>>>>> Stashed changes
