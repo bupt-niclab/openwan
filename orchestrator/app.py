@@ -1948,7 +1948,7 @@ IDP_tem = [
 ]
 @app.route('/api_templates/VPN/<switchname>')
 @login_required
-def api_templates(switchname):
+def api_templates_vpn(switchname):
     global LASTAPPLY_TID
     for t in VPN_tem:
         print(t['applied'])
@@ -1960,7 +1960,7 @@ def api_templates(switchname):
     return jsonify(errmsg = "success",data=VPN_tem)
 @app.route('/api_templates/UTM/<switchname>')
 @login_required
-def api_templates(switchname):
+def api_templates_utm(switchname):
     global LASTAPPLY_UTM
     for t in VPN_tem:
         print(t['applied'])
@@ -1972,7 +1972,7 @@ def api_templates(switchname):
     return jsonify(errmsg = "success",data=UTM_tem)
 @app.route('/api_templates/IDP/<switchname>')
 @login_required
-def api_templates(switchname):
+def api_templates_idp(switchname):
     global LASTAPPLY_IDP
     for t in VPN_tem:
         print(t['applied'])
@@ -2060,6 +2060,24 @@ def getTrafficPathinfo():
 
     return jsonify(errmsg = "success", data=json.dumps(nodesinfo_basic))
 
+devices_info = [
+    {'node_name':'LTE-node-2','CPU':'35/100','memory':'6400/8000','flow':'100'},
+    {'node_name':'hgw-1','CPU':'35/100','memory':'6400/8000','flow':'100'},
+    {'node_name':'LTE-node-3','CPU':'35/100','memory':'6400/8000','flow':'100'},
+    {'node_name':'ngfw-1','CPU':'35/100','memory':'6400/8000','flow':'100'}
+    
 
+]
 
-
+@app.route('/healthcheck_nodeinfo',methods = ['POST'])
+# @login_required
+def show_devices_info():
+    node_name = request.json['node_name']
+    flag = 0
+    for device in devices_info:
+        if device['node_name'] == node_name:
+            flag = 1
+            print(device)
+            return jsonify(errmsg = "success", data = json.dumps(device))
+    if flag == 0:
+        return jsonify(errmsg = "no such node!")
