@@ -353,6 +353,7 @@ def run_template(template):
 def add_template():
     vpn_form = VPNForm()
     utm_form = UTMForm()
+    idp_form = IDPForm()
     #获取utm数据库数据的条目数量
     utm_num = db_session.query(UTM).count() 
     utm_num = utm_num + 1
@@ -846,8 +847,8 @@ class UTMForm(Form):
         'old_status', choices=old_status, default='enable')
     old_policy_name = StringField(
         'old_policy_name', validators=[DataRequired()])
-    old_src_zone = StringField('old_src_zone', validators=[DataRequired()])
-    old_dst_zone = StringField('old_dst_zone', validators=[DataRequired()])
+    # old_src_zone = StringField('old_src_zone', validators=[DataRequired()])
+    # old_dst_zone = StringField('old_dst_zone', validators=[DataRequired()])
 
     src_zone = SelectField('src_zone', choices=dst_zone, default='trust')
     dst_zone = SelectField('dst_zone', choices=dst_zone, default='untrust')
@@ -857,7 +858,35 @@ class UTMForm(Form):
         'dst_address', validators=[DataRequired()], default='any')
     new_policy_name = StringField(
         'new_policy_name', validators=[DataRequired()])
+class IDPForm(Form):
+    name = StringField('name', validators=[DataRequired()])
+    idp_rule_name = StringField('idp_rule_name')
+    rule_src_zone = SelectField('rule_src_zone',choices=rule_src_zone,default = 'trust')
+    rule_dst_zone = SelectField('rule_src_zone',choices=rule_src_zone,default = 'trust')
+    idprule_action = SelectField('idprule_action',choices=idprule_action)
+    idprule_sev = SelectField('idprule_sev',choices=idprule_sev)
+    predefine_idp = SelectField('predefine_idp',choices=predefine_idp,default = 'enable')
+    custom_idp = SelectField('custom_idp',choices=custom_idp,default = 'untrust')
+    cus_attack_name = StringField('cus_attack_name')
+    cus_attack_serverity = SelectField('cus_attack_serverity',choices=cus_attack_serverity)
+    cus_attack_action = SelectField('cus_attack_action',choices=cus_attack_action)
+    cus_attack_direction = SelectField('cus_attack_direction',choices=cus_attack_direction)
 
+    old_status = SelectField(
+        'old_status', choices=old_status, default='enable')
+    old_policy_name = SelectField(
+        'old_policy_name', choices=old_policy_name)
+    # old_src_zone = StringField('old_src_zone', validators=[DataRequired()])
+    # old_dst_zone = StringField('old_dst_zone', validators=[DataRequired()])
+
+    src_zone = SelectField('src_zone', choices=dst_zone, default='trust')
+    dst_zone = SelectField('dst_zone', choices=dst_zone, default='untrust')
+    src_address = StringField(
+        'src_address', validators=[DataRequired()], default='any')
+    dst_address = StringField(
+        'dst_address', validators=[DataRequired()], default='any')
+    new_policy_name = StringField(
+        'new_policy_name')
 
 class NewTemplateForm(RunForm):
     name = StringField('name', validators=[DataRequired()])
