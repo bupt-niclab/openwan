@@ -26,9 +26,9 @@ from jinja2 import select_autoescape, Template
 # from flask.ext.sqlalchemy import sqlalchemy
 
 # global lastapply_tid = False
-LASTAPPLY_TID = ""
-LASTAPPLY_UTM = ""
-LASTAPPLY_IDP = ""
+LASTAPPLY_TID = 0
+LASTAPPLY_UTM = 0
+LASTAPPLY_IDP = 0
 
 # Init app
 
@@ -318,20 +318,20 @@ def templates():
         "templates.html", vpn_templates=vpn_tmp, utm_templates=utm_tmp)
 
 
-@app.route("/api_templates/<switchname>")
-# @login_required
-def api_templates(switchname):
-    global LASTAPPLY_TID
-    tmp = db_session.query(VPN).all()
-    tmp_dict = VPN2dict(tmp)
-    for t in tmp_dict:
-        if t['tid'] == LASTAPPLY_TID:
-            t['applied'] = True
-        else:
-            t['applied'] = False
-    # data = VPN2dict(tmp)
-    # data[0]['applied'] = True
-    return jsonify(errmsg="success", data=tmp_dict)
+# @app.route("/api_templates/<switchname>")
+# # @login_required
+# def api_templates(switchname):
+#     global LASTAPPLY_TID
+#     tmp = db_session.query(VPN).all()
+#     tmp_dict = VPN2dict(tmp)
+#     for t in tmp_dict:
+#         if t['tid'] == LASTAPPLY_TID:
+#             t['applied'] = True
+#         else:
+#             t['applied'] = False
+#     # data = VPN2dict(tmp)
+#     # data[0]['applied'] = True
+#     return jsonify(errmsg="success", data=tmp_dict)
 
 
 @app.route("/templates/run/<template>")
@@ -1930,45 +1930,89 @@ nodesinfo = [
         {'node_name':'LTE-node-2','node_type':'non-agent','node_state':'up','vpn':'down','utm':'down','idp':'down'}
     ]
 VPN_tem = [
-    {'id':'1','name':'vpn_1'},
-    {'id':'2','name':'vpn_2'},
-    {'id':'3','name':'vpn_3'}
+    {'tid':1,'name':'vpn_1','applied':False},
+    {'tid':2,'name':'vpn_2','applied':False},
+    {'tid':3,'name':'vpn_3','applied':False}
 ]
 
 UTM_tem = [
-    {'id':'1','name':'utm_1'},
-    {'id':'2','name':'utm_2'},
-    {'id':'3','name':'utm_3'}
+    {'tid':1,'name':'utm_1','applied':False},
+    {'tid':2,'name':'utm_2','applied':False},
+    {'tid':3,'name':'utm_3','applied':False}
 ]
 
 IDP_tem = [
-    {'id':'1','name':'idp_1'},
-    {'id':'2','name':'idp_2'},
-    {'id':'3','name':'idp_3'}
+    {'tid':1,'name':'idp_1','applied':False},
+    {'tid':2,'name':'idp_2','applied':False},
+    {'tid':3,'name':'idp_3','applied':False}
 ]
-
+@app.route('/api_templates/VPN/<switchname>')
+@login_required
+def api_templates(switchname):
+    global LASTAPPLY_TID
+    for t in VPN_tem:
+        print(t['applied'])
+        if t['tid'] == LASTAPPLY_TID:
+            t['applied'] = True
+        else:
+            t['applied'] = False
+        
+    return jsonify(errmsg = "success",data=VPN_tem)
+@app.route('/api_templates/UTM/<switchname>')
+@login_required
+def api_templates(switchname):
+    global LASTAPPLY_UTM
+    for t in VPN_tem:
+        print(t['applied'])
+        if t['tid'] == LASTAPPLY_UTM:
+            t['applied'] = True
+        else:
+            t['applied'] = False
+        
+    return jsonify(errmsg = "success",data=UTM_tem)
+@app.route('/api_templates/IDP/<switchname>')
+@login_required
+def api_templates(switchname):
+    global LASTAPPLY_IDP
+    for t in VPN_tem:
+        print(t['applied'])
+        if t['tid'] == LASTAPPLY_IDP:
+            t['applied'] = True
+        else:
+            t['applied'] = False
+        
+    return jsonify(errmsg = "success",data=VPN_tem)
 @app.route('/apply_vpn_template',methods=['POST'])
 @login_required
-def applyVPNtemplate_2():
+def applyVPNtemplate_1():
     global LASTAPPLY_TID
     tid = request.json['tid']
-    dest_ip = request.json['ip']
+    # dest_ip = request.json['ip']
     node_name = request.json['node_name']
+    print("tid is ",tid)
     LASTAPPLY_TID = tid
+    for t in VPN_tem:
+        if t['tid'] == LASTAPPLY_TID:
+            t['applied'] = True
+        print(t['name']," ",t['applied'])
     for node in nodesinfo:
         if node['node_name'] == node_name:
             node['vpn'] = 'up'
+    print(LASTAPPLY_TID)
 
     return jsonify(errmsg = "success")
 
 @app.route('/apply_utm_tempalte',methods=['POST'])
 @login_required
-def applyUTMtemplate_2():
-    global LASTAPPLY_TID
+def applyUTMtemplate_1():
+    global LASTAPPLY_UTM
     tid = request.json['tid']
-    dest_ip = request.json['ip']
+    # dest_ip = request.json['ip']
     node_name = request.json['node_name']
-    LASTAPPLY_TID = tid
+    LASTAPPLY_UTM = tid
+    for t in UTM_tem:
+        if t['tid'] == LASTAPPLY_UTM:
+            t['applied'] = True
     for node in nodesinfo:
         if node['node_name'] == node_name:
             node['utm'] = 'up'
@@ -1977,12 +2021,15 @@ def applyUTMtemplate_2():
 
 @app.route('/apply_idp_template',methods=['POST'])
 @login_required
-def applyIDPtemplate_2():
+def applyIDPtemplate_1():
     global LASTAPPLY_UTM
     tid = request.json['tid']
-    dest_ip = request.json['ip']
+    # dest_ip = request.json['ip']
     node_name = request.json['node_name']
     LASTAPPLY_IDP = tid
+    for t in IDP_tem:
+        if t['tid'] == LASTAPPLY_IDP:
+            t['applied'] = True
     for node in nodesinfo:
         if node['node_name'] == node_name:
             node['idp'] = 'up'
@@ -1998,6 +2045,8 @@ def applyIDPtemplate_2():
 def getControlPathInfo():
     
     return jsonify(errmsg="success", data=json.dumps(nodesinfo))
+
+
 nodesinfo_basic = [
     {'name':'LTE-node-2','ip':'125.34.194.7','input_pps':'35','output_pps':'27'},
     {'name':'hgw-1','ip':'125.34.194.8','input_pps':'23','output_pps':'45'},
@@ -2008,5 +2057,9 @@ nodesinfo_basic = [
 @app.route('/traffic_path_nodes', methods=['GET'])
 @login_required
 def getTrafficPathinfo():
-    
+
     return jsonify(errmsg = "success", data=json.dumps(nodesinfo_basic))
+
+
+
+
