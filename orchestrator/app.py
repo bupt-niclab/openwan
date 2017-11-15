@@ -1544,112 +1544,112 @@ def applyVPNtemplate():
 #     return jsonify(errmsg="success", data=json.dumps(nodesinfo))
 
 
-@app.route('/traffic_path_nodes', methods=['GET'])
-@login_required
-def getTrafficPathinfo():
-    nodesinfo_basic = []
-    nodesinfo_full = []
-    nodesinfo_result = []
-    #获取cpe节点名称
-    output = open('cpeinfo.txt', 'w')
-    all_cpes = []
-    test_ping_info = subprocess.check_output("salt '*' test.ping", shell=True)
-    for line in test_ping_info:
-        output.write(line)
-    output.close()
-    cpe_name = None
-    read_file = open('cpeinfo.txt', 'r')
-    d_cpe = dict()
-    for line in read_file.readlines():
-        d1 = dict()
-        if "cpe" in line:
-            d_cpe['name'] = line.strip().strip(':')
-            cpe_name = d_cpe['name']
-            all_cpes.append(cpe_name)
-    print(all_cpes)
-    read_file.close()
-    #获得cpe所有节点信息之后，遍历cpe节点连接的节点
-    all_cpes_conn = []
-    for cpe in all_cpes:
-        # str = "salt '"+ cpe + "' junos.rpc 'get-ike-active-peers-information' --output=json"
-        str = "salt 'cpeCloud' junos.rpc 'get-ike-active-peers-information' --output=json"
-        cpes_json_dup = subprocess.check_output(str, shell=True)
-        cpes_json_dup = cpes_json_dup.strip()
-        cpe_json = cpes_json_dup
-        print(cpe_json)
-        vmx_dict = json.loads(cpe_json)
-        print(type(vmx_dict))
-        for i in range(
-                len(vmx_dict['cpeCloud']['rpc_reply'][
-                    'ike-active-peers-information']['ike-active-peers'])):
-            d1 = dict()
-            d1['ip'] = vmx_dict['cpeCloud']['rpc_reply'][
-                'ike-active-peers-information']['ike-active-peers'][i][
-                    'ike-sa-remote-address']
-            d1['name'] = vmx_dict['cpeCloud']['rpc_reply'][
-                'ike-active-peers-information']['ike-active-peers'][i][
-                    'ike-ike-id']
-            equ_name = d1['name']
-            if "agent" in equ_name:
-                str = "salt '" + d1['name'] + "' junos.rpc 'get-pfe-statistics' --output=json"
-                equ_in_out = subprocess.check_output(str, shell=True)
-                equ_dict = json.loads(equ_in_out)
-                d1['input_pps'] = int(equ_dict[equ_name]['rpc_reply'][
-                    'pfe-statistics']['pfe-traffic-statistics']['input-pps'])
-                print("input pps is ", type(d1['input_pps']))
-                # if d1['input_pps'] <= 10:
-                #     d1['input_pps'] = 1
-                # elif d1['input_pps'] >10 and d1['input_pps'] <= 100 :
-                #     d1['input_pps'] = 2
-                # elif d1['input_pps'] > 100 and d1['input_pps'] <= 1000 :
-                #     d1['input_pps'] = 3
-                # else:
-                #     d1['input_pps'] = 4
+# @app.route('/traffic_path_nodes', methods=['GET'])
+# @login_required
+# def getTrafficPathinfo():
+#     nodesinfo_basic = []
+#     nodesinfo_full = []
+#     nodesinfo_result = []
+#     #获取cpe节点名称
+#     output = open('cpeinfo.txt', 'w')
+#     all_cpes = []
+#     test_ping_info = subprocess.check_output("salt '*' test.ping", shell=True)
+#     for line in test_ping_info:
+#         output.write(line)
+#     output.close()
+#     cpe_name = None
+#     read_file = open('cpeinfo.txt', 'r')
+#     d_cpe = dict()
+#     for line in read_file.readlines():
+#         d1 = dict()
+#         if "cpe" in line:
+#             d_cpe['name'] = line.strip().strip(':')
+#             cpe_name = d_cpe['name']
+#             all_cpes.append(cpe_name)
+#     print(all_cpes)
+#     read_file.close()
+#     #获得cpe所有节点信息之后，遍历cpe节点连接的节点
+#     all_cpes_conn = []
+#     for cpe in all_cpes:
+#         # str = "salt '"+ cpe + "' junos.rpc 'get-ike-active-peers-information' --output=json"
+#         str = "salt 'cpeCloud' junos.rpc 'get-ike-active-peers-information' --output=json"
+#         cpes_json_dup = subprocess.check_output(str, shell=True)
+#         cpes_json_dup = cpes_json_dup.strip()
+#         cpe_json = cpes_json_dup
+#         print(cpe_json)
+#         vmx_dict = json.loads(cpe_json)
+#         print(type(vmx_dict))
+#         for i in range(
+#                 len(vmx_dict['cpeCloud']['rpc_reply'][
+#                     'ike-active-peers-information']['ike-active-peers'])):
+#             d1 = dict()
+#             d1['ip'] = vmx_dict['cpeCloud']['rpc_reply'][
+#                 'ike-active-peers-information']['ike-active-peers'][i][
+#                     'ike-sa-remote-address']
+#             d1['name'] = vmx_dict['cpeCloud']['rpc_reply'][
+#                 'ike-active-peers-information']['ike-active-peers'][i][
+#                     'ike-ike-id']
+#             equ_name = d1['name']
+#             if "agent" in equ_name:
+#                 str = "salt '" + d1['name'] + "' junos.rpc 'get-pfe-statistics' --output=json"
+#                 equ_in_out = subprocess.check_output(str, shell=True)
+#                 equ_dict = json.loads(equ_in_out)
+#                 d1['input_pps'] = int(equ_dict[equ_name]['rpc_reply'][
+#                     'pfe-statistics']['pfe-traffic-statistics']['input-pps'])
+#                 print("input pps is ", type(d1['input_pps']))
+#                 # if d1['input_pps'] <= 10:
+#                 #     d1['input_pps'] = 1
+#                 # elif d1['input_pps'] >10 and d1['input_pps'] <= 100 :
+#                 #     d1['input_pps'] = 2
+#                 # elif d1['input_pps'] > 100 and d1['input_pps'] <= 1000 :
+#                 #     d1['input_pps'] = 3
+#                 # else:
+#                 #     d1['input_pps'] = 4
 
-                d1['output_pps'] = int(equ_dict[equ_name]['rpc_reply'][
-                    'pfe-statistics']['pfe-traffic-statistics']['output-pps'])
-                print("output pps is ", type(d1['output_pps']))
-            # if d1['output_pps'] <= 10:
-            #     d1['output_pps'] = 1
-            # elif d1['output_pps'] >10 and d1['output_pps'] <= 100 :
-            #     d1['output_pps'] = 2
-            # elif d1['output_pps'] > 100 and d1['output_pps'] <= 1000 :
-            #     d1['output_pps'] = 3
-            # else:
-            #     d1['output_pps'] = 4
-            nodesinfo_basic.append(d1)
-    # cpe_cloud_json_dup = subprocess.check_output("salt 'cpeCloud' junos.rpc 'get-ike-active-peers-information' --output=json", shell=True)
-    # cpe_cloud_json_dup = cpe_cloud_json_dup.strip()
-    # # print cpe_cloud_json, type(cpe_cloud_json)
-    # # cpe_cloud_json = cpe_cloud_json_dup[0: len(cpe_cloud_json_dup)/2]
-    # cpe_cloud_json = cpe_cloud_json_dup
-    # print cpe_cloud_json
-    # vmx_dict = json.loads(cpe_cloud_json)
-    # print type(vmx_dict)
-    # for i in range(len(vmx_dict['cpeCloud']['rpc_reply']['ike-active-peers-information']['ike-active-peers'])):
-    #     d1 = dict()
-    #     d1['ip'] = vmx_dict['cpeCloud']['rpc_reply']['ike-active-peers-information']['ike-active-peers'][i]['ike-sa-remote-address']
-    #     d1['name'] = vmx_dict['cpeCloud']['rpc_reply']['ike-active-peers-information']['ike-active-peers'][i]['ike-ike-id']
-    #     nodesinfo_basic.append(d1)
-    print(nodesinfo_basic)
-    # for j in range(len(nodesinfo_basic)):
-    #     d3 = dict()
-    #     str = "salt '"+ nodesinfo_basic[j]['name']+"' junos.rpc 'get-ike-active-peers-information' --output=json"
-    #     # child_nodes_json = os.popen(str)
-    #     child_nodes_json = subprocess.check_output(str, shell=True)
-    #     chiled_nodes_dict = json.loads(child_nodes_json)
-    #     d3['switch'] = nodesinfo_basic[j]
-    #     for k in range(len(nodesinfo_basic[j]['name']['cpeCloud']
-    #     ['rpc_reply']['ike-active-peers-information']['ike-active-peers'])):
-    #         d2 = dict()
-    #         d2['ip'] = nodesinfo_basic[j]['name']['cpeCloud']['rpc_reply']['ike-active-peers-information']['ike-active-peers'][k]['ike-sa-remote-address']
-    #         d2['name'] = nodesinfo_basic[j]['name']['cpeCloud']['rpc_reply']['ike-active-peers-information']['ike-active-peers'][k]['ike-ike-id']
-    #         nodesinfo_full[k].append(d2)
-    #     d3['devices'] = nodesinfo_full[k]
-    #     nodesinfo_result.append(d3)
-    #     nodesinfo_full.clear()
+#                 d1['output_pps'] = int(equ_dict[equ_name]['rpc_reply'][
+#                     'pfe-statistics']['pfe-traffic-statistics']['output-pps'])
+#                 print("output pps is ", type(d1['output_pps']))
+#             # if d1['output_pps'] <= 10:
+#             #     d1['output_pps'] = 1
+#             # elif d1['output_pps'] >10 and d1['output_pps'] <= 100 :
+#             #     d1['output_pps'] = 2
+#             # elif d1['output_pps'] > 100 and d1['output_pps'] <= 1000 :
+#             #     d1['output_pps'] = 3
+#             # else:
+#             #     d1['output_pps'] = 4
+#             nodesinfo_basic.append(d1)
+#     # cpe_cloud_json_dup = subprocess.check_output("salt 'cpeCloud' junos.rpc 'get-ike-active-peers-information' --output=json", shell=True)
+#     # cpe_cloud_json_dup = cpe_cloud_json_dup.strip()
+#     # # print cpe_cloud_json, type(cpe_cloud_json)
+#     # # cpe_cloud_json = cpe_cloud_json_dup[0: len(cpe_cloud_json_dup)/2]
+#     # cpe_cloud_json = cpe_cloud_json_dup
+#     # print cpe_cloud_json
+#     # vmx_dict = json.loads(cpe_cloud_json)
+#     # print type(vmx_dict)
+#     # for i in range(len(vmx_dict['cpeCloud']['rpc_reply']['ike-active-peers-information']['ike-active-peers'])):
+#     #     d1 = dict()
+#     #     d1['ip'] = vmx_dict['cpeCloud']['rpc_reply']['ike-active-peers-information']['ike-active-peers'][i]['ike-sa-remote-address']
+#     #     d1['name'] = vmx_dict['cpeCloud']['rpc_reply']['ike-active-peers-information']['ike-active-peers'][i]['ike-ike-id']
+#     #     nodesinfo_basic.append(d1)
+#     print(nodesinfo_basic)
+#     # for j in range(len(nodesinfo_basic)):
+#     #     d3 = dict()
+#     #     str = "salt '"+ nodesinfo_basic[j]['name']+"' junos.rpc 'get-ike-active-peers-information' --output=json"
+#     #     # child_nodes_json = os.popen(str)
+#     #     child_nodes_json = subprocess.check_output(str, shell=True)
+#     #     chiled_nodes_dict = json.loads(child_nodes_json)
+#     #     d3['switch'] = nodesinfo_basic[j]
+#     #     for k in range(len(nodesinfo_basic[j]['name']['cpeCloud']
+#     #     ['rpc_reply']['ike-active-peers-information']['ike-active-peers'])):
+#     #         d2 = dict()
+#     #         d2['ip'] = nodesinfo_basic[j]['name']['cpeCloud']['rpc_reply']['ike-active-peers-information']['ike-active-peers'][k]['ike-sa-remote-address']
+#     #         d2['name'] = nodesinfo_basic[j]['name']['cpeCloud']['rpc_reply']['ike-active-peers-information']['ike-active-peers'][k]['ike-ike-id']
+#     #         nodesinfo_full[k].append(d2)
+#     #     d3['devices'] = nodesinfo_full[k]
+#     #     nodesinfo_result.append(d3)
+#     #     nodesinfo_full.clear()
 
-    return jsonify(errmsg="success", data=json.dumps(nodesinfo_basic))
+#     return jsonify(errmsg="success", data=json.dumps(nodesinfo_basic))
 
 
 # @app.route('/apply_vpn_template', methods=['POST'])
@@ -1977,7 +1977,7 @@ def applyUTMtemplate_2():
 
 @app.route('/apply_idp_template',methods=['POST'])
 @login_required
-def applyUTMtemplate_2():
+def applyIDPtemplate_2():
     global LASTAPPLY_UTM
     tid = request.json['tid']
     dest_ip = request.json['ip']
@@ -1996,12 +1996,17 @@ def applyUTMtemplate_2():
 @app.route('/control_path_nodes',methods = ['GET'])
 @login_required
 def getControlPathInfo():
-<<<<<<< Updated upstream
-    nodesinfo = [
-        ()
-    ]
-=======
     
     return jsonify(errmsg="success", data=json.dumps(nodesinfo))
-
->>>>>>> Stashed changes
+nodesinfo_basic = [
+    {'name':'LTE-node-2','ip':'125.34.194.7','input_pps':'35','output_pps':'27'},
+    {'name':'hgw-1','ip':'125.34.194.8','input_pps':'23','output_pps':'45'},
+    {'name':'LTE-node-3','ip':'223.104.254.115','input_pps':'13','output_pps':'14'},
+    {'name':'ngfw-1','ip':'112.35.30.69','input_pps':'21','output_pps':'19'}
+    
+]
+@app.route('/traffic_path_nodes', methods=['GET'])
+@login_required
+def getTrafficPathinfo():
+    
+    return jsonify(errmsg = "success", data=json.dumps(nodesinfo_basic))
