@@ -72,7 +72,7 @@ $(document).ready(function(){
   
   menuItem.click(function() {
     if($(this)[0].id === 'check-info') {
-      window.open('/health_checks?devicename=1');
+      window.open('/health_checks/'+ currentNode.text);
     }
     menuList.hide();
   });

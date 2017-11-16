@@ -100,7 +100,7 @@ bundles = {
         output='gen/control_path.js'),
     'health_checks_js': 
     Bundle(
-        'js/echarts.simple.min.js',
+        'js/echarts.common.min.js',
         'js/health_checks.js',
         filters='jsmin',
         output='gen/health_checks.js'),
@@ -2167,20 +2167,22 @@ def health_checks():
 
 
 devices_info = [
-    {'node_name':'LTE-node-2','CPU':'35/100','memory':'6400/8000','flow':[5,4,4,3,3,2,4,7,8,10,15,17,18,17,19,16,15,20,15,19,23,19,13,7]},
-    {'node_name':'hgw-1','CPU':'35/100','memory':'6400/8000','flow':[5,4,4,3,3,2,4,7,8,10,15,17,18,17,19,16,15,20,15,19,23,19,13,7]},
-    {'node_name':'LTE-node-3','CPU':'35/100','memory':'6400/8000','flow':[5,4,4,3,3,2,4,7,8,10,15,17,18,17,19,16,15,20,15,19,23,19,13,7]},
-    {'node_name':'ngfw-1','CPU':'35/100','memory':'6400/8000','flow':[5,4,4,3,3,2,4,7,8,10,15,17,18,17,19,16,15,20,15,19,23,19,13,7]}
+    {'node_name':'LTE-node-2','CPU':'35','memory':'6400','flow':[5,4,4,3,3,2,4,7,8,10,15,17,18,17,19,16,15,20,15,19,23,19,13,7]},
+    {'node_name':'hgw-1','CPU':'45','memory':'5000','flow':[5,4,4,3,3,2,4,7,8,10,15,17,18,17,19,16,15,20,15,19,23,19,13,7]},
+    {'node_name':'LTE-node-3','CPU':'15','memory':'4000','flow':[5,4,4,3,3,2,4,7,8,10,15,17,18,17,19,16,15,20,15,19,23,19,13,7]},
+    {'node_name':'ngfw-1','CPU':'65','memory':'7000','flow':[5,4,4,3,3,2,4,7,8,10,15,17,18,17,19,16,15,20,15,19,23,19,13,7]}
     
 
 ]
 
-@app.route('/health_checks_/<node>', methods = ['GET'])
+@app.route('/health_checks/<node>', methods = ['GET'])
 # @login_required
 def show_devices_info(node):
-    print(node)
+    type = request.args.get("type", None)
     for device in devices_info:
         if device['node_name'] == node:
-            return render_template('device_health_checks.html', device=device)
-            # return jsonify(errmsg = "success", data = json.dumps(device))
+            if type:
+                return jsonify(errmsg = "success", data = json.dumps(device))              
+            else:
+                return render_template('device_health_checks.html', device=device)              
     return jsonify(errmsg = "no such node!")
