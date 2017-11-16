@@ -80,6 +80,7 @@ bundles = {
         'js/jsontree.js',
         'js/jquery.dataTables.min.js',
         'js/dataTables.bootstrap.js',
+        'js/fastclick.min.js',                
         'js/control-admin-2.js',
         filters='jsmin',
         output='gen/packed.js'),
@@ -93,8 +94,16 @@ bundles = {
     Bundle(
         'js/jtopo-0.4.8-min.js',
         'js/control_topo.js',
+        'js/jquery.loading.min.js',
+        'js/jquery-confirm.min.js',        
         filters='jsmin',
         output='gen/control_path.js'),
+    'health_checks_js': 
+    Bundle(
+        'js/echarts.simple.min.js',
+        'js/health_checks.js',
+        filters='jsmin',
+        output='gen/health_checks.js'),
     'base_css':
     Bundle(
         'vendor/bootstrap/css/bootstrap.css',
@@ -102,6 +111,8 @@ bundles = {
         'vendor/font-awesome/css/font-awesome.min.css',
         'css/jsontree.css',
         'css/dataTables.bootstrap.css',
+        'css/jquery.loading.min.css',
+        'css/jquery-confirm.min.css',
         filters='cssmin, cssrewrite',
         output='gen/packed.css')
 }
@@ -251,11 +262,6 @@ def minions_do_check_sync(minion):
         args=Call(test=True))['jid']
     return redirect(
         url_for('job_result', minion=minion, jid=jid, renderer='highstate'))
-
-@app.route("/health_checks")
-@login_required
-def health_checks():
-  return render_template('health_checks.html')
 
 @app.route("/jobs")
 @login_required
@@ -2014,7 +2020,7 @@ def applyVPNtemplate_1():
 
     return jsonify(errmsg = "success", status=0)
 
-@app.route('/apply_utm_tempalte',methods=['POST'])
+@app.route('/apply_utm_template',methods=['POST'])
 @login_required
 def applyUTMtemplate_1():
     global LASTAPPLY_UTM
@@ -2072,6 +2078,12 @@ def getTrafficPathinfo():
 
     return jsonify(errmsg = "success", data=json.dumps(nodesinfo_basic))
 
+@app.route("/health_checks")
+@login_required
+def health_checks():
+  return render_template('health_checks.html', nodes=nodesinfo_basic)
+
+
 devices_info = [
     {'node_name':'LTE-node-2','CPU':'35/100','memory':'6400/8000','flow':[5,4,4,3,3,2,4,7,8,10,15,17,18,17,19,16,15,20,15,19,23,19,13,7]},
     {'node_name':'hgw-1','CPU':'35/100','memory':'6400/8000','flow':[5,4,4,3,3,2,4,7,8,10,15,17,18,17,19,16,15,20,15,19,23,19,13,7]},
@@ -2081,15 +2093,12 @@ devices_info = [
 
 ]
 
-@app.route('/healthcheck_nodeinfo',methods = ['POST'])
+@app.route('/health_checks_/<node>', methods = ['GET'])
 # @login_required
-def show_devices_info():
-    node_name = request.json['node_name']
-    flag = 0
+def show_devices_info(node):
+    print(node)
     for device in devices_info:
-        if device['node_name'] == node_name:
-            flag = 1
-            print(device)
-            return jsonify(errmsg = "success", data = json.dumps(device))
-    if flag == 0:
-        return jsonify(errmsg = "no such node!")
+        if device['node_name'] == node:
+            return render_template('device_health_checks.html', device=device)
+            # return jsonify(errmsg = "success", data = json.dumps(device))
+    return jsonify(errmsg = "no such node!")

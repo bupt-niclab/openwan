@@ -2,6 +2,9 @@ var currentNode = null;
 var templateTable;
 
 $(document).ready(function(){
+  var attachFastClick = Origami.fastclick;
+  attachFastClick(document.body);
+  
   var canvas = document.getElementById('canvas'); 
   var stage = new JTopo.Stage(canvas); // 创建一个舞台对象
 
@@ -27,51 +30,50 @@ $(document).ready(function(){
   menuItem = menuList.find('a');
   
   menuItem.click(function() {
+    var api, type;
     if($(this)[0].id === 'config-vpn-template') {
-      $('#config-template-modal').modal();
-      if(!templateTable) {
-        templateTable = $('#templates').DataTable({
-          ajax: {
-            url: '/api_templates/VPN/' + currentNode.text
-          },
-          pageLength: 5,
-          columns: [{
-            data: "tid"
-          }, {
-            data: "name"
-          }, {
-            data: "applied"
-          }],
-          columnDefs: [
-          {
-            render: function(data, type, row, meta) {
-              // return '<a href="' + data + '" target="_blank">' + row.title + '</a>';
-              if (data) {
-                return '<button class="btn btn-primary" disabled style="margin-right: 10px">已应用</button><button class="btn btn-primary" onclick="editTemplate("' + row.tid + ')">编辑模板</button>';
-              } else {
-                return '<button class="btn btn-primary" style="margin-right: 10px" onclick="applyTemplate(' + row.tid + ')">应用</button><button class="btn btn-primary" onclick="editTemplate(' + row.tid + ')">编辑模板</button>';                
-              }           
-            },
-            //指定是第三列
-            targets: 2
-          }]
-        });
-        // templateTable.on('order.dt search.dt', function() {
-        //     t.column(0, {
-        //       "search": 'applied',
-        //       "order": 'applied'
-        //     }).nodes().each(function(cell, i) {
-        //       cell.innerHTML = i + 1;
-        //   });
-        // }).draw();
-      }
+      api = '/api_templates/VPN/' + currentNode.text;
+      type = 'vpn';
     }
     if ($(this)[0].id === 'config-utm-template') {
-      alert('配置 utm 模板');
+      api = '/api_templates/UTM/' + currentNode.text;
+      type = 'utm';      
     } 
     if ($(this)[0].id === 'config-idp-template') {
-      alert('配置 idp 模板');
+      api = '/api_templates/IDP/' + currentNode.text;
+      type = 'idp';      
     } 
+    $('#config-template-modal').modal();
+    if(!templateTable) {
+      templateTable = $('#templates').DataTable({
+        ajax: {
+          url: api
+        },
+        pageLength: 5,
+        columns: [{
+          data: "tid"
+        }, {
+          data: "name"
+        }, {
+          data: "applied"
+        }],
+        columnDefs: [
+        {
+          render: function(data, type, row, meta) {
+            // return '<a href="' + data + '" target="_blank">' + row.title + '</a>';
+            if (data) {
+              return '<button class="btn btn-primary" disabled style="margin-right: 10px">已应用</button><button class="btn btn-primary" onclick="editTemplate("' + row.tid + ',\'' + row.type + '\')">编辑模板</button>';
+            } else {
+              return '<button class="btn btn-primary" style="margin-right: 10px" onclick="applyTemplate(' + row.tid + ',\'' + row.type + '\')">应用</button><button class="btn btn-primary" onclick="editTemplate(' + row.tid + ',\'' + row.type + '\')">编辑模板</button>';                
+            }           
+          },
+          //指定是第三列
+          targets: 2
+        }]
+      });
+    } else {
+      templateTable.ajax.url(api).load();
+    }
     menuList.hide();
   });
 
@@ -172,12 +174,28 @@ function createSingleNode (nodeInfo, scene) {
   } else if (nodeInfo.node_state === 'down') {
     node.alarm = 'down';
   }
+  if (nodeInfo.vpn === 'up') {
+    node.alarm += '/vpn';
+  }
+  if (nodeInfo.utm === 'up') {
+    node.alarm += '/utm';
+  }
+  if (nodeInfo.idp === 'up') {
+    node.alarm += '/idp';
+  }
   node.fontColor = nodeInfo.fontColor || '0,0,0';  
   scene.add(node);
   if (nodeInfo.node_type === 'agent') {
     node.addEventListener('mouseup', function(event) {
       handler(event, node);
     });
+    node.addEventListener('touchstart', function(event){
+      handler(event, node);
+    }, false);
+    // node.addEventListener('click', function(event){
+    //   alert('dadas');
+    //   handler(event, node);
+    // }, false);
   }
   return node;
 }
@@ -247,13 +265,13 @@ function makeNodeEditable (scene) {
 function handler (event, node) {
   // console.log(node);
   currentNode = node;
-  if (event.button === 2) {
+  // if (event.button === 2) {
     // console.log(event);
     $('#contextmenu').css({
       top: event.layerY,
       left: event.layerX + 40
     }).show();
-  }
+  // }
 }  
 
 
@@ -283,13 +301,21 @@ function getTemplates(callback) {
 }
 
 // 应用模板
-function applyTemplate(tid) {
+function applyTemplate(tid, type) {
   if(currentNode.text === '192.168.0.13') {
     currentNode.text = 'cpe2';
   }
+  var api;
+  if (type === 'VPN') {
+    api = '/apply_vpn_template';
+  } else if (type === 'UTM') {
+    api = '/apply_utm_template';    
+  } else {
+    api = '/apply_idp_template';    
+  }
   $.ajax({
     type: 'post',
-    url: '/apply_vpn_template',
+    url: api,
     contentType: "application/json",
     data: JSON.stringify({
       tid: tid,
@@ -298,16 +324,31 @@ function applyTemplate(tid) {
     })
   }).done(function(response){
     if (response.status === 0) {
-      alert('应用成功');
+      $('#config-template-modal').modal('hide');
+      var canvas = $('#canvas');
+      canvas.loading({
+        message: '应用中...'
+      });
+      setTimeout(function(){
+        canvas.loading('stop');
+        $.alert({
+          title: '',
+          content: '模板应用成功！',
+          onAction: function() {
+            location.reload();
+          }
+        });
+      }, 1500);
+      
       templateTable.ajax.reload();  
     } else {
-      alert(response.errmsg)
+      alert(response.errmsg);
     }
   })
 }
 
 // 跳转至编辑模板页面
-function editTemplate(tid) {
-  window.location.href = '/template/edit/' + tid;
+function editTemplate(tid, type) {
+  window.location.href = '/template/edit/' + type + '/' + tid;
 }
 

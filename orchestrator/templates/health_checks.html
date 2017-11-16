@@ -26,10 +26,10 @@
             </tr>
             </thead>
             <tbody>
-            {% for minion, minion_data in minions.items() %}
+            {% for node in nodes %}
             <tr>
-            <td><a href="{{ url_for('minion_details', minion=minion) }}">{{ minion }}</a></td>
-            <td><a href="{{ url_for('minions_do_check_sync', minion=minion) }}">查看详情</a></td>
+            <td>{{ node.name }}</td>
+            <td><a href="{{ url_for('show_devices_info', node=node.name) }}">查看详情</a></td>
             </tr>
             {% endfor %}
             </tbody>
