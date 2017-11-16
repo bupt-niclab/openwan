@@ -2073,10 +2073,10 @@ def getTrafficPathinfo():
     return jsonify(errmsg = "success", data=json.dumps(nodesinfo_basic))
 
 devices_info = [
-    {'node_name':'LTE-node-2','CPU':'35/100','memory':'6400/8000','flow':'100'},
-    {'node_name':'hgw-1','CPU':'35/100','memory':'6400/8000','flow':'100'},
-    {'node_name':'LTE-node-3','CPU':'35/100','memory':'6400/8000','flow':'100'},
-    {'node_name':'ngfw-1','CPU':'35/100','memory':'6400/8000','flow':'100'}
+    {'node_name':'LTE-node-2','CPU':'35/100','memory':'6400/8000','flow':[5,4,4,3,3,2,4,7,8,10,15,17,18,17,19,16,15,20,15,19,23,19,13,7]},
+    {'node_name':'hgw-1','CPU':'35/100','memory':'6400/8000','flow':[5,4,4,3,3,2,4,7,8,10,15,17,18,17,19,16,15,20,15,19,23,19,13,7]},
+    {'node_name':'LTE-node-3','CPU':'35/100','memory':'6400/8000','flow':[5,4,4,3,3,2,4,7,8,10,15,17,18,17,19,16,15,20,15,19,23,19,13,7]},
+    {'node_name':'ngfw-1','CPU':'35/100','memory':'6400/8000','flow':[5,4,4,3,3,2,4,7,8,10,15,17,18,17,19,16,15,20,15,19,23,19,13,7]}
     
 
 ]
