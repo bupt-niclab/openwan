@@ -1930,21 +1930,21 @@ nodesinfo = [
         {'node_name':'LTE-node-2','node_type':'non-agent','node_state':'up','vpn':'down','utm':'down','idp':'down'}
     ]
 VPN_tem = [
-    {'tid':1,'name':'vpn_1','applied':False},
-    {'tid':2,'name':'vpn_2','applied':False},
-    {'tid':3,'name':'vpn_3','applied':False}
+    {'tid':1,'name':'vpn_1','applied':False,'type':'VPN'},
+    {'tid':2,'name':'vpn_2','applied':False,'type':'VPN'},
+    {'tid':3,'name':'vpn_3','applied':False,'type':'VPN'}
 ]
 
 UTM_tem = [
-    {'tid':1,'name':'utm_1','applied':False},
-    {'tid':2,'name':'utm_2','applied':False},
-    {'tid':3,'name':'utm_3','applied':False}
+    {'tid':1,'name':'utm_1','applied':False,'type':'UTM'},
+    {'tid':2,'name':'utm_2','applied':False,'type':'UTM'},
+    {'tid':3,'name':'utm_3','applied':False,'type':'UTM'}
 ]
 
 IDP_tem = [
-    {'tid':1,'name':'idp_1','applied':False},
-    {'tid':2,'name':'idp_2','applied':False},
-    {'tid':3,'name':'idp_3','applied':False}
+    {'tid':1,'name':'idp_1','applied':False,'type':'IDP'},
+    {'tid':2,'name':'idp_2','applied':False,'type':'IDP'},
+    {'tid':3,'name':'idp_3','applied':False,'type':'IDP'}
 ]
 @app.route('/api_templates/<switchname>')
 @login_required
