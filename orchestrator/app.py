@@ -1928,36 +1928,113 @@ def jinja_access_test(tid):
 
 
 nodesinfo = [
-        {'node_name':'cpe1','node_type':'agent','node_state':'up','vpn':'down','utm':'down','idp':'down'},
-        {'node_name':'cpeCloud','node_type':'agent','node_state':'up','vpn':'down','utm':'down','idp':'down'},
-        {'node_name':'LTE-node2-agent','node_type':'agent','node_state':'up','vpn':'down','utm':'down','idp':'down'},
-        {'node_name':'Agent-1','node_type':'non-agent','node_state':'up','vpn':'down','utm':'down','idp':'down'},
-        {'node_name':'Agent-2','node_type':'non-agent','node_state':'up','vpn':'down','utm':'down','idp':'down'},
-        {'node_name':'LTE-node-2','node_type':'non-agent','node_state':'up','vpn':'down','utm':'down','idp':'down'}
-    ]
-VPN_tem = [
+        {'node_name':'cpe1','node_type':'agent','node_state':'up','vpn':'down','utm':'down','idp':'down','vpn_id' : 0 ,'utm_id':0,'idp_id':0, 'vpn_tem':[
     {'tid':1,'name':'vpn_1','applied':False,'type':'VPN'},
     {'tid':2,'name':'vpn_2','applied':False,'type':'VPN'},
     {'tid':3,'name':'vpn_3','applied':False,'type':'VPN'}
-]
-
-UTM_tem = [
+], 'utm_tem':[
     {'tid':1,'name':'utm_1','applied':False,'type':'UTM'},
     {'tid':2,'name':'utm_2','applied':False,'type':'UTM'},
     {'tid':3,'name':'utm_3','applied':False,'type':'UTM'}
-]
-
-IDP_tem = [
+], 'idp_tem':[
     {'tid':1,'name':'idp_1','applied':False,'type':'IDP'},
     {'tid':2,'name':'idp_2','applied':False,'type':'IDP'},
     {'tid':3,'name':'idp_3','applied':False,'type':'IDP'}
-]
+]},
+        {'node_name':'cpeCloud','node_type':'agent','node_state':'up','vpn':'down','utm':'down','idp':'down','vpn_id' : 0 ,'utm_id':0,'idp_id':0, 'vpn_tem':[
+    {'tid':1,'name':'vpn_1','applied':False,'type':'VPN'},
+    {'tid':2,'name':'vpn_2','applied':False,'type':'VPN'},
+    {'tid':3,'name':'vpn_3','applied':False,'type':'VPN'}
+], 'utm_tem':[
+    {'tid':1,'name':'utm_1','applied':False,'type':'UTM'},
+    {'tid':2,'name':'utm_2','applied':False,'type':'UTM'},
+    {'tid':3,'name':'utm_3','applied':False,'type':'UTM'}
+], 'idp_tem':[
+    {'tid':1,'name':'idp_1','applied':False,'type':'IDP'},
+    {'tid':2,'name':'idp_2','applied':False,'type':'IDP'},
+    {'tid':3,'name':'idp_3','applied':False,'type':'IDP'}
+]},
+        {'node_name':'LTE-node2-agent','node_type':'agent','node_state':'up','vpn':'down','utm':'down','idp':'down','vpn_id' : 0 ,'utm_id':0,'idp_id':0, 'vpn_tem':[
+    {'tid':1,'name':'vpn_1','applied':False,'type':'VPN'},
+    {'tid':2,'name':'vpn_2','applied':False,'type':'VPN'},
+    {'tid':3,'name':'vpn_3','applied':False,'type':'VPN'}
+], 'utm_tem':[
+    {'tid':1,'name':'utm_1','applied':False,'type':'UTM'},
+    {'tid':2,'name':'utm_2','applied':False,'type':'UTM'},
+    {'tid':3,'name':'utm_3','applied':False,'type':'UTM'}
+], 'idp_tem':[
+    {'tid':1,'name':'idp_1','applied':False,'type':'IDP'},
+    {'tid':2,'name':'idp_2','applied':False,'type':'IDP'},
+    {'tid':3,'name':'idp_3','applied':False,'type':'IDP'}
+]},
+        {'node_name':'Agent-1','node_type':'non-agent','node_state':'up','vpn':'down','utm':'down','idp':'down','vpn_id' : 0 ,'utm_id':0,'idp_id':0, 'vpn_tem':[
+    {'tid':1,'name':'vpn_1','applied':False,'type':'VPN'},
+    {'tid':2,'name':'vpn_2','applied':False,'type':'VPN'},
+    {'tid':3,'name':'vpn_3','applied':False,'type':'VPN'}
+], 'utm_tem':[
+    {'tid':1,'name':'utm_1','applied':False,'type':'UTM'},
+    {'tid':2,'name':'utm_2','applied':False,'type':'UTM'},
+    {'tid':3,'name':'utm_3','applied':False,'type':'UTM'}
+], 'idp_tem':[
+    {'tid':1,'name':'idp_1','applied':False,'type':'IDP'},
+    {'tid':2,'name':'idp_2','applied':False,'type':'IDP'},
+    {'tid':3,'name':'idp_3','applied':False,'type':'IDP'}
+]},
+        {'node_name':'Agent-2','node_type':'non-agent','node_state':'up','vpn':'down','utm':'down','idp':'down','vpn_id' : 0 ,'utm_id':0,'idp_id':0, 'vpn_tem':[
+    {'tid':1,'name':'vpn_1','applied':False,'type':'VPN'},
+    {'tid':2,'name':'vpn_2','applied':False,'type':'VPN'},
+    {'tid':3,'name':'vpn_3','applied':False,'type':'VPN'}
+], 'utm_tem':[
+    {'tid':1,'name':'utm_1','applied':False,'type':'UTM'},
+    {'tid':2,'name':'utm_2','applied':False,'type':'UTM'},
+    {'tid':3,'name':'utm_3','applied':False,'type':'UTM'}
+], 'idp_tem':[
+    {'tid':1,'name':'idp_1','applied':False,'type':'IDP'},
+    {'tid':2,'name':'idp_2','applied':False,'type':'IDP'},
+    {'tid':3,'name':'idp_3','applied':False,'type':'IDP'}
+]},
+        {'node_name':'LTE-node-2','node_type':'non-agent','node_state':'up','vpn':'down','utm':'down','idp':'down','vpn_id' : 0 ,'utm_id':0,'idp_id':0, 'vpn_tem':[
+    {'tid':1,'name':'vpn_1','applied':False,'type':'VPN'},
+    {'tid':2,'name':'vpn_2','applied':False,'type':'VPN'},
+    {'tid':3,'name':'vpn_3','applied':False,'type':'VPN'}
+], 'utm_tem':[
+    {'tid':1,'name':'utm_1','applied':False,'type':'UTM'},
+    {'tid':2,'name':'utm_2','applied':False,'type':'UTM'},
+    {'tid':3,'name':'utm_3','applied':False,'type':'UTM'}
+], 'idp_tem':[
+    {'tid':1,'name':'idp_1','applied':False,'type':'IDP'},
+    {'tid':2,'name':'idp_2','applied':False,'type':'IDP'},
+    {'tid':3,'name':'idp_3','applied':False,'type':'IDP'}
+]}
+    ]
+# VPN_tem = [
+#     {'tid':1,'name':'vpn_1','applied':False,'type':'VPN'},
+#     {'tid':2,'name':'vpn_2','applied':False,'type':'VPN'},
+#     {'tid':3,'name':'vpn_3','applied':False,'type':'VPN'}
+# ]
+
+# UTM_tem = [
+#     {'tid':1,'name':'utm_1','applied':False,'type':'UTM'},
+#     {'tid':2,'name':'utm_2','applied':False,'type':'UTM'},
+#     {'tid':3,'name':'utm_3','applied':False,'type':'UTM'}
+# ]
+
+# IDP_tem = [
+#     {'tid':1,'name':'idp_1','applied':False,'type':'IDP'},
+#     {'tid':2,'name':'idp_2','applied':False,'type':'IDP'},
+#     {'tid':3,'name':'idp_3','applied':False,'type':'IDP'}
+# ]
 @app.route('/api_templates/<switchname>')
 @login_required
 def api_templates(switchname):
     global LASTAPPLY_TID
+    for node in nodesinfo:
+        if node['node_name'] == switchname:
+            LASTAPPLY_TID = node['vpn_id']
     for t in VPN_tem:
         print(t['applied'])
+        t['applied'] = False
+    for t in VPN_tem:
         if t['tid'] == LASTAPPLY_TID:
             t['applied'] = True
         else:
@@ -1967,91 +2044,96 @@ def api_templates(switchname):
 @app.route('/api_templates/VPN/<switchname>')
 @login_required
 def api_templates_vpn(switchname):
-    global LASTAPPLY_TID
-    for t in VPN_tem:
-        print(t['applied'])
-        if t['tid'] == LASTAPPLY_TID:
-            t['applied'] = True
-        else:
-            t['applied'] = False
-        
-    return jsonify(errmsg = "success",data=VPN_tem)
-@app.route('/api_templates/UTM/<switchname>')
-@login_required
-def api_templates_utm(switchname):
-    global LASTAPPLY_UTM
-    for t in VPN_tem:
-        print(t['applied'])
-        if t['tid'] == LASTAPPLY_UTM:
-            t['applied'] = True
-        else:
-            t['applied'] = False
-        
-    return jsonify(errmsg = "success",data=UTM_tem)
-@app.route('/api_templates/IDP/<switchname>')
-@login_required
-def api_templates_idp(switchname):
-    global LASTAPPLY_IDP
-    for t in VPN_tem:
-        print(t['applied'])
-        if t['tid'] == LASTAPPLY_IDP:
-            t['applied'] = True
-        else:
-            t['applied'] = False
-        
-    return jsonify(errmsg = "success",data=VPN_tem)
+    for node in nodesinfo:
+        if node['node_name'] == switchname:
+            print(node['node_name'])
+            print(node['vpn_id'])
+            for t in node['vpn_tem']:
+                print(t['applied'])
+                if t['tid'] == node['vpn_id']:
+                    t['applied'] = True
+                else:
+                    t['applied'] = False
+    for node in nodesinfo:
+        if node['node_name'] == switchname:
+            print(node['vpn_tem'])
+            return jsonify(errmsg = "success", data = node['vpn_tem'])
+    # return jsonify(errmsg = "success",data= nodesinfo[])
 @app.route('/apply_vpn_template',methods=['POST'])
 @login_required
 def applyVPNtemplate_1():
-    global LASTAPPLY_TID
     tid = request.json['tid']
-    # dest_ip = request.json['ip']
     node_name = request.json['node_name']
-    print("tid is ",tid)
-    LASTAPPLY_TID = tid
-    for t in VPN_tem:
-        if t['tid'] == LASTAPPLY_TID:
-            t['applied'] = True
-        print(t['name']," ",t['applied'])
     for node in nodesinfo:
         if node['node_name'] == node_name:
+            node['vpn_id'] = tid
             node['vpn'] = 'up'
-    print(LASTAPPLY_TID)
-
+            for t in node['vpn_tem']:
+                if t['tid'] == tid:
+                    t['applied'] = True
     return jsonify(errmsg = "success", status=0)
-
+@app.route('/api_templates/UTM/<switchname>')
+@login_required
+def api_templates_utm(switchname):
+    for node in nodesinfo:
+        if node['node_name'] == switchname:
+            print(node['node_name'])
+            print(node['utm_id'])
+            for t in node['utm_tem']:
+                print(t['applied'])
+                if t['tid'] == node['utm_id']:
+                    t['applied'] = True
+                else:
+                    t['applied'] = False
+    for node in nodesinfo:
+        if node['node_name'] == switchname:
+            print(node['utm_tem'])
+            return jsonify(errmsg = "success", data = node['utm_tem'])
 @app.route('/apply_utm_template',methods=['POST'])
 @login_required
 def applyUTMtemplate_1():
-    global LASTAPPLY_UTM
     tid = request.json['tid']
-    # dest_ip = request.json['ip']
     node_name = request.json['node_name']
-    LASTAPPLY_UTM = tid
-    for t in UTM_tem:
-        if t['tid'] == LASTAPPLY_UTM:
-            t['applied'] = True
     for node in nodesinfo:
         if node['node_name'] == node_name:
+            node['utm_id'] = tid
             node['utm'] = 'up'
-
+            for t in node['utm_tem']:
+                if t['tid'] == tid:
+                    t['applied'] = True
     return jsonify(errmsg = "success", status=0)
+
+
+@app.route('/api_templates/IDP/<switchname>')
+@login_required
+def api_templates_idp(switchname):
+    for node in nodesinfo:
+        if node['node_name'] == switchname:
+            print(node['node_name'])
+            print(node['idp_id'])
+            for t in node['idp_tem']:
+                print(t['applied'])
+                if t['tid'] == node['idp_id']:
+                    t['applied'] = True
+                else:
+                    t['applied'] = False
+    for node in nodesinfo:
+        if node['node_name'] == switchname:
+            print(node['idp_tem'])
+            return jsonify(errmsg = "success", data = node['idp_tem'])
 
 @app.route('/apply_idp_template',methods=['POST'])
 @login_required
 def applyIDPtemplate_2():
-    global LASTAPPLY_UTM
     tid = request.json['tid']
-    # dest_ip = request.json['ip']
     node_name = request.json['node_name']
-    LASTAPPLY_IDP = tid
-    for t in IDP_tem:
-        if t['tid'] == LASTAPPLY_IDP:
-            t['applied'] = True
     for node in nodesinfo:
         if node['node_name'] == node_name:
+            node['idp_id'] = tid
             node['idp'] = 'up'
-
+            for t in node['idp_tem']:
+                if t['tid'] == tid:
+                    t['applied'] = True
     return jsonify(errmsg = "success", status=0)
 
 
