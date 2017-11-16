@@ -27,12 +27,12 @@ $(document).ready(function(){
   menuItem = menuList.find('a');
   
   menuItem.click(function() {
-    if($(this)[0].id === 'config-template') {
+    if($(this)[0].id === 'config-vpn-template') {
       $('#config-template-modal').modal();
       if(!templateTable) {
         templateTable = $('#templates').DataTable({
           ajax: {
-            url: '/api_templates/' + currentNode.text
+            url: '/api_templates/VPN/' + currentNode.text
           },
           pageLength: 5,
           columns: [{
@@ -65,6 +65,12 @@ $(document).ready(function(){
         //   });
         // }).draw();
       }
+    }
+    if ($(this)[0].id === 'config-utm-template') {
+      alert('配置 utm 模板');
+    } 
+    if ($(this)[0].id === 'config-idp-template') {
+      alert('配置 idp 模板');
     } 
     menuList.hide();
   });

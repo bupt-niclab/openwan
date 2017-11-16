@@ -338,27 +338,27 @@ function handler (event, node) {
 
 // 获取节点信息
 function getNodes(callback) {
-  var mockData = [{
-    switch: {
-      name: 'CPE1',
-      id: 1
-    },
-    devices: [{ip: '10.0.0.0'}, {ip: '10.0.0.1'}, {ip: '10.0.0.2'}]
-  }, {
-    switch: {
-      name: 'CPE2',
-      id: 2
-    },
-    devices: [{ip: '192.0.0.0'}, {ip: '192.0.0.1'}, {ip: '192.0.0.2'}]
-  }];
-  callback(mockData);
-  // $.ajax({
-  //   type: "get",
-  //   url: "/traffic_path_nodes",
-  //   success: function (response) {
-  //     if (response.errmsg === 'success') {
-  //       callback(JSON.parse(response.data));
-  //     }
-  //   }
-  // });
+  // var mockData = [{
+  //   switch: {
+  //     name: 'CPE1',
+  //     id: 1
+  //   },
+  //   devices: [{ip: '10.0.0.0'}, {ip: '10.0.0.1'}, {ip: '10.0.0.2'}]
+  // }, {
+  //   switch: {
+  //     name: 'CPE2',
+  //     id: 2
+  //   },
+  //   devices: [{ip: '192.0.0.0'}, {ip: '192.0.0.1'}, {ip: '192.0.0.2'}]
+  // }];
+  // callback(mockData);
+  $.ajax({
+    type: "get",
+    url: "/traffic_path_nodes",
+    success: function (response) {
+      if (response.errmsg === 'success') {
+        callback(JSON.parse(response.data));
+      }
+    }
+  });
 }

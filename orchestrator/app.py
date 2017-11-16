@@ -2033,7 +2033,7 @@ def applyUTMtemplate_1():
 
 @app.route('/apply_idp_template',methods=['POST'])
 @login_required
-def applyIDPtemplate_1():
+def applyIDPtemplate_2():
     global LASTAPPLY_UTM
     tid = request.json['tid']
     # dest_ip = request.json['ip']
