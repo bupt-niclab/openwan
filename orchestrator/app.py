@@ -2012,7 +2012,7 @@ def applyVPNtemplate_1():
             node['vpn'] = 'up'
     print(LASTAPPLY_TID)
 
-    return jsonify(errmsg = "success")
+    return jsonify(errmsg = "success", status=0)
 
 @app.route('/apply_utm_tempalte',methods=['POST'])
 @login_required
@@ -2029,7 +2029,7 @@ def applyUTMtemplate_1():
         if node['node_name'] == node_name:
             node['utm'] = 'up'
 
-    return jsonify(errmsg = "success")
+    return jsonify(errmsg = "success", status=0)
 
 @app.route('/apply_idp_template',methods=['POST'])
 @login_required
@@ -2046,7 +2046,7 @@ def applyIDPtemplate_2():
         if node['node_name'] == node_name:
             node['idp'] = 'up'
 
-    return jsonify(errmsg = "success")
+    return jsonify(errmsg = "success", status=0)
 
 
 
