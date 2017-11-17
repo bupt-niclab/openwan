@@ -12,7 +12,7 @@ for(var i=0,j=nodeList.length;i<j;i++){var node=nodeList[i];var addedNode=create
 return addedNodeList;}
 function createSingleNode(nodeInfo,scene){var node=new JTopo.Node(nodeInfo.text);node.setLocation(nodeInfo.x,nodeInfo.y);node.setSize(nodeInfo.w,nodeInfo.h);if(nodeInfo.img){node.setImage('/static/images/'+nodeInfo.img,true);}
 node.dragable=nodeInfo.dragable;if(nodeInfo.state==='UP'){node.alarm='up';node.alarmColor='0, 255, 0';}else if(nodeInfo.state==='DOWN'){node.alarm='down';}
-node.fontColor=nodeInfo.fontColor||'0,0,0';scene.add(node);if(nodeInfo.nodeType==='switch'){node.addEventListener('mouseup',function(event){handler(event,node);});node.addEventListener('touchstart',function(event){handler(event,node);},false);node.addEventListener('dbclick',function(event){alert('hehe');},false);}
+node.fontColor=nodeInfo.fontColor||'0,0,0';scene.add(node);if(nodeInfo.nodeType==='switch'){node.addEventListener('mouseup',function(event){handler(event,node);});node.addEventListener('touchstart',function(event){handler(event,node);},false);}
 return node;}
 function createLink(fromNode,toNode,text,scene,level){var link=new JTopo.Link(fromNode,toNode,text);link.arrowsRadius=10;link.lineWidth=level?level*3:3;link.offsetGap=90;link.bundleOffset=40;link.bundleGap=20;link.textOffsetY=30;link.fontColor='81,181,220';link.strokeColor='81,181,220';console.log(link);scene.add(link);return link;}
 function makeNodeEditable(scene){var beginNode=null;var tempNodeA=new JTopo.Node('tempA');;tempNodeA.setSize(1,1);var tempNodeZ=new JTopo.Node('tempZ');;tempNodeZ.setSize(1,1);var link=new JTopo.Link(tempNodeA,tempNodeZ);scene.mouseup(function(e){if(e.button===2){scene.remove(link);return;}
