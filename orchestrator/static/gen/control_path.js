@@ -17,7 +17,7 @@ node.dragable=nodeInfo.dragable;if(nodeInfo.node_state==='up'){node.alarm='up';n
 if(nodeInfo.vpn==='up'){node.alarm+='/vpn';}
 if(nodeInfo.utm==='up'){node.alarm+='/utm';}
 if(nodeInfo.idp==='up'){node.alarm+='/idp';}
-node.fontColor=nodeInfo.fontColor||'0,0,0';scene.add(node);if(nodeInfo.node_type==='agent'){node.addEventListener('mouseup',function(event){handler(event,node);});node.addEventListener('touchstart',function(event){handler(event,node);},false);}
+node.fontColor=nodeInfo.fontColor||'0,0,0';scene.add(node);if(nodeInfo.node_type==='agent'){node.addEventListener('mouseup',function(event){handler(event,node);});node.addEventListener('touchend',function(event){handler(event,node);},false);}
 return node;}
 function createLink(fromNode,toNode,text,scene){var link=new JTopo.Link(fromNode,toNode,text);link.lineWidth=3;link.dashedPattern=5;link.bundleOffset=60;link.bundleGap=20;link.textOffsetY=3;link.strokeColor='81,181,220';scene.add(link);return link;}
 function makeNodeEditable(scene){var beginNode=null;var tempNodeA=new JTopo.Node('tempA');;tempNodeA.setSize(1,1);var tempNodeZ=new JTopo.Node('tempZ');;tempNodeZ.setSize(1,1);var link=new JTopo.Link(tempNodeA,tempNodeZ);scene.mouseup(function(e){if(e.button===2){scene.remove(link);return;}

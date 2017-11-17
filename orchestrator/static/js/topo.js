@@ -2,6 +2,9 @@ var currentNode = null;
 var templateTable;
 
 $(document).ready(function(){
+  var attachFastClick = Origami.fastclick;
+  attachFastClick(document.body);
+
   var canvas = document.getElementById('canvas'); 
   var stage = new JTopo.Stage(canvas); // 创建一个舞台对象
 
@@ -149,9 +152,24 @@ $(document).ready(function(){
     })
     var addedNodeList = createNodes(nodeList, scene);
     for (var i = 0, j = addedNodeList.length;i < j;i++) {
+      console.log(addedNodeList[i]);
       var linkText = '入节点PPS: ' + addedNodeList[i].input_pps + '; 出节点PPS: ' + addedNodeList[i].output_pps;
       createLink(addedNodeList[i], local, linkText, scene);
-      // createLink(local, addedNodeList[i], '', scene, addedNodeList[i].input_pps);      
+      for (var x = 0, y = addedNodeList[i].lower_nodes.length; x < y;x++) {
+        var lower_node = {
+          x: randomNodePosition('x'),
+          y: randomNodePosition('y'),
+          w: 40,
+          h: 40,
+          text: addedNodeList[i].lower_nodes[x].name,
+          img: 'switch_2.png',
+          dragable: true,
+          nodeType: 'host',
+        }
+        
+        // var addedLowerNode = createSingleNode(lower_node, scene);
+        // createLink(addedNodeList[i], lower_node, '', scene);      
+      }     
     }
   });
   // var nodeList = simulateNodes();
@@ -212,7 +230,8 @@ function createNodes (nodeList, scene) {
     var addedNode = createSingleNode(node, scene);
     addedNode.ip = node.ip;
     addedNode.input_pps = node.input_pps;
-    addedNode.output_pps = node.output_pps;    
+    addedNode.output_pps = node.output_pps;
+    addedNode.lower_nodes = node.lower_nodes;
     addedNodeList.push(addedNode);
   }
   return addedNodeList;
@@ -239,7 +258,10 @@ function createSingleNode (nodeInfo, scene) {
   if (nodeInfo.nodeType === 'switch') {
     node.addEventListener('mouseup', function(event) {
       handler(event, node);
-    })
+    });
+    node.addEventListener('touchstart', function(event){
+      handler(event, node);
+    }, false);
   }
   return node;
 }
@@ -327,13 +349,13 @@ function makeNodeEditable (scene) {
 function handler (event, node) {
   // console.log(node);
   currentNode = node;
-  if (event.button === 2) {
+  // if (event.button === 2) {
     // console.log(event);
     $('#contextmenu').css({
       top: event.layerY,
-      left: event.layerX + 40
+      left: event.layerX + 10
     }).show();
-  }
+  // }
 }  
 
 // 获取节点信息

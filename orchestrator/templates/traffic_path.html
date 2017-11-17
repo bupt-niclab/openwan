@@ -71,6 +71,7 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='js/fastclick.min.js') }}"></script>
 {% assets "traffic_path_js" %}
 <script type="text/javascript" src="{{ ASSET_URL }}"></script>
 {% endassets %}

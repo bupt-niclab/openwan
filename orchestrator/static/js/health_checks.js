@@ -34,7 +34,26 @@ $.ajax({
         type: 'pie',
         radius: '55%',
         center: ['50%', '60%'],
-        data: [{ value: cpu, name: '已使用' }, { value: 100 - cpu, name: '未使用' }],
+        data: [
+          { value: cpu, 
+            name: '已使用',
+            label: {
+              normal: {
+                show: true,
+                formatter: '{b} {d}%'
+              }
+            }
+          }, 
+          { value: 100 - cpu, 
+            name: '未使用',
+            label: {
+              normal: {
+                show: true,
+                formatter: '{b} {d}%'
+              }
+            }
+          }
+        ],
         itemStyle: {
           emphasis: {
             shadowBlur: 10,
@@ -66,7 +85,27 @@ $.ajax({
         type: 'pie',
         radius: '55%',
         center: ['50%', '60%'],
-        data: [{ value: memory, name: '已使用' }, { value: 8000 - memory, name: '未使用' }],
+        data: [
+          { 
+            value: memory, 
+            name: '已使用',
+            label: {
+              normal: {
+                show: true,
+                formatter: '{b} {d}%'
+              }
+            }
+          }, { 
+            value: 8000 - memory, 
+            name: '未使用',
+            label: {
+              normal: {
+                show: true,
+                formatter: '{b} {d}%'
+              }
+            } 
+          }
+        ],
         itemStyle: {
           emphasis: {
             shadowBlur: 10,
@@ -96,11 +135,13 @@ $.ajax({
     },
     xAxis: {
       type: 'category',
+      name: '时间(h)',
       boundaryGap: false,
       data: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23']
     },
     yAxis: {
-      type: 'value'
+      type: 'value',
+      name: '流量(MB)'
     },
     series: [
       {

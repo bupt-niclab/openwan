@@ -189,11 +189,10 @@ function createSingleNode (nodeInfo, scene) {
     node.addEventListener('mouseup', function(event) {
       handler(event, node);
     });
-    node.addEventListener('touchstart', function(event){
+    node.addEventListener('touchend', function(event){
       handler(event, node);
     }, false);
     // node.addEventListener('click', function(event){
-    //   alert('dadas');
     //   handler(event, node);
     // }, false);
   }
