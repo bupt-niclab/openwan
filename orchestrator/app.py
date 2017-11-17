@@ -2148,10 +2148,10 @@ def getControlPathInfo():
 
 
 nodesinfo_basic = [
-    {'name':"LTE-node-2",'ip':"125.34.194.7",'input_pps':35,'output_pps':27},
-    {'name':"hgw-1",'ip':"125.34.194.8",'input_pps':23,'output_pps':45},
-    {'name':"LTE-node-3",'ip':"223.104.254.115",'input_pps':13,'output_pps':14},
-    {'name':"ngfw-1",'ip':"112.35.30.69",'input_pps':21,'output_pps':19}
+    {'name':"LTE-node-2",'ip':"125.34.194.7",'input_pps':35,'output_pps':27,'lower_nodes':[{'name':'host_1','ip':'112.35.29.140'},{'name':'host_2','ip':'112.35.29.141'}]},
+    {'name':"hgw-1",'ip':"125.34.194.8",'input_pps':23,'output_pps':45,'lower_nodes':[{'name':'host_a','ip':'125.34.194.20'},{'name':'host_b','ip':'125.34.194.100'}]},
+    {'name':"LTE-node-3",'ip':"223.104.254.115",'input_pps':13,'output_pps':14,'lower_nodes':[{'name':'host_33','ip':'223.104.254.120'},{'name':'host_32','ip':'223.104.254.130'}]},
+    {'name':"ngfw-1",'ip':"112.35.30.69",'input_pps':21,'output_pps':19,'lower_nodes':[{'name':'host_c','ip':'112.35.30.25'},{'name':'host_d','ip':'112.35.30.30'}]}
     
 ]
 @app.route('/traffic_path_nodes', methods=['GET'])
