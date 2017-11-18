@@ -77,14 +77,17 @@ $(document).ready(function(){
     if($(this)[0].id === 'check-info') {
       window.open('/health_checks/'+ currentNode.text);
     }
+    if($(this)[0].id === 'hide-menu') {
+      menuList.hide();
+    }
     menuList.hide();
   });
 
 
   stage.click(function(event) {
-    if (event.button === 0) {
-      menuList.hide();
-    }
+    // if (event.button === 0) {
+    //   menuList.hide();
+    // }
   });
 
   // var applyBtn = $('.apply-template');
@@ -256,12 +259,15 @@ function createSingleNode (nodeInfo, scene) {
   scene.add(node);
   // TODO: 判断是否是 CPE 节点
   if (nodeInfo.nodeType === 'switch') {
-    node.addEventListener('mouseup', function(event) {
-      handler(event, node);
-    });
-    node.addEventListener('touchstart', function(event){
+    // node.addEventListener('mouseup', function(event) {
+    //   handler(event, node);
+    // });
+    node.addEventListener('click', function(event){
       handler(event, node);
     }, false);
+    // node.click(function(event){
+    //   handler(event, node);
+    // })
   }
   return node;
 }
@@ -294,67 +300,18 @@ function createLink (fromNode, toNode, text, scene, level) {
   return link;
 }
 
-// 创建动态连线
-function makeNodeEditable (scene) { 
-  var beginNode = null;
-
-  var tempNodeA = new JTopo.Node('tempA');;
-  tempNodeA.setSize(1, 1);
-  
-  var tempNodeZ = new JTopo.Node('tempZ');;
-  tempNodeZ.setSize(1, 1);
-  
-  var link = new JTopo.Link(tempNodeA, tempNodeZ);
-  
-  scene.mouseup(function(e) {
-    if (e.button === 2) {
-      scene.remove(link);
-      return;
-    }
-    if (e.target !== null && e.target instanceof JTopo.Node) {
-      if (beginNode === null) {
-        beginNode = e.target;
-        scene.add(link);
-        tempNodeA.setLocation(e.x, e.y);
-        tempNodeZ.setLocation(e.x, e.y);
-      } else if (beginNode !== e.target) {
-        var endNode = e.target;
-        var l = new JTopo.Link(beginNode, endNode);
-        scene.add(l);
-        l.addEventListener('mouseup', function(event) {
-          handler(event);
-        });
-        beginNode = null;
-        scene.remove(link);
-      } else {
-        beginNode = null;
-      }
-    } else {
-      scene.remove(link);
-    }
-  });
-  
-  scene.mousedown(function(e){
-    if(e.target == null || e.target === beginNode || e.target === link){
-      scene.remove(link);
-    }
-  });
-
-  scene.mousemove(function(e){
-    tempNodeZ.setLocation(e.x, e.y);
-  });
-}
-
 // 右键弹出菜单
 function handler (event, node) {
   // console.log(node);
   currentNode = node;
+  console.log(event);  
   // if (event.button === 2) {
     // console.log(event);
     $('#contextmenu').css({
       top: event.layerY,
-      left: event.layerX + 10
+      left: event.layerX + 10,
     }).show();
+    // $('#contextmenu').css('display', 'block');
   // }
 }  
 

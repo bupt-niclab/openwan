@@ -30,6 +30,10 @@ $(document).ready(function(){
   menuItem = menuList.find('a');
   
   menuItem.click(function() {
+    if($(this)[0].id === 'hide-menu') {
+      menuList.hide();
+      return;
+    } 
     var api, type;
     if($(this)[0].id === 'config-vpn-template') {
       api = '/api_templates/VPN/' + currentNode.text;
@@ -78,9 +82,10 @@ $(document).ready(function(){
   });
 
   stage.click(function(event) {
-    if (event.button === 0) {
-      menuList.hide();
-    }
+    console.log(event);
+    // if (event.button === 0) {
+    //   menuList.hide();
+    // }
   });
 
   getNodes(function(nodeList) {
@@ -189,12 +194,12 @@ function createSingleNode (nodeInfo, scene) {
     node.addEventListener('mouseup', function(event) {
       handler(event, node);
     });
-    node.addEventListener('touchend', function(event){
-      handler(event, node);
-    }, false);
-    // node.addEventListener('click', function(event){
+    // node.addEventListener('touchend', function(event){
     //   handler(event, node);
     // }, false);
+    node.addEventListener('click', function(event){
+      handler(event, node);
+    }, false);
   }
   return node;
 }
