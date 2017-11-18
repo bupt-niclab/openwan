@@ -2072,6 +2072,21 @@ def applyVPNtemplate_1():
                 if t['tid'] == tid:
                     t['applied'] = True
     return jsonify(errmsg = "success", status=0)
+@app.route('/cancel_vpn_template',methods = ['POST'])
+@login_required
+def cancelVPNtemplate():
+    tid = request.json['tid']
+    node_name = request.json['node_name']
+    for node in nodesinfo:
+        if node['node_name'] == node_name:
+            node['vpn_id'] = 0
+            node['vpn'] = 'down'
+            for t in node['vpn_tem']:
+                if t['tid'] == tid:
+                    t['applied'] = False
+        print(node['vpn_tem'])
+    return jsonify(errmsg = "success",status=0)
+
 @app.route('/api_templates/UTM/<switchname>')
 @login_required
 def api_templates_utm(switchname):
@@ -2102,7 +2117,20 @@ def applyUTMtemplate_1():
                 if t['tid'] == tid:
                     t['applied'] = True
     return jsonify(errmsg = "success", status=0)
-
+@app.route('/cancel_utm_template',methods = ['POST'])
+@login_required
+def cancelUTMtemplate():
+    tid = request.json['tid']
+    node_name = request.json['node_name']
+    for node in nodesinfo:
+        if node['node_name'] == node_name:
+            node['utm_id'] = 0
+            node['utm'] = 'down'
+            for t in node['utm_tem']:
+                if t['tid'] == tid:
+                    t['applied'] = False
+        print(node['utm_tem'])
+    return jsonify(errmsg = "success",status=0)
 
 @app.route('/api_templates/IDP/<switchname>')
 @login_required
@@ -2135,7 +2163,20 @@ def applyIDPtemplate_2():
                 if t['tid'] == tid:
                     t['applied'] = True
     return jsonify(errmsg = "success", status=0)
-
+@app.route('/cancel_idp_template',methods = ['POST'])
+@login_required
+def cancelIDPtemplate():
+    tid = request.json['tid']
+    node_name = request.json['node_name']
+    for node in nodesinfo:
+        if node['node_name'] == node_name:
+            node['idp_id'] = 0
+            node['idp'] = 'down'
+            for t in node['idp_tem']:
+                if t['tid'] == tid:
+                    t['applied'] = False
+        print(node['idp_tem'])
+    return jsonify(errmsg = "success",status=0)
 
 
 
