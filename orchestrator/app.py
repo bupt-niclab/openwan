@@ -94,7 +94,8 @@ bundles = {
     Bundle(
         'js/jtopo-0.4.8-min.js',
         'js/control_topo.js',
-        'js/jquery.loading.min.js',
+        'js/jquery-loading-overlay.min.js',
+        'js/loadingoverlay_progress.min.js',
         'js/jquery-confirm.min.js',        
         filters='jsmin',
         output='gen/control_path.js'),

@@ -66,7 +66,7 @@ $(document).ready(function(){
           render: function(data, type, row, meta) {
             // return '<a href="' + data + '" target="_blank">' + row.title + '</a>';
             if (data) {
-              return '<button class="btn btn-primary" disabled style="margin-right: 10px">已应用</button><button class="btn btn-primary" onclick="editTemplate("' + row.tid + ',\'' + row.type + '\')">编辑模板</button>';
+              return '<button class="btn btn-primary" style="margin-right: 10px" onclick="cancalTemplate(' + row.tid + ',\'' + row.type + '\')">取消应用</button><button class="btn btn-primary" onclick="editTemplate("' + row.tid + ',\'' + row.type + '\')">编辑模板</button>';
             } else {
               return '<button class="btn btn-primary" style="margin-right: 10px" onclick="applyTemplate(' + row.tid + ',\'' + row.type + '\')">应用</button><button class="btn btn-primary" onclick="editTemplate(' + row.tid + ',\'' + row.type + '\')">编辑模板</button>';                
             }           
@@ -329,20 +329,33 @@ function applyTemplate(tid, type) {
   }).done(function(response){
     if (response.status === 0) {
       $('#config-template-modal').modal('hide');
-      var canvas = $('#canvas');
-      canvas.loading({
-        message: '应用中...'
+      // var canvas = $('#canvas');
+      // canvas.loading({
+      //   message: '应用中...'
+      // });
+
+      var progress = new LoadingOverlayProgress();
+      $.LoadingOverlay('show', {
+        custom: progress.Init()
       });
-      setTimeout(function(){
-        canvas.loading('stop');
-        $.alert({
-          title: '',
-          content: '模板应用成功！',
-          onAction: function() {
-            location.reload();
-          }
-        });
-      }, 1500);
+      var count = 0;
+      var interval  = setInterval(function(){
+        if (count >= 100) {
+            clearInterval(interval);
+            delete progress;
+            $.LoadingOverlay("hide");
+            $.alert({
+              title: '',
+              content: '模板应用成功！',
+              onAction: function() {
+                location.reload();
+              }
+            });
+            return;
+        }
+        count++;
+        progress.Update(count);
+      }, 20);
       
       templateTable.ajax.reload();  
     } else {
@@ -354,5 +367,60 @@ function applyTemplate(tid, type) {
 // 跳转至编辑模板页面
 function editTemplate(tid, type) {
   window.location.href = '/template/edit/' + type + '/' + tid;
+}
+
+function cancalTemplate(tid, type) {
+
+  if(currentNode.text === '192.168.0.13') {
+    currentNode.text = 'cpe2';
+  }
+  var api;
+  if (type === 'VPN') {
+    api = '/cancel_vpn_template';
+  } else if (type === 'UTM') {
+    api = '/cancel_utm_template';    
+  } else {
+    api = '/cancel_idp_template';    
+  }
+  $.ajax({
+    type: 'post',
+    url: api,
+    contentType: "application/json",
+    data: JSON.stringify({
+      tid: tid,
+      // ip: currentNode.ip,
+      node_name: currentNode.text
+    })
+  }).done(function(response){
+    if (response.status === 0) {
+      $('#config-template-modal').modal('hide');
+      var progress = new LoadingOverlayProgress();
+      $.LoadingOverlay('show', {
+        custom: progress.Init()
+      });
+      var count = 0;
+      var interval  = setInterval(function(){
+        if (count >= 100) {
+            clearInterval(interval);
+            delete progress;
+            $.LoadingOverlay("hide");
+            $.alert({
+              title: '',
+              content: '模板取消应用成功！',
+              onAction: function() {
+                location.reload();
+              }
+            });
+            return;
+        }
+        count++;
+        progress.Update(count);
+      }, 20);
+      
+      templateTable.ajax.reload();  
+    } else {
+      alert(response.errmsg);
+    }
+  })
 }
 
