@@ -158,6 +158,7 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         try:
+            session.permanent = True
             user_token = client.login(form['username'].data,
                                       form['password'].data)
             if not validate_permissions(user_token['perms']):
@@ -187,7 +188,7 @@ def logout():
 def index():
     t1 = time.time()
     # minions = client.minions_status()
-    minions = {'down': [], 'up': ['Agent-1', 'Agent-2', 'cpe1', 'cpeCloud']}
+    minions = {'down': [], 'up': ['Agent-git1', 'Agent-2', 'cpe1', 'cpeCloud']}
     print("minions is :",minions)
     sync_status = {}
     sync_number = 0
