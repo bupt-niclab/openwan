@@ -15,7 +15,8 @@ if host == '0.0.0.0':
            """listening to 0.0.0.0 which is very dangerous. If you're not """
            """100% hundred sure of what to do, exit now.""")
 # timer_mission()
-app.run(debug=True, host='0.0.0.0')
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0')
 
 
 
