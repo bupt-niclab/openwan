@@ -1,5 +1,6 @@
 import json
 import sys
+import time
 
 import requests
 from requests.exceptions import ConnectionError
@@ -222,9 +223,13 @@ class HTTPSaltStackClient(object):
         headers = {'accept': 'application/json', 'X-Auth-Token': token,
                    'content-type': 'application/json'}
         # tmp = templates.query.
+        t1 = time.time()
         r = self.session.post(self.endpoint, data=json.dumps(data),
                               headers=headers, verify=self.verify_ssl)
-        print r
+        t2 = time.time()
+        runtime = t2-t1
+        print("time is", runtime)                      
+        print("devices: ",r)
         if not r['return'][0]:
             raise JobNotStarted("Couldn't run job")
         return r['return'][0]

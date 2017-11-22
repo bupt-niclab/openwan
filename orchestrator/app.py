@@ -4,6 +4,7 @@ import sys
 import json
 import os
 import socket
+import time
 
 from functools import wraps
 from six import string_types
@@ -171,7 +172,6 @@ def login():
                 return redirect(request.args.get("next") or url_for("index"))
         except Unauthorized:
             flash('Invalid credentials', 'error')
-
     return render_template("login.html", form=form)
 
 
@@ -185,12 +185,31 @@ def logout():
 @app.route("/")
 @login_required
 def index():
-    minions = client.minions_status()
+    t1 = time.time()
+    # minions = client.minions_status()
+    minions = {'down': [], 'up': ['Agent-1', 'Agent-2', 'cpe1', 'cpeCloud']}
+    print("minions is :",minions)
     sync_status = {}
     sync_number = 0
-
-    jobs = sorted(list(client.jobs().items()), reverse=True)[:10]
-
+    t3 = time.time()
+    # jobs = sorted(list(client.jobs().items()), reverse=True)[:10]
+    jobs = [(u'20171121190708480681', {u'Function': u'test.ping', u'Target': u'*', u'Target-type': u'glob', u'User': u'root', u'StartTime': u'2017, Nov 21 19:07:08.480681', u'Arguments': []}),
+     (u'20171121190222183844', {u'Function': u'test.ping', u'Target': u'*', u'Target-type': u'glob', u'User': u'root', u'StartTime': u'2017, Nov 21 19:02:22.183844', u'Arguments': []}), 
+     (u'20171121185707302510', {u'Function': u'test.ping', u'Target': u'*', u'Target-type': u'glob', u'User': u'root', u'StartTime': u'2017, Nov 21 18:57:07.302510', u'Arguments': []}), 
+     (u'20171121184643017020', {u'Function': u'test.ping', u'Target': u'*', u'Target-type': u'glob', u'User': u'root', u'StartTime': u'2017, Nov 21 18:46:43.017020', u'Arguments': []}), 
+     (u'20171121184310170219', {u'Function': u'test.ping', u'Target': u'*', u'Target-type': u'glob', u'User': u'root', u'StartTime': u'2017, Nov 21 18:43:10.170219', u'Arguments': []}), 
+     (u'20171121184147022468', {u'Function': u'test.ping', u'Target': u'*', u'Target-type': u'glob', u'User': u'root', u'StartTime': u'2017, Nov 21 18:41:47.022468', u'Arguments': []}), 
+     (u'20171121183756677917', {u'Function': u'test.ping', u'Target': u'*', u'Target-type': u'glob', u'User': u'root', u'StartTime': u'2017, Nov 21 18:37:56.677917', u'Arguments': []}), 
+     (u'20171121182944124150', {u'Function': u'test.ping', u'Target': u'*', u'Target-type': u'glob', u'User': u'root', u'StartTime': u'2017, Nov 21 18:29:44.124150', u'Arguments': []}), 
+     (u'20171121182544802324', {u'Function': u'test.ping', u'Target': u'*', u'Target-type': u'glob', u'User': u'root', u'StartTime': u'2017, Nov 21 18:25:44.802324', u'Arguments': []}),
+     (u'20171121180359526025', {u'Function': u'test.ping', u'Target': u'*', u'Target-type': u'glob', u'User': u'root', u'StartTime': u'2017, Nov 21 18:03:59.526025', u'Arguments': []})]
+    
+    print("jobs is ",jobs)
+    t2 = time.time()
+    runtime  = t2-t1
+    runtime1 = t3-t1
+    print("run time is ",runtime)
+    print("t3 is ",runtime1)
     return render_template(
         'dashboard.html', minions=minions, ok_status=sync_number, jobs=jobs)
 
@@ -198,15 +217,16 @@ def index():
 @app.route("/minions")
 @login_required
 def minions_status():
+    t1 = time.time()
     minions = client.minions()
     minions_status = client.minions_status()
-
+    t2 = time.time()
     for minion in minions_status['up']:
         minions.setdefault(minion, {})['state'] = 'up'
 
     for minion in minions_status['down']:
         minions.setdefault(minion, {})['state'] = 'down'
-
+    t3 = time.time()
     jobs = client.select_jobs(
         'state.highstate',
         minions,
@@ -215,7 +235,14 @@ def minions_status():
         default_arguments_values={
             'test': False
         })
-
+    t4 = time.time()
+    runtime1 = t2-t1
+    runtime2 = t3-t2
+    runtime3 = t4-t3
+    print("runtime1 ",runtime1)
+    print("runtime2 ",runtime2)
+    print("runtime3 ",runtime3)
+    
     return render_template('minions.html', minions=minions, jobs=jobs)
 
 
