@@ -2,6 +2,10 @@ wheel
 jinja2
 flask
 flask-wtf
+flask-assets
+flask-babel
+apscheduler
+bs4
 requests
 pymongo
 six
